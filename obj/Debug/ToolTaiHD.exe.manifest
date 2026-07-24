@@ -786,6 +786,18 @@
     </dependentAssembly>
   </dependency>
   <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="FuzzySharp.dll" size="39936">
+      <assemblyIdentity name="FuzzySharp" version="1.0.4.0" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>0iEtvyjyVTUl2KrFV5kUkopiqIlsz2JCGCURFwp7bzQ=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="JsonConverter.Abstractions.dll" size="9728">
       <assemblyIdentity name="JsonConverter.Abstractions" version="0.7.2.0" publicKeyToken="7BA85365B500F2E2" language="neutral" processorArchitecture="msil" />
       <hash>
@@ -978,14 +990,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ToolTaiHD.exe" size="198560">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ToolTaiHD.exe" size="337824">
       <assemblyIdentity name="ToolTaiHD" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>CR3fUCLwNEKwnGp1f4UTzWqb+PHE2zkyy9PMSN/X/QU=</dsig:DigestValue>
+        <dsig:DigestValue>hiOw8zqLgWR/l+1EbHPQzLnWlfvDimXtzhjR/kSNyaI=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
