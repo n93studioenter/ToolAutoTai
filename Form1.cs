@@ -1,5 +1,6 @@
 ﻿using BrotliSharpLib;
 using ClosedXML.Excel;
+using ClosedXML.Parser;
 using DevExpress.ClipboardSource.SpreadsheetML;
 using DevExpress.Data.Utils;
 using DevExpress.XtraEditors;
@@ -13,6 +14,7 @@ using DevExpress.XtraWaitForm;
 using DocumentFormat.OpenXml.Office2010.CustomUI;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using FuzzySharp;
 using Microsoft.Win32;
@@ -4622,9 +4624,8 @@ string mst, string shDon, DateTime nLap, int Types)
                         }
 
                         // Chốt giao dịch: Ghi toàn bộ xuống ổ cứng
-                        trans.Commit();
-                        this.Close();
-                        //XtraMessageBox.Show($"Đã lưu thành công tổng cộng {invoices.Count} hóa đơn vào Database!", "Thông báo");
+                        trans.Commit(); 
+                        XtraMessageBox.Show($"Đã lưu thành công tổng cộng {invoices.Count} hóa đơn vào Database!", "Thông báo");
                     }
                     catch (Exception ex)
                     {
@@ -4797,21 +4798,7 @@ string mst, string shDon, DateTime nLap, int Types)
 
                 for (int runCount = 1; runCount <= totalRuns; runCount++)
                 {
-                    //Đọc file xml
-                    foreach (DataRow item in tbCompany.Rows)
-                    {
-                        string vbdbpath = item["Dbpath"]?.ToString() ?? "";
-                        string connectionString2 = "Provider=Microsoft.ACE.OLEDB.12.0;" +
-                                    "Data Source=" + vbdbpath + ";" +
-                                    "Jet OLEDB:Database Password=1@35^7*9)1;";
-                        LoadHoadonCT(connectionString2);
-                        Loadtbimport(connectionString2);
-                        string qrkh = "SELECT * FROM KhachHang"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
-                        tbKhachhang = ExecuteQuery2(qrkh, connectionString2);
-                        XulylietkeHoaDon(2, connectionString2);
-                    }
-                
-                    return;
+                  
                     Log($"🔄 ===== BẮT ĐẦU LẦN CHẠY {runCount}/{totalRuns} =====");
                     labelControl3.Text = $"🔄 ===== BẮT ĐẦU LẦN CHẠY {runCount}/{totalRuns} =====";
                     // Refresh lại danh sách công ty mỗi lần chạy
@@ -4876,7 +4863,20 @@ string mst, string shDon, DateTime nLap, int Types)
 
                     await Task.WhenAll(tasks);
                     Log($"✅ Lần chạy {runCount}/{totalRuns} hoàn thành!");
-                   
+
+                    //Đọc file xml
+                    foreach (DataRow item in tbCompany.Rows)
+                    {
+                        string vbdbpath = item["Dbpath"]?.ToString() ?? "";
+                        string connectionString2 = "Provider=Microsoft.ACE.OLEDB.12.0;" +
+                                    "Data Source=" + vbdbpath + ";" +
+                                    "Jet OLEDB:Database Password=1@35^7*9)1;";
+                        LoadHoadonCT(connectionString2);
+                        Loadtbimport(connectionString2);
+                        string qrkh = "SELECT * FROM KhachHang"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
+                        tbKhachhang = ExecuteQuery2(qrkh, connectionString2);
+                        XulylietkeHoaDon(2, connectionString2);
+                    }
                     // Chờ giữa các lần chạy
                     if (runCount < totalRuns)
                     {
