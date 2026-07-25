@@ -384,12 +384,11 @@ namespace ToolTaiHD
 
             string query = @"SELECT * FROM tbCompany WHERE Saoviet = ?  order by STT";
             tbCompany = ExecuteQuery(query, new OleDbParameter("?", computerName));
+           
             gridControl1.DataSource = tbCompany;
             SetupGridCheckBox();
             SetupGridFolderColumn();
-            // Load dữ liệu cache
-            LoadHoadonCT();
-            Loadtbimport();
+            // Load dữ liệu cache 
 
 
             string qrst = @"SELECT * FROM tbsetting WHERE Saoviet = ?";
@@ -693,7 +692,7 @@ namespace ToolTaiHD
         #endregion
 
         #region Load Cache Data
-        private void LoadHoadonCT()
+        private void LoadHoadonCT(string connectionst)
         {
             try
             {
@@ -712,7 +711,7 @@ namespace ToolTaiHD
                     WHERE 
                         hd.KyHieu <> '...'";
 
-                var data = ExecuteQuery(query);
+                var data = ExecuteQuery2(query, connectionst);
                 lookupHoaDonCT.Clear();
 
                 foreach (DataRow item in data.Rows)
@@ -736,12 +735,12 @@ namespace ToolTaiHD
             }
         }
         DataTable tbimports;
-        private void Loadtbimport()
+        private void Loadtbimport(string conectionst)
         {
             try
             {
                 string query = "SELECT * FROM tbimport";
-                tbimports = ExecuteQuery(query);
+                tbimports = ExecuteQuery2(query, conectionst);
                 lookupTbImport.Clear();
 
                 foreach (DataRow row in tbimports.Rows)
@@ -1032,101 +1031,7 @@ namespace ToolTaiHD
         //        btnRun.Enabled = true;
         //    }
         //}
-        private async void btnRun_Click(object sender, EventArgs e)
-        {
-            btnRun.Enabled = false;
-
-            try
-            {
-                int totalRuns = 5; // Số lần lặp lại
-
-                for (int runCount = 1; runCount <= totalRuns; runCount++)
-                {
-                    Log($"🔄 ===== BẮT ĐẦU LẦN CHẠY {runCount}/{totalRuns} =====");
-                    labelControl3.Text = $"🔄 ===== BẮT ĐẦU LẦN CHẠY {runCount}/{totalRuns} =====";
-                    // Refresh lại danh sách công ty mỗi lần chạy
-                    string query = @"SELECT * FROM tbCompany WHERE IsRun = 1 and Saoviet = ? order by STT";
-                    string computerName = Environment.MachineName;
-
-                    tbCompany = ExecuteQuery(query, new OleDbParameter("?", computerName));
-
-                    if (tbCompany.Rows.Count == 0)
-                    {
-                        Log($"⚠️ Lần chạy {runCount}: Không có công ty nào đang hoạt động!");
-                        continue;
-                    }
-
-                    Log($"🚀 Lần chạy {runCount}: Xử lý {tbCompany.Rows.Count} công ty (tối đa {txtSoluongtai.Text} cùng lúc)");
-
-                    int maxParallel = int.Parse(txtSoluongtai.Text);
-                    SemaphoreSlim semaphore = new SemaphoreSlim(maxParallel);
-                    List<Task> tasks = new List<Task>();
-
-                    foreach (DataRow item in tbCompany.Rows)
-                    {
-                        string vbdbpath = item["Dbpath"]?.ToString() ?? "";
-                        string companyName = item["Name"]?.ToString() ?? "Unknown";
-
-                        if (string.IsNullOrEmpty(vbdbpath))
-                        {
-                            Log($"⚠️ {companyName}: Không có Dbpath, bỏ qua!");
-                            continue;
-                        }
-
-                        await semaphore.WaitAsync();
-
-                        // Copy DataRow để tránh lỗi cross-thread
-                        DataRow rowCopy = item;
-
-                        tasks.Add(Task.Run(async () =>
-                        {
-                            try
-                            {
-                                // Cập nhật status trên UI thread
-                                UpdateStatusOnUI(rowCopy, $"🔄 Lần {runCount}/{totalRuns} - Đang xử lý...");
-
-                                await TaihoadonCongty(vbdbpath, rowCopy);
-
-                                // Cập nhật status sau khi hoàn thành
-                                UpdateStatusOnUI(rowCopy, $"✅ Lần {runCount}/{totalRuns} - Hoàn thành");
-                                //Tiến hành đọc hoá đơn
-
-                            }
-                            catch (Exception ex)
-                            {
-                                Log($"❌ Lỗi {companyName} (Lần {runCount}): {ex.Message}");
-                                UpdateStatusOnUI(rowCopy, $"❌ Lần {runCount}: {ex.Message}");
-                            }
-                            finally
-                            {
-                                semaphore.Release();
-                                await Task.Delay(2000);
-                            }
-                        }));
-                    }
-
-                    await Task.WhenAll(tasks);
-                    Log($"✅ Lần chạy {runCount}/{totalRuns} hoàn thành!");
-
-                    // Chờ giữa các lần chạy
-                    if (runCount < totalRuns)
-                    {
-                        Log($"⏳ Chờ 2s trước lần chạy tiếp theo...");
-                        await Task.Delay(2000);
-                    }
-                }
-
-                Log($"✅ ===== HOÀN THÀNH TẤT CẢ {totalRuns} LẦN CHẠY =====");
-            }
-            catch (Exception ex)
-            {
-                Log($"❌ Lỗi: {ex.Message}");
-            }
-            finally
-            {
-                btnRun.Enabled = true;
-            }
-        }
+       
 
         // ✅ Hàm cập nhật status an toàn trên UI thread
         private void UpdateStatusOnUI(DataRow row, string statusText)
@@ -1182,7 +1087,9 @@ namespace ToolTaiHD
             string connectionString2 = "Provider=Microsoft.ACE.OLEDB.12.0;" +
                                        "Data Source=" + vbdbpath + ";" +
                                        "Jet OLEDB:Database Password=1@35^7*9)1;";
-
+            string qrkh = "SELECT * FROM KhachHang"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
+            tbKhachhang = ExecuteQuery2(qrkh, connectionString2);
+         
             try
             {
                 string query = @"SELECT * FROM tbRegister";
@@ -3150,7 +3057,7 @@ namespace ToolTaiHD
         // ==================== TOÀN CỤC (chỉ khai báo 1 lần) ====================
         private readonly Dictionary<string, (string SoHieu, double Percent)> _cacheToanCuc
             = new Dictionary<string, (string SoHieu, double Percent)>(StringComparer.OrdinalIgnoreCase);
-        public async Task<List<VatTu>> LoadDataVattuAsync()
+        public async Task<List<VatTu>> LoadDataVattuAsync(string conectionst)
         {
             // Hiển thị popup loading
             List<VatTu> lstVattu = new List<VatTu>();
@@ -3160,9 +3067,9 @@ namespace ToolTaiHD
                 // 1. Lấy danh sách VatTu từ database
 
                 var queryVatTu = @"SELECT * FROM Vattu";
-                var ListVattu = await Task.Run(() => ExecuteQuery(queryVatTu, null));
+                var ListVattu = await Task.Run(() => ExecuteQuery2(queryVatTu, conectionst, null));
                 var queryMaphanloai = @"SELECT * FROM PhanLoaiVattu";
-                ListPhanloaiVattu = await Task.Run(() => ExecuteQuery(queryMaphanloai, null));
+                ListPhanloaiVattu = await Task.Run(() => ExecuteQuery2(queryMaphanloai, conectionst, null));
 
                 // 2. Chuyển đổi chuỗi VNI sang Unicode (nếu cần)
                 foreach (DataRow item in ListVattu.Rows)
@@ -3183,7 +3090,7 @@ namespace ToolTaiHD
                 // 4. Lấy dữ liệu TonKho theo danh sách MaVatTu đã gom nhóm
                 var queryTonKhoBatch = @"SELECT * FROM TonKho WHERE MaVatTu IN (" +
                                        string.Join(",", maVatTuList) + ")";
-                var allTonKho = await Task.Run(() => ExecuteQuery(queryTonKhoBatch, null));
+                var allTonKho = await Task.Run(() => ExecuteQuery2(queryTonKhoBatch, conectionst, null));
 
                 // 5. Chuyển dữ liệu TonKho thành Dictionary để truy cập nhanh bằng MaVatTu
                 var tonKhoDict = allTonKho.Rows
@@ -3378,9 +3285,9 @@ namespace ToolTaiHD
                 _optimizedVatTu[item.Key] = (ten1, ten2, quyCach, item.Value.DonVi, item.Value.Dongia, item.Value.SoLuong);
             }
         }
-        private async Task XulylietkeHoaDon(int type)
+        private async Task XulylietkeHoaDon(int type,string connectionString2)
         {
-            lstvt = await LoadDataVattuAsync();
+            lstvt = await LoadDataVattuAsync(connectionString2);
             string pathType = type == 1 ? "HDVao" : "HDRa";
             int fromMonth = DateTime.Now.Month;
             int toMonth = DateTime.Now.Month;
@@ -3428,7 +3335,7 @@ namespace ToolTaiHD
             }
             if (allInvoicesToSave.Count > 0)
             {
-                await SaveAllInvoicesBulk(allInvoicesToSave, type == 1 ? 1 : 2);
+                await SaveAllInvoicesBulk(allInvoicesToSave, type == 1 ? 1 : 2, connectionString2);
 
             }
         }
@@ -4627,7 +4534,7 @@ string mst, string shDon, DateTime nLap, int Types)
 
             return input.Trim();
         }
-        private async Task SaveAllInvoicesBulk(List<TbImport> invoices, int type)
+        private async Task SaveAllInvoicesBulk(List<TbImport> invoices, int type,string connectionString)
         {
             using (OleDbConnection conn = new OleDbConnection(connectionString))
             {
@@ -4877,7 +4784,118 @@ string mst, string shDon, DateTime nLap, int Types)
                 }
             }
         }
+
         #endregion
+
+        private async void btnRun_Click(object sender, EventArgs e)
+        {
+            btnRun.Enabled = false;
+
+            try
+            {
+                int totalRuns = 3; // Số lần lặp lại
+
+                for (int runCount = 1; runCount <= totalRuns; runCount++)
+                {
+                    //Đọc file xml
+                    foreach (DataRow item in tbCompany.Rows)
+                    {
+                        string vbdbpath = item["Dbpath"]?.ToString() ?? "";
+                        string connectionString2 = "Provider=Microsoft.ACE.OLEDB.12.0;" +
+                                    "Data Source=" + vbdbpath + ";" +
+                                    "Jet OLEDB:Database Password=1@35^7*9)1;";
+                        LoadHoadonCT(connectionString2);
+                        Loadtbimport(connectionString2);
+                        string qrkh = "SELECT * FROM KhachHang"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
+                        tbKhachhang = ExecuteQuery2(qrkh, connectionString2);
+                        XulylietkeHoaDon(2, connectionString2);
+                    }
+                
+                    return;
+                    Log($"🔄 ===== BẮT ĐẦU LẦN CHẠY {runCount}/{totalRuns} =====");
+                    labelControl3.Text = $"🔄 ===== BẮT ĐẦU LẦN CHẠY {runCount}/{totalRuns} =====";
+                    // Refresh lại danh sách công ty mỗi lần chạy
+                    string query = @"SELECT * FROM tbCompany WHERE IsRun = 1 and Saoviet = ? order by STT";
+                    string computerName = Environment.MachineName;
+
+                    tbCompany = ExecuteQuery(query, new OleDbParameter("?", computerName));
+
+                    if (tbCompany.Rows.Count == 0)
+                    {
+                        Log($"⚠️ Lần chạy {runCount}: Không có công ty nào đang hoạt động!");
+                        continue;
+                    }
+
+                    Log($"🚀 Lần chạy {runCount}: Xử lý {tbCompany.Rows.Count} công ty (tối đa {txtSoluongtai.Text} cùng lúc)");
+
+                    int maxParallel = int.Parse(txtSoluongtai.Text);
+                    SemaphoreSlim semaphore = new SemaphoreSlim(maxParallel);
+                    List<Task> tasks = new List<Task>(); 
+                    foreach (DataRow item in tbCompany.Rows)
+                    {
+                        string vbdbpath = item["Dbpath"]?.ToString() ?? "";
+                        string companyName = item["Name"]?.ToString() ?? "Unknown";
+
+                        if (string.IsNullOrEmpty(vbdbpath))
+                        {
+                            Log($"⚠️ {companyName}: Không có Dbpath, bỏ qua!");
+                            continue;
+                        }
+
+                        await semaphore.WaitAsync();
+
+                        // Copy DataRow để tránh lỗi cross-thread
+                        DataRow rowCopy = item;
+
+                        tasks.Add(Task.Run(async () =>
+                        {
+                            try
+                            {
+                                // Cập nhật status trên UI thread
+                                UpdateStatusOnUI(rowCopy, $"🔄 Lần {runCount}/{totalRuns} - Đang xử lý...");
+
+                                await TaihoadonCongty(vbdbpath, rowCopy);
+
+                                // Cập nhật status sau khi hoàn thành
+                                UpdateStatusOnUI(rowCopy, $"✅ Lần {runCount}/{totalRuns} - Hoàn thành");
+                                //Tiến hành đọc hoá đơn
+
+                            }
+                            catch (Exception ex)
+                            {
+                                Log($"❌ Lỗi {companyName} (Lần {runCount}): {ex.Message}");
+                                UpdateStatusOnUI(rowCopy, $"❌ Lần {runCount}: {ex.Message}");
+                            }
+                            finally
+                            {
+                                semaphore.Release();
+                                await Task.Delay(2000);
+                            }
+                        }));
+                    }
+
+                    await Task.WhenAll(tasks);
+                    Log($"✅ Lần chạy {runCount}/{totalRuns} hoàn thành!");
+                   
+                    // Chờ giữa các lần chạy
+                    if (runCount < totalRuns)
+                    {
+                        Log($"⏳ Chờ 2s trước lần chạy tiếp theo...");
+                        await Task.Delay(2000);
+                    }
+                }
+
+                Log($"✅ ===== HOÀN THÀNH TẤT CẢ {totalRuns} LẦN CHẠY =====");
+            }
+            catch (Exception ex)
+            {
+                Log($"❌ Lỗi: {ex.Message}");
+            }
+            finally
+            {
+                btnRun.Enabled = true;
+            }
+        }
     }
 
     #region Extension Methods
