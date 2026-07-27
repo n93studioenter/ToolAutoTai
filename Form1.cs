@@ -3,6 +3,7 @@ using ClosedXML.Excel;
 using ClosedXML.Parser;
 using DevExpress.ClipboardSource.SpreadsheetML;
 using DevExpress.Data.Utils;
+using DevExpress.Xpo.DB.Helpers;
 using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Repository;
 using DevExpress.XtraGrid;
@@ -1017,7 +1018,7 @@ namespace ToolTaiHD
 
                                 // ✅ Gọi DocfileXmlOne qua instance của Form1
                                 string ph = Path.Combine(path, filename.Replace(".zip", "_KNM.xml"));
-                                await form.DocfileXmlOne(ph, 1, 1); // ✅ SỬA: gọi qua form instance
+                                await form.DocfileXmlOne(ph, 1, 1,""); // ✅ SỬA: gọi qua form instance
                                   
 
                                 Log($"✅ {companyName}: Tạo KNM XML thành công cho HĐ {shdon}");
@@ -3435,7 +3436,7 @@ namespace ToolTaiHD
                 var batch = allFiles.Skip(i).Take(batchSize);
 
                 // Tạo các task đọc file
-                var tasks = batch.Select(file => DocfileXmlOne(file, 1, type));
+                var tasks = batch.Select(file => DocfileXmlOne(file, 1, type, connectionString2));
 
                 // --- ĐOẠN QUAN TRỌNG: Hứng kết quả từ các file vừa đọc ---
                 TbImport[] results = await Task.WhenAll(tasks);
@@ -3457,15 +3458,26 @@ namespace ToolTaiHD
             }
             if (allInvoicesToSave.Count > 0)
             {
-                await SaveAllInvoicesBulk(allInvoicesToSave, type == 1 ? 1 : 2, connectionString2);
-
+                await SaveAllInvoicesBulk(allInvoicesToSave, type == 1 ? 1 : 2, connectionString2); 
             }
         }
         private List<TbImport> lstdsVao = new List<TbImport>();
 
         private List<TbImport> lstdsRa = new List<TbImport>();
-        private async Task<TbImport> DocfileXmlOne(string pathXml, int stt, int type)
+        private System.Data.DataTable LoadDinhDanhTaiKhoanUuTien(int type)
         {
+            string query = (type == 1)
+                ? @"SELECT * FROM tbDinhdanhtaikhoan WHERE KeyValue LIKE '%Ưu tiên vào%'"
+                : @"SELECT * FROM tbDinhdanhtaikhoan WHERE KeyValue LIKE '%Ưu tiên ra%'";
+            return ExecuteQuery2(query, null);
+        }
+        private async Task<TbImport> DocfileXmlOne(string pathXml, int stt, int type,string connectionString2)
+        {
+            DataTable PLHH;
+            string querykh = @" SELECT *  FROM PhanLoaiVattu"; // Sử dụng ? thay cho @mst trong OleDb
+            PLHH = ExecuteQuery(querykh, new OleDbParameter("?", ""));
+
+            var tbDinhDanhtaikhoanUuTien = LoadDinhDanhTaiKhoanUuTien(type);
             if (pathXml.Contains("427"))
             {
                 int kiemtra = 10;
@@ -3827,9 +3839,280 @@ namespace ToolTaiHD
             var keys = NormalizeTbImportKey(tbImport.Mst, tbImport.SHDon, tbImport.NLap, type);
             lookupTbImport.Add(keys);
             if (isAddhd == true)
+            {
+                ApplyDefaultAndRuleBasedAccountsForAll(tbImport, tbDinhDanhtaikhoan, tbDinhDanhtaikhoanUuTien,type,  connectionString2);
                 return tbImport;
+            }
             else
                 return null;
+        }
+        System.Data.DataTable tbDinhDanhtaikhoanUuTien;
+        private void ApplyDefaultAndRuleBasedAccountsForAll(
+         TbImport lsthoaodn,
+          DataTable tbDinhDanhtaikhoan,
+          DataTable tbDinhDanhtaikhoanUuTien,int type,string connectionst)
+        {
+            Stopwatch sw = Stopwatch.StartNew();
+            // 1. Cache các rule ưu tiên (chỉ 1 lần)
+            var rulesUuTienVao = new List<(string KeyValue, string TKNo, string TKCo)>();
+            var rulesUuTienRa = new List<(string KeyValue, string TKNo, string TKCo)>();
+            var rulesDefault = new List<(string KeyValue, string TKNo, string TKCo, string Noidung, string IsChecked, string Loai)>();
+
+            foreach (DataRow row in tbDinhDanhtaikhoan.Rows)
+            {
+                string loai = row.Field<string>("Loai");
+                string keyValue = row.Field<string>("KeyValue")?.Trim() ?? "";
+                string tkNo = row.Field<string>("TKNo")?.Trim() ?? "";
+                string tkCo = row.Field<string>("TKCo")?.Trim() ?? "";
+                string types = row.Field<string>("Type") ?? "";
+                string IsChecked = row.Field<string>("IsChecked") ?? "";
+                if (string.IsNullOrEmpty(keyValue)) continue;
+
+                if (keyValue.Contains("Ưu tiên vào"))
+                    rulesUuTienVao.Add((keyValue, tkNo, tkCo));
+                else if (keyValue.Contains("Ưu tiên ra"))
+                    rulesUuTienRa.Add((keyValue, tkNo, tkCo));
+                else
+                    rulesDefault.Add((keyValue, tkNo, tkCo, types, IsChecked, loai));
+            }
+
+            // 2. Cache rule ưu tiên chung (nếu có)
+            string tkNoUuTien = null, tkCoUuTien = null;
+            int tkThueUuTien = 0;
+            //if (tbDinhDanhtaikhoanUuTien.Rows.Count > 0)
+            //{
+            //    var row = tbDinhDanhtaikhoanUuTien.Rows[0];
+            //    tkNoUuTien = row.Field<string>("TKNo")?.Trim();
+            //    tkCoUuTien = row.Field<string>("TKCo")?.Trim();
+            //    tkThueUuTien = row.Field<int>("TkThue");
+            //}
+            var item = lsthoaodn;
+            // 3. Duyệt 1 lần duy nhất qua 300 item
+            using (var conn = new OleDbConnection(connectionst))
+            {
+                conn.Open();
+                using (var tran = conn.BeginTransaction())
+                {
+                    try
+                    {
+                      
+                        if (item.Macdinhstatus == "1") return; // đã áp dụng mặc định
+                        if (item.SHDon == "3105")
+                        {
+                            int test = 10;
+                        }
+
+                        // Ưu tiên cao nhất: Ưu tiên vào/ra
+                        bool changed = false;
+                        string targetKeyword = type == 1 ? "Ưu tiên vào" : "Ưu tiên ra";
+                        var rules = type == 1 ? rulesUuTienVao : rulesUuTienRa;
+
+                        foreach (var rule in rules)
+                        {
+                            if (rule.KeyValue.Contains(targetKeyword))
+                            {
+                                if (item.TKNo != rule.TKNo)
+                                {
+                                    item.TKNo = rule.TKNo;
+                                    changed = true;
+                                }
+                                if (item.TKCo != rule.TKCo)
+                                {
+                                    item.TKCo = rule.TKCo;
+                                    changed = true;
+                                }
+
+                                break; // chỉ áp dụng rule đầu tiên khớp
+                            }
+                        }
+
+                        // Rule mặc định (từ khoá, MST, ...)
+                        foreach (var rule in rulesDefault)
+                        {
+                            var getNd = rule.KeyValue.ToLower().Split(',').Select(s => s.Trim()).ToList();
+                            bool match = false;
+
+                            // Kiểm tra từ khoá trong Noidung hoặc Ten
+                            foreach (var md in getNd)
+                            {
+                                if ((Helpers.ConvertVniToUnicode(item.Noidung)?.ToLower().Contains(md) ?? false) || (item.Mst?.ToLower().Contains(md) ?? false))
+                                {
+                                    if (type.ToString()== rule.Loai)
+                                    {
+                                        match = true;
+                                        item.IsMD = 1;   
+                                        item.TKNo = rule.TKNo;
+                                        item.TKCo = rule.TKCo;
+                                      //  item.Checked = rule.IsChecked == "-1" ? false : true;
+                                        if (!string.IsNullOrEmpty(rule.Noidung))
+                                        {
+                                            int currentmonth = item.NLap.Month;
+                                            int currentyear = item.NLap.Year;
+                                            if (!item.Noidung.Contains("Thay thế"))
+                                            {
+                                                item.Noidung = rule.Noidung.Replace("{Month}", currentmonth.ToString());
+                                                item.Noidung = item.Noidung.Replace("{Year}", currentyear.ToString());
+                                            }
+                                        }
+                                        foreach (var de in item.tbImportDetails)
+                                        {
+                                            //if (de.IsMacdinh != 1)
+                                            //{
+                                            //    if (de.TKCo != "711")
+                                            //    {
+                                            //        de.TKCo = item.TKCo;
+                                            //    }
+                                            //    de.TKNo = item.TKNo;
+
+                                            //}
+
+                                        }
+                                    }
+
+                                }
+                                //Kiểm tra con
+                                //foreach (var detail in item.tbImportDetails)
+                                //{
+                                //    //if (detail.IsMacdinh == 1 || detail.TKCo == "711")
+                                //    //    continue;
+                                //    //Kiểm tra chi tiết có mặc định không
+                                //    string querykh = @" SELECT *  FROM PhanLoaiVattu"; // Sử dụng ? thay cho @mst trong OleDb
+                                //    var PLHH = ExecuteQuery(querykh, new OleDbParameter("?", ""));
+                                //    //Ưu tiên theo phân loại vật tư
+                                //    var findvt = lstvt.Where(m => m.SoHieu.ToLower() == detail.SoHieu.ToLower()).FirstOrDefault();
+                                //    var findpl = findvt != null ? PLHH.AsEnumerable().Where(m => m.Field<int>("MaSo") == findvt.MaPhanLoai).FirstOrDefault() : null;
+                                //    if (findpl != null && !string.IsNullOrEmpty(detail.TKCo) && !string.IsNullOrEmpty(findpl.Field<string>("TkNo")))
+                                //    {
+                                //        if (type == 2)
+                                //        {
+                                //            detail.TKNo = item.TKNo;
+                                //            if (detail.TKCo == "711")
+                                //            {
+                                //                int a = 10;
+                                //            }
+                                //            if (!string.IsNullOrEmpty(findpl.Field<string>("TKCo")))
+                                //            {
+                                //                detail.TKCo = findpl.Field<string>("TKCo");
+                                //            }
+                                //            else
+                                //            {
+                                //                detail.TKCo = item.TKCo;
+                                //            }
+                                //        }
+                                //        else
+                                //        {
+                                //            if (detail.TKCo == "711")
+                                //            {
+                                //                int a = 10;
+                                //            }
+                                //            if (detail.IsMacdinh != 1)
+                                //            {
+                                //                detail.TKNo = item.TKNo;
+                                //                if (!string.IsNullOrEmpty(findpl.Field<string>("TKNo")))
+                                //                    detail.TKNo = findpl.Field<string>("TKNo");
+                                //                else
+                                //                    detail.TKCo = item.TKCo;
+                                //            }
+
+                                //        }
+                                //        detail.IsMacdinh = 1;
+
+                                //    }
+                                //    //Nếu ko có thì kiểm tra mật định, nếu ko có thì theo Parant
+                                //    else
+                                //    {
+                                //        bool childmath = false;
+                                //        //Kiểm tra theo mật định
+                                //        if ((detail.Ten?.ToLower().Contains(md) ?? false))
+                                //        {
+                                //            if (detail.TKCo == "711")
+                                //            {
+                                //                int a = 10;
+                                //            }
+                                //            detail.TKNo = rule.TKNo;
+                                //            detail.TKCo = rule.TKCo;
+                                //            detail.IsMacdinh = 1;
+                                //            childmath = true;
+                                //        }
+                                //        //Trường hợp ko có gì thì theo mật định cha
+                                //        if (childmath == false && !string.IsNullOrEmpty(detail.TKCo))
+                                //        {
+                                //            if (detail.TKCo == "711")
+                                //            {
+                                //                int a = 10;
+                                //            }
+                                //            detail.TKNo = item.TKNo;
+                                //            detail.TKCo = item.TKCo;
+                                //        }
+                                //    }
+
+                                //}
+                            }
+
+
+                        }
+                        //Thực hiện 5211 
+                        UpdateMatdinhOptimized(item, conn, tran);
+                        // Áp dụng rule ưu tiên chung (nếu chưa có TKNo/TKCo)
+                        if (tkNoUuTien != null && (string.IsNullOrEmpty(item.TKNo) || item.TKNo == "0"))
+                            item.TKNo = tkNoUuTien;
+                        if (tkCoUuTien != null && (string.IsNullOrEmpty(item.TKCo) || item.TKCo == "0"))
+                            item.TKCo = tkCoUuTien;
+                        //if (tkThueUuTien != 0 && item.TkThue == 0)
+                        //    item.TkThue = tkThueUuTien;
+
+                        tran.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        tran.Rollback();
+                        XtraMessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+
+            sw.Stop();
+           
+        }
+        private void UpdateMatdinhOptimized(TbImport item, OleDbConnection conn, OleDbTransaction tran)
+        {
+            // 1. Cập nhật master (tbimport)
+            string queryMaster = @"
+            UPDATE tbimport
+            SET TKNo = ?, TKCo = ?, Noidung = ?, Macdinhstatus = ? , IsMD= ?
+            WHERE ID = ?";
+
+
+            using (var cmd = new OleDbCommand(queryMaster, conn, tran))
+            {
+                cmd.Parameters.AddWithValue("TKNo", item.TKNo);
+                cmd.Parameters.AddWithValue("TKCo", item.TKCo);
+                cmd.Parameters.AddWithValue("Noidung", Helpers.ConvertUnicodeToVni(item.Noidung));
+                cmd.Parameters.AddWithValue("Macdinhstatus", "1");
+                cmd.Parameters.AddWithValue("IsMD",item.IsMD);
+                cmd.Parameters.AddWithValue("ID", item.ID);
+                cmd.ExecuteNonQuery();
+            }
+
+            // 2. Cập nhật tất cả chi tiết trong 1 query (batch update)
+            foreach (var it in item.tbImportDetails)
+            {
+                // Chỉ update nếu chi tiết đã có TKCo (theo logic cũ)
+                if (string.IsNullOrEmpty(it.TKCo)) continue;
+                string queryDetail = @"
+                UPDATE tbimportdetail d
+                SET d.TKNo = ?, d.TKCo = ?
+                WHERE d.ID = ?";
+
+                using (var cmd = new OleDbCommand(queryDetail, conn, tran))
+                {
+                    cmd.Parameters.AddWithValue("TKNo", it.TKNo);  // tất cả chi tiết dùng cùng TKNo
+                    cmd.Parameters.AddWithValue("TKCo", it.TKCo);  // cùng TKCo
+                    cmd.Parameters.AddWithValue("ParentID", it.ID);
+
+                    cmd.ExecuteNonQuery(); // Cập nhật tất cả chi tiết cùng lúc
+                }
+            }
         }
         private string NormalizeNameForSearch(string input)
         {
@@ -4665,8 +4948,8 @@ string mst, string shDon, DateTime nLap, int Types)
                 {
                     try
                     {
-                        string sqlParent = @"INSERT INTO tbImport (SHDon, KHHDon, NLap, Ten, Noidung, TKNo, TKCo, TkThue, Mst, [Status], Ngaytao, TongTien, Vat, TPhi, TgTCThue, TgTThue, [Type], InvoiceType, IsHaschild, TVat, Vat2, TVat2, Vat3, TVat3, TgTCThue1, TgTCThue2, TgTCThue3, Khmshdon, hdon, [Path]) 
-                                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                        string sqlParent = @"INSERT INTO tbImport (SHDon, KHHDon, NLap, Ten, Noidung, TKNo, TKCo, TkThue, Mst, [Status], Ngaytao, TongTien, Vat, TPhi, TgTCThue, TgTThue, [Type], InvoiceType, IsHaschild, TVat, Vat2, TVat2, Vat3, TVat3, TgTCThue1, TgTCThue2, TgTCThue3, Khmshdon, hdon, [Path],IsMD) 
+                                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
                         string sqlDetail = @"INSERT INTO tbimportdetail (ParentId, SoHieu, SoLuong, DonGia, DVT, Ten, MaCT, TKNo, TKCo, TTien, [Percent], Tchat,SoPSGoc,VAT) 
                                      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -4708,7 +4991,7 @@ string mst, string shDon, DateTime nLap, int Types)
                                 cmdParent.Parameters.AddWithValue("?", item.Khmshdon ?? "");
                                 cmdParent.Parameters.AddWithValue("?", item.hdon ?? "");
                                 cmdParent.Parameters.AddWithValue("?", item.Path ?? "");
-
+                                cmdParent.Parameters.AddWithValue("?", item.IsMD);
                                 await cmdParent.ExecuteNonQueryAsync();
                             }
 
@@ -4746,6 +5029,7 @@ string mst, string shDon, DateTime nLap, int Types)
                         // Chốt giao dịch: Ghi toàn bộ xuống ổ cứng
                         trans.Commit();  
                         Log($"Đã lưu thành công tổng cộng {invoices.Count} hóa đơn vào Database!");
+
                     }
                     catch (Exception ex)
                     {
@@ -4965,37 +5249,37 @@ string mst, string shDon, DateTime nLap, int Types)
 
                         tasks.Add(Task.Run(async () =>
                         {
-                            for (int runCount = 1; runCount <= totalRuns; runCount++)
-                            {
-                                await semaphore.WaitAsync();
+                            //for (int runCount = 1; runCount <= totalRuns; runCount++)
+                            //{
+                            //    await semaphore.WaitAsync();
 
-                                try
-                                {
-                                    // ✅ Cập nhật số lần đang chạy
-                                    UpdateRunCountOnUI(rowCopy, runCount, totalRuns); 
-                                    UpdateStatusOnUI(rowCopy, $"🔄 {companyName} - Vòng {loopCount}/{totalLoops} - Lần {runCount}/{totalRuns} - Đang xử lý...");
-                                    Log($"🔄 {companyName}: Vòng {loopCount} - Lần {runCount}/{totalRuns}");
+                            //    try
+                            //    {
+                            //        // ✅ Cập nhật số lần đang chạy
+                            //        UpdateRunCountOnUI(rowCopy, runCount, totalRuns); 
+                            //        UpdateStatusOnUI(rowCopy, $"🔄 {companyName} - Vòng {loopCount}/{totalLoops} - Lần {runCount}/{totalRuns} - Đang xử lý...");
+                            //        Log($"🔄 {companyName}: Vòng {loopCount} - Lần {runCount}/{totalRuns}");
 
-                                    await TaihoadonCongty(vbdbpath, rowCopy);
+                            //        await TaihoadonCongty(vbdbpath, rowCopy);
 
-                                    UpdateStatusOnUI(rowCopy, $"✅ {companyName} - Vòng {loopCount} - Lần {runCount}/{totalRuns} - Hoàn thành");
-                                    Log($"✅ {companyName}: Hoàn thành vòng {loopCount} - lần {runCount}/{totalRuns}");
-                                }
-                                catch (Exception ex)
-                                {
-                                    Log($"❌ Lỗi {companyName} (Vòng {loopCount} - Lần {runCount}): {ex.Message}");
-                                    UpdateStatusOnUI(rowCopy, $"❌ {companyName} - Vòng {loopCount} - Lần {runCount}: {ex.Message}");
-                                }
-                                finally
-                                {
-                                    semaphore.Release();
+                            //        UpdateStatusOnUI(rowCopy, $"✅ {companyName} - Vòng {loopCount} - Lần {runCount}/{totalRuns} - Hoàn thành");
+                            //        Log($"✅ {companyName}: Hoàn thành vòng {loopCount} - lần {runCount}/{totalRuns}");
+                            //    }
+                            //    catch (Exception ex)
+                            //    {
+                            //        Log($"❌ Lỗi {companyName} (Vòng {loopCount} - Lần {runCount}): {ex.Message}");
+                            //        UpdateStatusOnUI(rowCopy, $"❌ {companyName} - Vòng {loopCount} - Lần {runCount}: {ex.Message}");
+                            //    }
+                            //    finally
+                            //    {
+                            //        semaphore.Release();
 
-                                    if (runCount < totalRuns)
-                                    {
-                                        await Task.Delay(1000);
-                                    }
-                                }
-                            }
+                            //        if (runCount < totalRuns)
+                            //        {
+                            //            await Task.Delay(1000);
+                            //        }
+                            //    }
+                            //}
 
                             // ✅ Xử lý XML sau khi hoàn thành
                             Log($"📄 {companyName}: Bắt đầu xử lý XML...");

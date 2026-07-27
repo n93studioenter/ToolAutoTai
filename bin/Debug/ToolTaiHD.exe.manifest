@@ -990,14 +990,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ToolTaiHD.exe" size="346016">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ToolTaiHD.exe" size="348064">
       <assemblyIdentity name="ToolTaiHD" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>6HraGBNghIHg7GQlUJfxj05/v6S21q8r6B6dIJaTyBs=</dsig:DigestValue>
+        <dsig:DigestValue>HAdxm8yB4+Dr4iOIlHvuwRjbMvDLeWe44lRR/rTaQwg=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

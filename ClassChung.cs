@@ -45,6 +45,8 @@ namespace ToolTaiHD
         public double IsImport { get; set; }
         public string hdon { get; set; }
         public int IsDieuchinh { get; set; }
+        public bool IsMacdinh { get; set; } = false;
+        public int IsMD { get; set; }
         public List<TbImportDetail> tbImportDetails { get; set; } = new List<TbImportDetail>();
     }
     public class TbImportDetail
