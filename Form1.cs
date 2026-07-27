@@ -15,6 +15,7 @@ using DocumentFormat.OpenXml.Office2010.CustomUI;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.VariantTypes;
 using DocumentFormat.OpenXml.Wordprocessing;
 using FuzzySharp;
 using Microsoft.Win32;
@@ -957,6 +958,11 @@ namespace ToolTaiHD
                                 }
                                 return true;
                             }
+                            if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+                            {
+                                //Tải thử cho xml tự tạo
+                               // GetKNMXMLAsync(mstnb, getSHHD, getSohd, tokken, getdate, folderpath, filename,this);
+                            }
                         }
                     }
                     catch (OperationCanceledException)
@@ -972,7 +978,74 @@ namespace ToolTaiHD
                 }
                 return false;
             }
+            public async Task GetKNMXMLAsync(string nbmst, string khhdon, string shdon, string tokken,
+     DateTime GetNLap, string path, string filename, string companyName, Form1 form)
+            {
+                try
+                {
+                    string url = $"https://hoadondientu.gdt.gov.vn/api/query/invoices/detail?nbmst={nbmst}&khhdon={khhdon}&shdon={shdon}&khmshdon=1";
 
+                    using (var client = new HttpClient())
+                    {
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokken);
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        client.Timeout = TimeSpan.FromSeconds(30);
+
+                        try
+                        {
+                            HttpResponseMessage response = await client.GetAsync(url);
+
+                            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                            {
+                                Log($"❌ {companyName}: Token hết hạn khi lấy KNM XML cho HĐ {shdon}"); 
+                                return;
+                            }
+
+                            if (response.IsSuccessStatusCode)
+                            {
+                                string responseBody = await response.Content.ReadAsStringAsync();
+
+                                if (string.IsNullOrEmpty(responseBody))
+                                {
+                                    Log($"⚠️ {companyName}: Response rỗng cho HĐ {shdon}"); 
+                                    return;
+                                }
+
+                                var rootObject = JsonConvert.DeserializeObject<Invoice>(responseBody);
+
+                                TaoFileXmlChiCoDLHDon(path, filename.Replace(".zip", ""), rootObject, GetNLap); 
+
+                                // ✅ Gọi DocfileXmlOne qua instance của Form1
+                                string ph = Path.Combine(path, filename.Replace(".zip", "_KNM.xml"));
+                                await form.DocfileXmlOne(ph, 1, 1); // ✅ SỬA: gọi qua form instance
+                                  
+
+                                Log($"✅ {companyName}: Tạo KNM XML thành công cho HĐ {shdon}");
+                            }
+                            else
+                            {
+                                Log($"⚠️ {companyName}: Lỗi API cho HĐ {shdon}: {response.StatusCode}");
+                            }
+                        }
+                        catch (TaskCanceledException)
+                        {
+                            Log($"⏰ {companyName}: Timeout khi lấy KNM XML cho HĐ {shdon}"); 
+                        }
+                        catch (HttpRequestException ex)
+                        {
+                            Log($"❌ {companyName}: Lỗi HttpRequest khi lấy KNM XML: {ex.Message}"); 
+                        }
+                        catch (Exception ex)
+                        {
+                            Log($"❌ {companyName}: Lỗi GetKNMXMLAsync: {ex.Message}"); 
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log($"❌ {companyName}: Lỗi GetKNMXMLAsync: {ex.Message}"); 
+                }
+            }
             public async Task<string> GetStringAsync(string url)
             {
                 var response = await GetAsync(url);
@@ -1179,27 +1252,26 @@ namespace ToolTaiHD
                     // ============================================================
                     Log($"[{companyName}] 📤 Bắt đầu tải hóa đơn đầu ra...");
 
-                    string directoryPathRa = Path.Combine(savedPath, currentYear, "HDRa");
-                    string qriv = @"SELECT * FROM tbInvoiceInfo";
-                    var tbInvoiceInfo = ExecuteQuery2(qriv, connectionString2);
-                    var invoicesRa = await GetListHoaDonCanTai(username, savedPath, 2);
-                    if (invoicesRa.Count > 0 || tbInvoiceInfo.Rows.Count > 0)
-                    {
-                        //Kiểm tra xem có đăng ký invoice không
+                    //string directoryPathRa = Path.Combine(savedPath, currentYear, "HDRa");
+                    //string qriv = @"SELECT * FROM tbInvoiceInfo";
+                    //var tbInvoiceInfo = ExecuteQuery2(qriv, connectionString2);
+                    //var invoicesRa = await GetListHoaDonCanTai(username, savedPath, 2);
+                    //if (invoicesRa.Count > 0 || tbInvoiceInfo.Rows.Count > 0)
+                    //{
                      
-                        if(tbInvoiceInfo.Rows.Count > 0)
-                        {
-                            Tainhacungcap(vbdbpath);
-                        }
-                        else
-                        {
-                            await TaiHangLoatHoaDon(companyClient, invoicesRa, "đầu ra", companyName, dtrow);
-                        }
-                    }
-                    else
-                    {
-                        Log($"📭 {companyName}: Không có hóa đơn đầu ra mới");
-                    }
+                    //    if(tbInvoiceInfo.Rows.Count > 0)
+                    //    {
+                    //        Tainhacungcap(vbdbpath, dtrow);
+                    //    }
+                    //    else
+                    //    {
+                    //        await TaiHangLoatHoaDon(companyClient, invoicesRa, "đầu ra", companyName, dtrow);
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    Log($"📭 {companyName}: Không có hóa đơn đầu ra mới");
+                    //}
                 }
 
                 Log($"✅ {companyName}: Hoàn thành xử lý!");
@@ -1249,7 +1321,7 @@ namespace ToolTaiHD
             public string message { get; set; }
             public SearchData data { get; set; }
         }
-        private async void Tainhacungcap(string vbdbpath)
+        private async void Tainhacungcap(string vbdbpath, DataRow companyRow = null)
         {
             string connectionString2 = "Provider=Microsoft.ACE.OLEDB.12.0;" +
                                       "Data Source=" + vbdbpath + ";" +
@@ -1397,7 +1469,8 @@ namespace ToolTaiHD
                                         string filepathpdf = Path.Combine(savedPath, pathYear, pathravao, firstDayOfMonth.Month.ToString(), filenamepdf);
 
                                         DownloadInvoiceXml(client, invoice.id.ToString(), filepath);
-                                        DownloadInvoicePdf(client, invoice.id.ToString(), filepathpdf); 
+                                        DownloadInvoicePdf(client, invoice.id.ToString(), filepathpdf);
+                                        UpdateStatusOnUI(companyRow, $"✅ Lần {i}/{total} - Hoàn thành");
                                         Application.DoEvents();
                                         // Chờ 500ms để tránh rate limit
                                         await Task.Delay(150);
@@ -1682,7 +1755,7 @@ namespace ToolTaiHD
                 if (File.Exists(filePath))
                 {
                     TimeSpan ts = DateTime.Now - File.GetLastWriteTime(filePath);
-                    if (ts.TotalMinutes < 120)
+                    if (ts.TotalMinutes < 300)
                     {
                         Log($"✅ {companyName}: Đã có file {fileType} (còn mới)");
                         return true;
@@ -1755,7 +1828,7 @@ namespace ToolTaiHD
                 if (File.Exists(filePath))
                 {
                     TimeSpan ts = DateTime.Now - File.GetLastWriteTime(filePath);
-                    if (ts.TotalMinutes < 120)
+                    if (ts.TotalMinutes < 300)
                     {
                         Log($"✅ {companyName}: Đã có file {fileType} (còn mới)");
                         return true;
@@ -2142,22 +2215,55 @@ namespace ToolTaiHD
             // Nếu thất bại, thử lấy KNM XML
             if (invoice.Type == 1)
             {
-                await GetKNMXMLAsync(invoice.Mst, invoice.SHHD, invoice.Sohd, client, invoice.NLap, invoice.DirectoryPath, invoice.Sohd, companyName);
+                await GetKNMXMLAsync(invoice.Mst, invoice.SHHD, invoice.Sohd, tokken, invoice.NLap, invoice.DirectoryPath, invoice.Sohd, companyName);
             }
 
             return false;
         }
 
-        public async Task GetKNMXMLAsync(string nbmst, string khhdon, string shdon, CompanyHttpClient client, DateTime GetNLap, string path, string filename, string companyName)
+        public async Task GetKNMXMLAsync(string nbmst, string khhdon, string shdon, string token,
+     DateTime GetNLap, string path, string filename, string companyName)
         {
             string url = $"https://hoadondientu.gdt.gov.vn/api/query/invoices/detail?nbmst={nbmst}&khhdon={khhdon}&shdon={shdon}&khmshdon=1";
 
             try
             {
-                string responseBody = await client.GetStringAsync(url);
-                var rootObject = JsonConvert.DeserializeObject<Invoice>(responseBody);
-                TaoFileXmlChiCoDLHDon(path, filename, rootObject, GetNLap);
-                Log($"✅ {companyName}: Đã tạo KNM XML cho HĐ {shdon}");
+                using (var client = new HttpClient())
+                {
+                    // ✅ Set header đúng cho JSON
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    client.Timeout = TimeSpan.FromSeconds(30);
+
+                    HttpResponseMessage response = await client.GetAsync(url);
+
+                    if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        Log($"❌ {companyName}: Token hết hạn khi lấy KNM XML cho HĐ {shdon}");
+                        return;
+                    }
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseBody = await response.Content.ReadAsStringAsync();
+
+                        if (string.IsNullOrEmpty(responseBody))
+                        {
+                            Log($"⚠️ {companyName}: Response rỗng cho HĐ {shdon}");
+                            return;
+                        }
+
+                        var rootObject = JsonConvert.DeserializeObject<Invoice>(responseBody);
+                        TaoFileXmlChiCoDLHDon(path, filename, rootObject, GetNLap);
+                        Log($"✅ {companyName}: Đã tạo KNM XML cho HĐ {shdon}");
+                    }
+                    else
+                    {
+                        string errorContent = await response.Content.ReadAsStringAsync();
+                        Log($"⚠️ {companyName}: Lỗi API ({response.StatusCode}): {errorContent}");
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -2211,8 +2317,9 @@ namespace ToolTaiHD
         {
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
+            string currentDate = NLap.ToString("yyyyMMdd");
 
-            fileName = $"{fileName}_KNM.xml";
+            fileName = $"{currentDate}_{fileName}_KNM.xml";
             string fullPath = Path.Combine(folderPath, fileName);
 
             XmlDocument doc = new XmlDocument();
@@ -2227,17 +2334,17 @@ namespace ToolTaiHD
             XmlElement ttChung = doc.CreateElement("TTChung");
             dlHDon.AppendChild(ttChung);
 
-            ThemPhanTu(doc, ttChung, "PBan", $"{Invoice.Pban}");
-            ThemPhanTu(doc, ttChung, "THDon", $"Hóa đơn GTGT");
-            ThemPhanTu(doc, ttChung, "KHMSHDon", $"{Invoice.Khmshdon}");
-            ThemPhanTu(doc, ttChung, "KHHDon", $"{Invoice.Khhdon}");
-            ThemPhanTu(doc, ttChung, "SHDon", $"{Invoice.Shdon}");
-            ThemPhanTu(doc, ttChung, "NLap", $"{NLap}");
+            ThemPhanTu(doc, ttChung, "PBan", Invoice.Pban ?? "");
+            ThemPhanTu(doc, ttChung, "THDon", "Hóa đơn GTGT");
+            ThemPhanTu(doc, ttChung, "KHMSHDon", Invoice.Khmshdon ?? "");
+            ThemPhanTu(doc, ttChung, "KHHDon", Invoice.Khhdon ?? "");
+            ThemPhanTu(doc, ttChung, "SHDon", Invoice.Shdon ?? "");
+            ThemPhanTu(doc, ttChung, "NLap", NLap.ToString("dd/MM/yyyy"));
             ThemPhanTu(doc, ttChung, "HDCTTChinh", "0");
-            ThemPhanTu(doc, ttChung, "DVTTe", $"{Invoice.Dvtte}");
-            ThemPhanTu(doc, ttChung, "TGia", $"{Invoice.Tgia}");
-            ThemPhanTu(doc, ttChung, "HTTToan", $"{Invoice.Thtttoan}");
-            ThemPhanTu(doc, ttChung, "MSTTCGP", $"{Invoice.Msttcgp}");
+            ThemPhanTu(doc, ttChung, "DVTTe", Invoice.Dvtte ?? "");
+            ThemPhanTu(doc, ttChung, "TGia", Invoice.Tgia ?? "");
+            ThemPhanTu(doc, ttChung, "HTTToan", Invoice.Thtttoan ?? "");
+            ThemPhanTu(doc, ttChung, "MSTTCGP", Invoice.Msttcgp ?? "");
 
             // TTKhac trong TTChung
             XmlElement ttKhacChung = doc.CreateElement("TTKhac");
@@ -2250,18 +2357,18 @@ namespace ToolTaiHD
 
             // NBan
             XmlElement nBan = doc.CreateElement("NBan");
-            ThemPhanTu(doc, nBan, "Ten", $"{Invoice.Nbten}");
-            ThemPhanTu(doc, nBan, "MST", $"{Invoice.Nbmst}");
-            ThemPhanTu(doc, nBan, "DChi", $"{Invoice.Nbdchi}");
-            ThemPhanTu(doc, nBan, "SDThoai", $"{Invoice.Nbsdthoai}");
+            ThemPhanTu(doc, nBan, "Ten", Invoice.Nbten ?? "");
+            ThemPhanTu(doc, nBan, "MST", Invoice.Nbmst ?? "");
+            ThemPhanTu(doc, nBan, "DChi", Invoice.Nbdchi ?? "");
+            ThemPhanTu(doc, nBan, "SDThoai", Invoice.Nbsdthoai ?? "");
             ndHDon.AppendChild(nBan);
 
             // NMua
             XmlElement nMua = doc.CreateElement("NMua");
-            ThemPhanTu(doc, nMua, "Ten", $"{Invoice.Nmten}");
-            ThemPhanTu(doc, nMua, "MST", $"{Invoice.Nmmst}");
-            ThemPhanTu(doc, nMua, "DChi", $"{Invoice.Nmdchi}");
-            ThemPhanTu(doc, nMua, "MKHang", $"{Invoice.Mkhang}");
+            ThemPhanTu(doc, nMua, "Ten", Invoice.Nmten ?? "");
+            ThemPhanTu(doc, nMua, "MST", Invoice.Nmmst ?? "");
+            ThemPhanTu(doc, nMua, "DChi", Invoice.Nmdchi ?? "");
+            ThemPhanTu(doc, nMua, "MKHang", Invoice.Mkhang ?? "");
             ThemPhanTu(doc, nMua, "HVTNMHang", "");
             ndHDon.AppendChild(nMua);
 
@@ -2270,13 +2377,23 @@ namespace ToolTaiHD
             ndHDon.AppendChild(dsHHDVu);
 
             int stt = 1;
-            if (Invoice.Hdhhdvu != null)
+            if (Invoice.Hdhhdvu != null && Invoice.Hdhhdvu.Any())
             {
                 foreach (var dt in Invoice.Hdhhdvu.ToList())
                 {
-                    TaoHangHoa(doc, dsHHDVu, "0", $"{stt}", !string.IsNullOrEmpty(dt.Ten) ? $"{dt.Ten}" : "Hoá đơn không nhận mã",
-                        $"{dt.Dvtinh}", $"{dt.Sluong}", $"{dt.Dgia}", $"{dt.Tsuat.Value * 100}", $"{dt.Thtien}",
-                        new[] { ("Amount", "numeric", $"{dt.Thtien}"), ("VATAmount", "numeric", "0") });
+                    // ✅ Lấy giá trị với kiểm tra null
+                    string ten = !string.IsNullOrEmpty(dt.Ten) ? dt.Ten : "Hoá đơn không nhận mã";
+                    string dvtinh = dt.Dvtinh ?? "";
+                    string sluong = dt.Sluong?.ToString() ?? "0";
+                    string dgia = dt.Dgia?.ToString() ?? "0";
+                    string tsuat = (dt.Tsuat ?? 0).ToString();
+                    string thtien = dt.Thtien?.ToString() ?? "0";
+
+                    TaoHangHoa(doc, dsHHDVu, "0", $"{stt}", ten, dvtinh, sluong, dgia, tsuat, thtien,
+                        new[] {
+                    ("Amount", "numeric", thtien),
+                    ("VATAmount", "numeric", "0")
+                        });
                     stt++;
                 }
             }
@@ -2285,11 +2402,12 @@ namespace ToolTaiHD
             XmlElement tToan = doc.CreateElement("TToan");
             ndHDon.AppendChild(tToan);
 
-            ThemPhanTu(doc, tToan, "TgTCThue", $"{Invoice.Tgtcthue}");
-            ThemPhanTu(doc, tToan, "TgTThue", $"{Invoice.Tgtthue}");
-            ThemPhanTu(doc, tToan, "TTCKTMai", $"{Invoice.Ttcktmai}");
-            ThemPhanTu(doc, tToan, "TgTTTBSo", $"{Invoice.Tgtttbso}");
-            ThemPhanTu(doc, tToan, "TgTTTBChu", $"{Invoice.Tgtttbchu}");
+            // ✅ Sử dụng GetValueOrDefault() cho các giá trị decimal? và kiểm tra null
+            ThemPhanTu(doc, tToan, "TgTCThue", Invoice.Tgtcthue?.ToString() ?? "0");
+            ThemPhanTu(doc, tToan, "TgTThue", Invoice.Tgtthue?.ToString() ?? "0");
+            ThemPhanTu(doc, tToan, "TTCKTMai", Invoice.Ttcktmai?.ToString() ?? "0");
+            ThemPhanTu(doc, tToan, "TgTTTBSo", Invoice.Tgtttbso?.ToString() ?? "0");
+            ThemPhanTu(doc, tToan, "TgTTTBChu", Invoice.Tgtttbchu ?? "");
 
             XmlWriterSettings settings = new XmlWriterSettings
             {
@@ -2301,12 +2419,11 @@ namespace ToolTaiHD
 
             using (XmlWriter writer = XmlWriter.Create(fullPath, settings))
             {
-                doc.Save(writer);
+                doc.Save(writer); 
             }
 
             return fullPath;
         }
-
         static void ThemPhanTu(XmlDocument doc, XmlElement parent, string ten, string giaTri)
         {
             XmlElement e = doc.CreateElement(ten);
@@ -2483,10 +2600,12 @@ namespace ToolTaiHD
             public string Nmdchi { get; set; }
             public string Mkhang { get; set; }
             public List<HangHoa> Hdhhdvu { get; set; }
-            public decimal Tgtcthue { get; set; }
-            public decimal Tgtthue { get; set; }
-            public decimal Ttcktmai { get; set; }
-            public decimal Tgtttbso { get; set; }
+
+            // ✅ Đổi thành decimal? (nullable)
+            public decimal? Tgtcthue { get; set; }
+            public decimal? Tgtthue { get; set; }
+            public decimal? Ttcktmai { get; set; }
+            public decimal? Tgtttbso { get; set; }
             public string Tgtttbchu { get; set; }
             public decimal? Tgtphi { get; set; }
         }
@@ -2495,11 +2614,12 @@ namespace ToolTaiHD
         {
             public string Ten { get; set; }
             public string Dvtinh { get; set; }
-            public decimal Sluong { get; set; }
-            public decimal Dgia { get; set; }
-            public decimal? Tsuat { get; set; }
-            public decimal Thtien { get; set; }
+            public decimal? Sluong { get; set; }      // ✅ Nullable
+            public decimal? Dgia { get; set; }        // ✅ Nullable
+            public decimal? Tsuat { get; set; }       // ✅ Nullable
+            public decimal? Thtien { get; set; }      // ✅ Nullable
         }
+         
         #endregion
 
         private void labelControl1_Click(object sender, EventArgs e)
@@ -4624,8 +4744,8 @@ string mst, string shDon, DateTime nLap, int Types)
                         }
 
                         // Chốt giao dịch: Ghi toàn bộ xuống ổ cứng
-                        trans.Commit(); 
-                        XtraMessageBox.Show($"Đã lưu thành công tổng cộng {invoices.Count} hóa đơn vào Database!", "Thông báo");
+                        trans.Commit();  
+                        Log($"Đã lưu thành công tổng cộng {invoices.Count} hóa đơn vào Database!");
                     }
                     catch (Exception ex)
                     {
@@ -4788,36 +4908,48 @@ string mst, string shDon, DateTime nLap, int Types)
 
         #endregion
 
+        // Sửa lại hàm btnRun_Click để thêm cột RunCount
         private async void btnRun_Click(object sender, EventArgs e)
         {
             btnRun.Enabled = false;
 
             try
             {
-                int totalRuns = 3; // Số lần lặp lại
+                int totalRuns = int.Parse(txtsolanlap.Text);
+                int totalLoops = 5;
 
-                for (int runCount = 1; runCount <= totalRuns; runCount++)
+                for (int loopCount = 1; loopCount <= totalLoops; loopCount++)
                 {
-                  
-                    Log($"🔄 ===== BẮT ĐẦU LẦN CHẠY {runCount}/{totalRuns} =====");
-                    labelControl3.Text = $"🔄 ===== BẮT ĐẦU LẦN CHẠY {runCount}/{totalRuns} =====";
-                    // Refresh lại danh sách công ty mỗi lần chạy
+                    Log($"🔄 ===== BẮT ĐẦU VÒNG LẶP {loopCount}/{totalLoops} =====");
+                    labelControl3.Text = $"🔄 ===== BẮT ĐẦU VÒNG LẶP {loopCount}/{totalLoops} =====";
+
                     string query = @"SELECT * FROM tbCompany WHERE IsRun = 1 and Saoviet = ? order by STT";
                     string computerName = Environment.MachineName;
-
                     tbCompany = ExecuteQuery(query, new OleDbParameter("?", computerName));
+
+                    // ✅ Thêm cột RunCount nếu chưa có
+                    if (!tbCompany.Columns.Contains("RunCount"))
+                    {
+                        tbCompany.Columns.Add("RunCount", typeof(string));
+                    }
+                    // ✅ Reset RunCount về "0/0"
+                    foreach (DataRow row in tbCompany.Rows)
+                    {
+                        row["RunCount"] = "0/0";
+                    }
 
                     if (tbCompany.Rows.Count == 0)
                     {
-                        Log($"⚠️ Lần chạy {runCount}: Không có công ty nào đang hoạt động!");
+                        Log($"⚠️ Vòng lặp {loopCount}: Không có công ty nào đang hoạt động!");
                         continue;
                     }
 
-                    Log($"🚀 Lần chạy {runCount}: Xử lý {tbCompany.Rows.Count} công ty (tối đa {txtSoluongtai.Text} cùng lúc)");
+                    Log($"🚀 Vòng lặp {loopCount}: Xử lý {tbCompany.Rows.Count} công ty, mỗi công ty chạy {totalRuns} lần");
 
                     int maxParallel = int.Parse(txtSoluongtai.Text);
                     SemaphoreSlim semaphore = new SemaphoreSlim(maxParallel);
-                    List<Task> tasks = new List<Task>(); 
+                    List<Task> tasks = new List<Task>();
+
                     foreach (DataRow item in tbCompany.Rows)
                     {
                         string vbdbpath = item["Dbpath"]?.ToString() ?? "";
@@ -4829,63 +4961,83 @@ string mst, string shDon, DateTime nLap, int Types)
                             continue;
                         }
 
-                        await semaphore.WaitAsync();
-
-                        // Copy DataRow để tránh lỗi cross-thread
                         DataRow rowCopy = item;
 
                         tasks.Add(Task.Run(async () =>
                         {
+                            for (int runCount = 1; runCount <= totalRuns; runCount++)
+                            {
+                                await semaphore.WaitAsync();
+
+                                try
+                                {
+                                    // ✅ Cập nhật số lần đang chạy
+                                    UpdateRunCountOnUI(rowCopy, runCount, totalRuns); 
+                                    UpdateStatusOnUI(rowCopy, $"🔄 {companyName} - Vòng {loopCount}/{totalLoops} - Lần {runCount}/{totalRuns} - Đang xử lý...");
+                                    Log($"🔄 {companyName}: Vòng {loopCount} - Lần {runCount}/{totalRuns}");
+
+                                    await TaihoadonCongty(vbdbpath, rowCopy);
+
+                                    UpdateStatusOnUI(rowCopy, $"✅ {companyName} - Vòng {loopCount} - Lần {runCount}/{totalRuns} - Hoàn thành");
+                                    Log($"✅ {companyName}: Hoàn thành vòng {loopCount} - lần {runCount}/{totalRuns}");
+                                }
+                                catch (Exception ex)
+                                {
+                                    Log($"❌ Lỗi {companyName} (Vòng {loopCount} - Lần {runCount}): {ex.Message}");
+                                    UpdateStatusOnUI(rowCopy, $"❌ {companyName} - Vòng {loopCount} - Lần {runCount}: {ex.Message}");
+                                }
+                                finally
+                                {
+                                    semaphore.Release();
+
+                                    if (runCount < totalRuns)
+                                    {
+                                        await Task.Delay(1000);
+                                    }
+                                }
+                            }
+
+                            // ✅ Xử lý XML sau khi hoàn thành
+                            Log($"📄 {companyName}: Bắt đầu xử lý XML...");
+                            UpdateStatusOnUI(rowCopy, $"📄 {companyName} - Đang xử lý XML...");
+                            UpdateRunCountOnUI(rowCopy, totalRuns, totalRuns); // Hiển thị hoàn thành
+
                             try
                             {
-                                // Cập nhật status trên UI thread
-                                UpdateStatusOnUI(rowCopy, $"🔄 Lần {runCount}/{totalRuns} - Đang xử lý...");
+                                string connectionString2 = "Provider=Microsoft.ACE.OLEDB.12.0;" +
+                                            "Data Source=" + vbdbpath + ";" +
+                                            "Jet OLEDB:Database Password=1@35^7*9)1;";
 
-                                await TaihoadonCongty(vbdbpath, rowCopy);
+                                LoadHoadonCT(connectionString2);
+                                Loadtbimport(connectionString2);
+                                string qrkh = "SELECT * FROM KhachHang";
+                                tbKhachhang = ExecuteQuery2(qrkh, connectionString2);
+                                string querydd = @" SELECT *  FROM tbDinhdanhtaikhoan"; // Sử dụng ? thay cho @mst trong OleDb
+                                tbDinhDanhtaikhoan = ExecuteQuery2(querydd, connectionString2);
+                                await Task.Run(() => XulylietkeHoaDon(1, connectionString2));
 
-                                // Cập nhật status sau khi hoàn thành
-                                UpdateStatusOnUI(rowCopy, $"✅ Lần {runCount}/{totalRuns} - Hoàn thành");
-                                //Tiến hành đọc hoá đơn
-
+                                UpdateStatusOnUI(rowCopy, $"✅ {companyName} - Hoàn thành XML");
+                                Log($"✅ {companyName}: Hoàn thành xử lý XML");
                             }
                             catch (Exception ex)
                             {
-                                Log($"❌ Lỗi {companyName} (Lần {runCount}): {ex.Message}");
-                                UpdateStatusOnUI(rowCopy, $"❌ Lần {runCount}: {ex.Message}");
-                            }
-                            finally
-                            {
-                                semaphore.Release();
-                                await Task.Delay(2000);
+                                Log($"❌ Lỗi XML {companyName}: {ex.Message}");
+                                UpdateStatusOnUI(rowCopy, $"❌ {companyName} - Lỗi XML: {ex.Message}");
                             }
                         }));
                     }
 
                     await Task.WhenAll(tasks);
-                    Log($"✅ Lần chạy {runCount}/{totalRuns} hoàn thành!");
+                    Log($"✅ Vòng lặp {loopCount}/{totalLoops} hoàn thành!");
 
-                    //Đọc file xml
-                    foreach (DataRow item in tbCompany.Rows)
+                    if (loopCount < totalLoops)
                     {
-                        string vbdbpath = item["Dbpath"]?.ToString() ?? "";
-                        string connectionString2 = "Provider=Microsoft.ACE.OLEDB.12.0;" +
-                                    "Data Source=" + vbdbpath + ";" +
-                                    "Jet OLEDB:Database Password=1@35^7*9)1;";
-                        LoadHoadonCT(connectionString2);
-                        Loadtbimport(connectionString2);
-                        string qrkh = "SELECT * FROM KhachHang"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
-                        tbKhachhang = ExecuteQuery2(qrkh, connectionString2);
-                        XulylietkeHoaDon(2, connectionString2);
-                    }
-                    // Chờ giữa các lần chạy
-                    if (runCount < totalRuns)
-                    {
-                        Log($"⏳ Chờ 2s trước lần chạy tiếp theo...");
-                        await Task.Delay(2000);
+                        Log($"⏳ Chờ 5s trước vòng lặp tiếp theo...");
+                        await Task.Delay(5000);
                     }
                 }
 
-                Log($"✅ ===== HOÀN THÀNH TẤT CẢ {totalRuns} LẦN CHẠY =====");
+                Log($"✅ ===== HOÀN THÀNH TẤT CẢ {totalLoops} VÒNG LẶP =====");
             }
             catch (Exception ex)
             {
@@ -4894,6 +5046,47 @@ string mst, string shDon, DateTime nLap, int Types)
             finally
             {
                 btnRun.Enabled = true;
+            }
+        }
+        // ✅ Hàm cập nhật số lần chạy trên UI
+        private void UpdateRunCountOnUI(DataRow row, int currentRun, int totalRuns)
+        {
+            try
+            {
+                if (row == null) return;
+
+                if (this.InvokeRequired)
+                {
+                    this.Invoke(new Action(() =>
+                    {
+                        try
+                        {
+                            if (!row.Table.Columns.Contains("RunCount"))
+                            {
+                                row.Table.Columns.Add("RunCount", typeof(string));
+                            }
+                            row["RunCount"] = $"{currentRun}/{totalRuns}";
+                            gridControl1.RefreshDataSource();
+                        }
+                        catch (Exception ex)
+                        {
+                            Log($"⚠️ Lỗi update RunCount: {ex.Message}");
+                        }
+                    }));
+                }
+                else
+                {
+                    if (!row.Table.Columns.Contains("RunCount"))
+                    {
+                        row.Table.Columns.Add("RunCount", typeof(string));
+                    }
+                    row["RunCount"] = $"{currentRun}/{totalRuns}";
+                    gridControl1.RefreshDataSource();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"⚠️ Lỗi UpdateRunCountOnUI: {ex.Message}");
             }
         }
     }

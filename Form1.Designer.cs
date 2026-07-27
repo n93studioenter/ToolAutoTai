@@ -29,11 +29,11 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            DevExpress.XtraEditors.Controls.EditorButtonImageOptions editorButtonImageOptions1 = new DevExpress.XtraEditors.Controls.EditorButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject1 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject2 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject3 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject4 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraEditors.Controls.EditorButtonImageOptions editorButtonImageOptions2 = new DevExpress.XtraEditors.Controls.EditorButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject5 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject6 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject7 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject8 = new DevExpress.Utils.SerializableAppearanceObject();
             this.gridControl1 = new DevExpress.XtraGrid.GridControl();
             this.companyBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.gridView1 = new DevExpress.XtraGrid.Views.Grid.GridView();
@@ -47,10 +47,12 @@
             this.colDauvao = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colDaura = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn1 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.gridColumn2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.repositoryItemButtonEdit1 = new DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit();
             this.congtyBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.btnRun = new DevExpress.XtraEditors.SimpleButton();
             this.groupControl1 = new DevExpress.XtraEditors.GroupControl();
+            this.labelControl4 = new DevExpress.XtraEditors.LabelControl();
             this.txttimeout = new DevExpress.XtraEditors.TextEdit();
             this.labelControl2 = new DevExpress.XtraEditors.LabelControl();
             this.txtBlock3 = new DevExpress.XtraEditors.TextEdit();
@@ -66,6 +68,8 @@
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.groupControl2 = new DevExpress.XtraEditors.GroupControl();
             this.labelControl3 = new DevExpress.XtraEditors.LabelControl();
+            this.label1 = new System.Windows.Forms.Label();
+            this.txtsolanlap = new DevExpress.XtraEditors.TextEdit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.companyBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
@@ -84,17 +88,18 @@
             ((System.ComponentModel.ISupportInitialize)(this.checkEdit1.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl2)).BeginInit();
             this.groupControl2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtsolanlap.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // gridControl1
             // 
             this.gridControl1.DataSource = this.companyBindingSource;
-            this.gridControl1.Location = new System.Drawing.Point(8, 150);
+            this.gridControl1.Location = new System.Drawing.Point(8, 153);
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
             this.gridControl1.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.repositoryItemButtonEdit1});
-            this.gridControl1.Size = new System.Drawing.Size(1096, 297);
+            this.gridControl1.Size = new System.Drawing.Size(1096, 294);
             this.gridControl1.TabIndex = 0;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -116,7 +121,8 @@
             this.colIsRun,
             this.colDauvao,
             this.colDaura,
-            this.gridColumn1});
+            this.gridColumn1,
+            this.gridColumn2});
             this.gridView1.GridControl = this.gridControl1;
             this.gridView1.Name = "gridView1";
             this.gridView1.CellValueChanged += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView1_CellValueChanged);
@@ -206,12 +212,22 @@
             this.gridColumn1.VisibleIndex = 5;
             this.gridColumn1.Width = 94;
             // 
+            // gridColumn2
+            // 
+            this.gridColumn2.Caption = "RunCount";
+            this.gridColumn2.FieldName = "RunCount";
+            this.gridColumn2.MinWidth = 25;
+            this.gridColumn2.Name = "gridColumn2";
+            this.gridColumn2.Visible = true;
+            this.gridColumn2.VisibleIndex = 6;
+            this.gridColumn2.Width = 94;
+            // 
             // repositoryItemButtonEdit1
             // 
             this.repositoryItemButtonEdit1.AutoHeight = false;
-            editorButtonImageOptions1.Image = global::ToolTaiHD.Properties.Resources.cancel_32x32;
+            editorButtonImageOptions2.Image = global::ToolTaiHD.Properties.Resources.cancel_32x32;
             this.repositoryItemButtonEdit1.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "", -1, true, true, false, editorButtonImageOptions1, new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject1, serializableAppearanceObject2, serializableAppearanceObject3, serializableAppearanceObject4, "", null, null, DevExpress.Utils.ToolTipAnchor.Default)});
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "", -1, true, true, false, editorButtonImageOptions2, new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject5, serializableAppearanceObject6, serializableAppearanceObject7, serializableAppearanceObject8, "", null, null, DevExpress.Utils.ToolTipAnchor.Default)});
             this.repositoryItemButtonEdit1.Name = "repositoryItemButtonEdit1";
             // 
             // congtyBindingSource
@@ -229,6 +245,7 @@
             // 
             // groupControl1
             // 
+            this.groupControl1.Controls.Add(this.labelControl4);
             this.groupControl1.Controls.Add(this.txttimeout);
             this.groupControl1.Controls.Add(this.labelControl2);
             this.groupControl1.Controls.Add(this.txtBlock3);
@@ -247,12 +264,22 @@
             this.groupControl1.TabIndex = 14;
             this.groupControl1.Text = "Thiết lập";
             // 
+            // labelControl4
+            // 
+            this.labelControl4.Appearance.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
+            this.labelControl4.Appearance.Options.UseFont = true;
+            this.labelControl4.Location = new System.Drawing.Point(17, 73);
+            this.labelControl4.Name = "labelControl4";
+            this.labelControl4.Size = new System.Drawing.Size(183, 16);
+            this.labelControl4.TabIndex = 15;
+            this.labelControl4.Text = "Mốc thời gian tải trong ngày";
+            // 
             // txttimeout
             // 
             this.txttimeout.EditValue = "10";
-            this.txttimeout.Location = new System.Drawing.Point(563, 31);
+            this.txttimeout.Location = new System.Drawing.Point(731, 31);
             this.txttimeout.Name = "txttimeout";
-            this.txttimeout.Size = new System.Drawing.Size(125, 24);
+            this.txttimeout.Size = new System.Drawing.Size(67, 24);
             this.txttimeout.TabIndex = 14;
             this.txttimeout.EditValueChanged += new System.EventHandler(this.txttimeout_EditValueChanged);
             // 
@@ -262,16 +289,16 @@
             this.labelControl2.Appearance.ForeColor = System.Drawing.Color.Yellow;
             this.labelControl2.Appearance.Options.UseFont = true;
             this.labelControl2.Appearance.Options.UseForeColor = true;
-            this.labelControl2.Location = new System.Drawing.Point(492, 37);
+            this.labelControl2.Location = new System.Drawing.Point(533, 35);
             this.labelControl2.Name = "labelControl2";
-            this.labelControl2.Size = new System.Drawing.Size(51, 16);
+            this.labelControl2.Size = new System.Drawing.Size(192, 16);
             this.labelControl2.TabIndex = 13;
-            this.labelControl2.Text = "Timeout";
+            this.labelControl2.Text = "Thời gian chờ tải 1 hoá đơn(s)";
             // 
             // txtBlock3
             // 
             this.txtBlock3.Enabled = false;
-            this.txtBlock3.Location = new System.Drawing.Point(563, 64);
+            this.txtBlock3.Location = new System.Drawing.Point(769, 69);
             this.txtBlock3.Name = "txtBlock3";
             this.txtBlock3.Size = new System.Drawing.Size(125, 24);
             this.txtBlock3.TabIndex = 12;
@@ -280,7 +307,7 @@
             // 
             // chkMoc3
             // 
-            this.chkMoc3.Location = new System.Drawing.Point(473, 68);
+            this.chkMoc3.Location = new System.Drawing.Point(679, 73);
             this.chkMoc3.Name = "chkMoc3";
             this.chkMoc3.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
             this.chkMoc3.Properties.Appearance.Options.UseFont = true;
@@ -292,9 +319,9 @@
             // txtSoluongtai
             // 
             this.txtSoluongtai.EditValue = "1";
-            this.txtSoluongtai.Location = new System.Drawing.Point(342, 31);
+            this.txtSoluongtai.Location = new System.Drawing.Point(435, 31);
             this.txtSoluongtai.Name = "txtSoluongtai";
-            this.txtSoluongtai.Size = new System.Drawing.Size(125, 24);
+            this.txtSoluongtai.Size = new System.Drawing.Size(53, 24);
             this.txtSoluongtai.TabIndex = 10;
             this.txtSoluongtai.EditValueChanged += new System.EventHandler(this.textEdit4_EditValueChanged);
             // 
@@ -304,11 +331,11 @@
             this.labelControl1.Appearance.ForeColor = System.Drawing.Color.Lime;
             this.labelControl1.Appearance.Options.UseFont = true;
             this.labelControl1.Appearance.Options.UseForeColor = true;
-            this.labelControl1.Location = new System.Drawing.Point(248, 35);
+            this.labelControl1.Location = new System.Drawing.Point(231, 35);
             this.labelControl1.Name = "labelControl1";
-            this.labelControl1.Size = new System.Drawing.Size(77, 16);
+            this.labelControl1.Size = new System.Drawing.Size(187, 16);
             this.labelControl1.TabIndex = 9;
-            this.labelControl1.Text = "Số lượng tải";
+            this.labelControl1.Text = "Số lượng công ty tải cùng lúc";
             this.labelControl1.Click += new System.EventHandler(this.labelControl1_Click);
             // 
             // radioButton1
@@ -325,7 +352,7 @@
             // txtBlock2
             // 
             this.txtBlock2.Enabled = false;
-            this.txtBlock2.Location = new System.Drawing.Point(338, 64);
+            this.txtBlock2.Location = new System.Drawing.Point(548, 71);
             this.txtBlock2.Name = "txtBlock2";
             this.txtBlock2.Size = new System.Drawing.Size(125, 24);
             this.txtBlock2.TabIndex = 4;
@@ -334,7 +361,7 @@
             // 
             // chkMoc2
             // 
-            this.chkMoc2.Location = new System.Drawing.Point(248, 68);
+            this.chkMoc2.Location = new System.Drawing.Point(454, 73);
             this.chkMoc2.Name = "chkMoc2";
             this.chkMoc2.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
             this.chkMoc2.Properties.Appearance.Options.UseFont = true;
@@ -346,7 +373,7 @@
             // txtBlock1
             // 
             this.txtBlock1.Enabled = false;
-            this.txtBlock1.Location = new System.Drawing.Point(100, 64);
+            this.txtBlock1.Location = new System.Drawing.Point(306, 69);
             this.txtBlock1.Name = "txtBlock1";
             this.txtBlock1.Size = new System.Drawing.Size(125, 24);
             this.txtBlock1.TabIndex = 2;
@@ -355,7 +382,7 @@
             // 
             // chkMoc1
             // 
-            this.chkMoc1.Location = new System.Drawing.Point(17, 68);
+            this.chkMoc1.Location = new System.Drawing.Point(223, 73);
             this.chkMoc1.Name = "chkMoc1";
             this.chkMoc1.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
             this.chkMoc1.Properties.Appearance.Options.UseFont = true;
@@ -402,15 +429,36 @@
             // 
             this.labelControl3.Location = new System.Drawing.Point(13, 127);
             this.labelControl3.Name = "labelControl3";
-            this.labelControl3.Size = new System.Drawing.Size(75, 16);
+            this.labelControl3.Size = new System.Drawing.Size(12, 16);
             this.labelControl3.TabIndex = 17;
-            this.labelControl3.Text = "labelControl3";
+            this.labelControl3.Text = "...";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
+            this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
+            this.label1.Location = new System.Drawing.Point(385, 127);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(175, 16);
+            this.label1.TabIndex = 18;
+            this.label1.Text = "Số lần lặp lại trên 1 lần tải";
+            // 
+            // txtsolanlap
+            // 
+            this.txtsolanlap.EditValue = "5";
+            this.txtsolanlap.Location = new System.Drawing.Point(575, 123);
+            this.txtsolanlap.Name = "txtsolanlap";
+            this.txtsolanlap.Size = new System.Drawing.Size(125, 24);
+            this.txtsolanlap.TabIndex = 19;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1111, 649);
+            this.Controls.Add(this.txtsolanlap);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.labelControl3);
             this.Controls.Add(this.groupControl2);
             this.Controls.Add(this.groupControl1);
@@ -441,6 +489,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.checkEdit1.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl2)).EndInit();
             this.groupControl2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.txtsolanlap.Properties)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -480,6 +529,10 @@
         private DevExpress.XtraEditors.LabelControl labelControl2;
         private DevExpress.XtraEditors.LabelControl labelControl3;
         private DevExpress.XtraGrid.Columns.GridColumn gridColumn1;
+        private System.Windows.Forms.Label label1;
+        private DevExpress.XtraEditors.TextEdit txtsolanlap;
+        private DevExpress.XtraGrid.Columns.GridColumn gridColumn2;
+        private DevExpress.XtraEditors.LabelControl labelControl4;
     }
 }
 
