@@ -696,7 +696,7 @@ namespace ToolTaiHD
         #endregion
 
         #region Load Cache Data
-        private void LoadHoadonCT(string connectionst)
+        private void LoadHoadonCT(string connectionst, TTinChung TTinChung)
         {
             try
             {
@@ -737,9 +737,10 @@ namespace ToolTaiHD
             {
                 Log($"Lỗi LoadHoadonCT: {ex.Message}");
             }
+            TTinChung.lookupHoaDonCT = lookupHoaDonCT;
         }
         DataTable tbimports;
-        private void Loadtbimport(string conectionst)
+        private void Loadtbimport(string conectionst, TTinChung TTinChung)
         {
             try
             {
@@ -765,6 +766,7 @@ namespace ToolTaiHD
             {
                 Log($"Lỗi Loadtbimport: {ex.Message}");
             }
+            TTinChung.lookupTbImport = lookupTbImport;
         }
         #endregion
 
@@ -980,7 +982,7 @@ namespace ToolTaiHD
                 return false;
             }
             public async Task GetKNMXMLAsync(string nbmst, string khhdon, string shdon, string tokken,
-     DateTime GetNLap, string path, string filename, string companyName, Form1 form)
+     DateTime GetNLap, string path, string filename, string companyName, Form1 form, TTinChung TTinChung)
             {
                 try
                 {
@@ -1018,7 +1020,7 @@ namespace ToolTaiHD
 
                                 // ✅ Gọi DocfileXmlOne qua instance của Form1
                                 string ph = Path.Combine(path, filename.Replace(".zip", "_KNM.xml"));
-                                await form.DocfileXmlOne(ph, 1, 1,""); // ✅ SỬA: gọi qua form instance
+                                await form.DocfileXmlOne(ph, 1, 1,"", TTinChung); // ✅ SỬA: gọi qua form instance
                                   
 
                                 Log($"✅ {companyName}: Tạo KNM XML thành công cho HĐ {shdon}");
@@ -1253,26 +1255,26 @@ namespace ToolTaiHD
                     // ============================================================
                     Log($"[{companyName}] 📤 Bắt đầu tải hóa đơn đầu ra...");
 
-                    //string directoryPathRa = Path.Combine(savedPath, currentYear, "HDRa");
-                    //string qriv = @"SELECT * FROM tbInvoiceInfo";
-                    //var tbInvoiceInfo = ExecuteQuery2(qriv, connectionString2);
-                    //var invoicesRa = await GetListHoaDonCanTai(username, savedPath, 2);
-                    //if (invoicesRa.Count > 0 || tbInvoiceInfo.Rows.Count > 0)
-                    //{
-                     
-                    //    if(tbInvoiceInfo.Rows.Count > 0)
-                    //    {
-                    //        Tainhacungcap(vbdbpath, dtrow);
-                    //    }
-                    //    else
-                    //    {
-                    //        await TaiHangLoatHoaDon(companyClient, invoicesRa, "đầu ra", companyName, dtrow);
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    Log($"📭 {companyName}: Không có hóa đơn đầu ra mới");
-                    //}
+                    string directoryPathRa = Path.Combine(savedPath, currentYear, "HDRa");
+                    string qriv = @"SELECT * FROM tbInvoiceInfo";
+                    var tbInvoiceInfo = ExecuteQuery2(qriv, connectionString2);
+                    var invoicesRa = await GetListHoaDonCanTai(username, savedPath, 2);
+                    if (invoicesRa.Count > 0 || tbInvoiceInfo.Rows.Count > 0)
+                    {
+
+                        if (tbInvoiceInfo.Rows.Count > 0)
+                        {
+                            Tainhacungcap(vbdbpath, dtrow);
+                        }
+                        else
+                        {
+                            await TaiHangLoatHoaDon(companyClient, invoicesRa, "đầu ra", companyName, dtrow);
+                        }
+                    }
+                    else
+                    {
+                        Log($"📭 {companyName}: Không có hóa đơn đầu ra mới");
+                    }
                 }
 
                 Log($"✅ {companyName}: Hoàn thành xử lý!");
@@ -3408,9 +3410,9 @@ namespace ToolTaiHD
                 _optimizedVatTu[item.Key] = (ten1, ten2, quyCach, item.Value.DonVi, item.Value.Dongia, item.Value.SoLuong);
             }
         }
-        private async Task XulylietkeHoaDon(int type,string connectionString2)
+        private async Task XulylietkeHoaDon(int type,string connectionString2, TTinChung TTinChung)
         {
-            lstvt = await LoadDataVattuAsync(connectionString2);
+           
             string pathType = type == 1 ? "HDVao" : "HDRa";
             int fromMonth = DateTime.Now.Month;
             int toMonth = DateTime.Now.Month;
@@ -3436,7 +3438,7 @@ namespace ToolTaiHD
                 var batch = allFiles.Skip(i).Take(batchSize);
 
                 // Tạo các task đọc file
-                var tasks = batch.Select(file => DocfileXmlOne(file, 1, type, connectionString2));
+                var tasks = batch.Select(file => DocfileXmlOne(file, 1, type, connectionString2, TTinChung));
 
                 // --- ĐOẠN QUAN TRỌNG: Hứng kết quả từ các file vừa đọc ---
                 TbImport[] results = await Task.WhenAll(tasks);
@@ -3471,11 +3473,9 @@ namespace ToolTaiHD
                 : @"SELECT * FROM tbDinhdanhtaikhoan WHERE KeyValue LIKE '%Ưu tiên ra%'";
             return ExecuteQuery2(query, null);
         }
-        private async Task<TbImport> DocfileXmlOne(string pathXml, int stt, int type,string connectionString2)
+        private async Task<TbImport> DocfileXmlOne(string pathXml, int stt, int type,string connectionString2, TTinChung TTinChung)
         {
-            DataTable PLHH;
-            string querykh = @" SELECT *  FROM PhanLoaiVattu"; // Sử dụng ? thay cho @mst trong OleDb
-            PLHH = ExecuteQuery(querykh, new OleDbParameter("?", ""));
+          
 
             var tbDinhDanhtaikhoanUuTien = LoadDinhDanhTaiKhoanUuTien(type);
             if (pathXml.Contains("427"))
@@ -3558,7 +3558,7 @@ namespace ToolTaiHD
                     // 4. Phân loại Mua/Bán và Kiểm tra MST công ty
                     if (type == 1) // Hóa đơn đầu vào
                     {
-                        GetMST();
+                        GetMST(connectionString2);
                         // if (mstcongty != nMua?.SelectSingleNode("MST")?.InnerText && CCCD != nMua?.SelectSingleNode("MST")?.InnerText) return null;
                         tbImport.Ten = Helpers.ConvertUnicodeToVni(nBan?.SelectSingleNode("Ten")?.InnerText ?? "");
                         tbImport.Mst = nBan?.SelectSingleNode("MST")?.InnerText ?? "";
@@ -3628,7 +3628,7 @@ namespace ToolTaiHD
                         string dChi = doiTacNode?.SelectSingleNode("DChi")?.InnerText ?? "";
                         string sdt = doiTacNode?.SelectSingleNode("SDThoai")?.InnerText ?? "";
                         if (!string.IsNullOrEmpty(tbImport.Mst) && !string.IsNullOrEmpty(tbImport.Ten) && !CheckExistKH(tbImport.Mst))
-                            InitCustomer(type == 1 ? 2 : 3, tbImport.Mst, tbImport.Ten, dChi, tbImport.Mst, "", sdt);
+                            InitCustomer(type == 1 ? 2 : 3, tbImport.Mst, tbImport.Ten, dChi, tbImport.Mst, "", sdt, connectionString2);
                         else
                         {
                             var kl = tbKhachhang.AsEnumerable().FirstOrDefault(m => m.Field<string>("SoHieu") == "KL");
@@ -3746,7 +3746,7 @@ namespace ToolTaiHD
                             };
                             if (string.IsNullOrEmpty(dt.DVT))
                             {
-                                var findvt = lstvt.FirstOrDefault(m => m.TenVattu.ToLower() == dt.Ten.ToLower());
+                                var findvt = TTinChung.lstvt.FirstOrDefault(m => m.TenVattu.ToLower() == dt.Ten.ToLower());
                                 if (findvt != null)
                                 {
                                     dt.DVT = Helpers.ConvertUnicodeToVni(findvt.DonVi);
@@ -3914,6 +3914,7 @@ namespace ToolTaiHD
                                 if (item.TKNo != rule.TKNo)
                                 {
                                     item.TKNo = rule.TKNo;
+                                  
                                     changed = true;
                                 }
                                 if (item.TKCo != rule.TKCo)
@@ -3943,7 +3944,15 @@ namespace ToolTaiHD
                                         item.IsMD = 1;   
                                         item.TKNo = rule.TKNo;
                                         item.TKCo = rule.TKCo;
-                                      //  item.Checked = rule.IsChecked == "-1" ? false : true;
+                                        if (item.TKNo == "6421" || item.TKNo == "6422")
+                                        {
+                                            item.IsHaschild = "0";
+                                        }
+                                        if (item.TKCo == "5113")
+                                        {
+                                            item.IsHaschild = "0";
+                                        }
+                                        //  item.Checked = rule.IsChecked == "-1" ? false : true;
                                         if (!string.IsNullOrEmpty(rule.Noidung))
                                         {
                                             int currentmonth = item.NLap.Month;
@@ -3956,16 +3965,11 @@ namespace ToolTaiHD
                                         }
                                         foreach (var de in item.tbImportDetails)
                                         {
-                                            //if (de.IsMacdinh != 1)
-                                            //{
-                                            //    if (de.TKCo != "711")
-                                            //    {
-                                            //        de.TKCo = item.TKCo;
-                                            //    }
-                                            //    de.TKNo = item.TKNo;
-
-                                            //}
-
+                                            if (de.TKCo != "711")
+                                            {
+                                                de.TKCo = item.TKCo;
+                                            }
+                                            de.TKNo = item.TKNo;
                                         }
                                     }
 
@@ -4581,7 +4585,7 @@ namespace ToolTaiHD
 
             return uniqueAbbreviation;
         }
-        public void InitCustomer(int Maphanloai, string Sohieu, string Ten, string Diachi, string Mst, string cccd, string sdt)
+        public void InitCustomer(int Maphanloai, string Sohieu, string Ten, string Diachi, string Mst, string cccd, string sdt,string connectionst)
         {
             if (string.IsNullOrEmpty(sdt))
                 sdt = "xxx";
@@ -4688,7 +4692,7 @@ namespace ToolTaiHD
                 // Thực thi truy vấn và lấy kết quả
                 try
                 {
-                    int a = ExecuteQueryResult(query, parameters);
+                    int a = ExecuteQueryResult2(query, connectionst, parameters);
                     query = "SELECT * FROM KhachHang"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
                     tbKhachhang = ExecuteQuery(query);
                 }
@@ -4719,9 +4723,9 @@ namespace ToolTaiHD
                 // Thực thi truy vấn và lấy kết quả
                 try
                 {
-                    int a = ExecuteQueryResult(query, parameters);
+                    int a = ExecuteQueryResult2(query, connectionst, parameters);
                     query = "SELECT * FROM KhachHang"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
-                    tbKhachhang = ExecuteQuery(query);
+                    tbKhachhang = ExecuteQuery2(query,connectionst);
                 }
                 catch (Exception ex)
                 {
@@ -4729,13 +4733,13 @@ namespace ToolTaiHD
                 }
             }
         }
-        private void GetMST()
+        private void GetMST(string connectionString2)
         {
             string query = "SELECT * FROM License";
 
             // Tạo mảng tham số với giá trị cho câu lệnh SQL
 
-            var kq = ExecuteQuery(query, null);
+            var kq = ExecuteQuery2(query, connectionString2, null);
             if (kq.Rows.Count > 0)
             {
                 MSTCongTY = kq.Rows[0]["MaSoThue"].ToString();
@@ -4979,7 +4983,7 @@ string mst, string shDon, DateTime nLap, int Types)
                                 cmdParent.Parameters.AddWithValue("?", Math.Round(item.TgTThue));
                                 cmdParent.Parameters.AddWithValue("?", type);
                                 cmdParent.Parameters.AddWithValue("?", "0"); // InvoiceType
-                                cmdParent.Parameters.AddWithValue("?", "1"); // IsHaschild
+                                cmdParent.Parameters.AddWithValue("?", item.IsHaschild==null ? "1": item.IsHaschild); // IsHaschild
                                 cmdParent.Parameters.AddWithValue("?", item.TVat);
                                 cmdParent.Parameters.AddWithValue("?", item.Vat2 ?? "0");
                                 cmdParent.Parameters.AddWithValue("?", item.TVat2);
@@ -5200,7 +5204,7 @@ string mst, string shDon, DateTime nLap, int Types)
             try
             {
                 int totalRuns = int.Parse(txtsolanlap.Text);
-                int totalLoops = 5;
+                int totalLoops = int.Parse(txtSovongtai.Text);
 
                 for (int loopCount = 1; loopCount <= totalLoops; loopCount++)
                 {
@@ -5249,37 +5253,37 @@ string mst, string shDon, DateTime nLap, int Types)
 
                         tasks.Add(Task.Run(async () =>
                         {
-                            //for (int runCount = 1; runCount <= totalRuns; runCount++)
-                            //{
-                            //    await semaphore.WaitAsync();
+                            for (int runCount = 1; runCount <= totalRuns; runCount++)
+                            {
+                                await semaphore.WaitAsync();
 
-                            //    try
-                            //    {
-                            //        // ✅ Cập nhật số lần đang chạy
-                            //        UpdateRunCountOnUI(rowCopy, runCount, totalRuns); 
-                            //        UpdateStatusOnUI(rowCopy, $"🔄 {companyName} - Vòng {loopCount}/{totalLoops} - Lần {runCount}/{totalRuns} - Đang xử lý...");
-                            //        Log($"🔄 {companyName}: Vòng {loopCount} - Lần {runCount}/{totalRuns}");
+                                try
+                                {
+                                    // ✅ Cập nhật số lần đang chạy
+                                    UpdateRunCountOnUI(rowCopy, runCount, totalRuns);
+                                    UpdateStatusOnUI(rowCopy, $"🔄 {companyName} - Vòng {loopCount}/{totalLoops} - Lần {runCount}/{totalRuns} - Đang xử lý...");
+                                    Log($"🔄 {companyName}: Vòng {loopCount} - Lần {runCount}/{totalRuns}");
 
-                            //        await TaihoadonCongty(vbdbpath, rowCopy);
+                                    await TaihoadonCongty(vbdbpath, rowCopy);
 
-                            //        UpdateStatusOnUI(rowCopy, $"✅ {companyName} - Vòng {loopCount} - Lần {runCount}/{totalRuns} - Hoàn thành");
-                            //        Log($"✅ {companyName}: Hoàn thành vòng {loopCount} - lần {runCount}/{totalRuns}");
-                            //    }
-                            //    catch (Exception ex)
-                            //    {
-                            //        Log($"❌ Lỗi {companyName} (Vòng {loopCount} - Lần {runCount}): {ex.Message}");
-                            //        UpdateStatusOnUI(rowCopy, $"❌ {companyName} - Vòng {loopCount} - Lần {runCount}: {ex.Message}");
-                            //    }
-                            //    finally
-                            //    {
-                            //        semaphore.Release();
+                                    UpdateStatusOnUI(rowCopy, $"✅ {companyName} - Vòng {loopCount} - Lần {runCount}/{totalRuns} - Hoàn thành");
+                                    Log($"✅ {companyName}: Hoàn thành vòng {loopCount} - lần {runCount}/{totalRuns}");
+                                }
+                                catch (Exception ex)
+                                {
+                                    Log($"❌ Lỗi {companyName} (Vòng {loopCount} - Lần {runCount}): {ex.Message}");
+                                    UpdateStatusOnUI(rowCopy, $"❌ {companyName} - Vòng {loopCount} - Lần {runCount}: {ex.Message}");
+                                }
+                                finally
+                                {
+                                    semaphore.Release();
 
-                            //        if (runCount < totalRuns)
-                            //        {
-                            //            await Task.Delay(1000);
-                            //        }
-                            //    }
-                            //}
+                                    if (runCount < totalRuns)
+                                    {
+                                        await Task.Delay(1000);
+                                    }
+                                }
+                            }
 
                             // ✅ Xử lý XML sau khi hoàn thành
                             Log($"📄 {companyName}: Bắt đầu xử lý XML...");
@@ -5292,16 +5296,23 @@ string mst, string shDon, DateTime nLap, int Types)
                                             "Data Source=" + vbdbpath + ";" +
                                             "Jet OLEDB:Database Password=1@35^7*9)1;";
 
-                                LoadHoadonCT(connectionString2);
-                                Loadtbimport(connectionString2);
+                               
                                 string qrkh = "SELECT * FROM KhachHang";
                                 tbKhachhang = ExecuteQuery2(qrkh, connectionString2);
                                 string querydd = @" SELECT *  FROM tbDinhdanhtaikhoan"; // Sử dụng ? thay cho @mst trong OleDb
                                 tbDinhDanhtaikhoan = ExecuteQuery2(querydd, connectionString2);
-                                await Task.Run(() => XulylietkeHoaDon(1, connectionString2));
-
+                                TTinChung TTinChung = new TTinChung();
+                                TTinChung.lstvt = await LoadDataVattuAsync(connectionString2);
+                                string querykh = @" SELECT *  FROM PhanLoaiVattu"; // Sử dụng ? thay cho @mst trong OleDb
+                                TTinChung.PLHH = ExecuteQuery2(querykh, connectionString2, new OleDbParameter("?", ""));
+                                LoadHoadonCT(connectionString2, TTinChung);
+                                Loadtbimport(connectionString2, TTinChung);
+                                await Task.Run(() => XulylietkeHoaDon(1, connectionString2, TTinChung));
+                                await Task.Run(() => XulylietkeHoaDon(2, connectionString2, TTinChung));
                                 UpdateStatusOnUI(rowCopy, $"✅ {companyName} - Hoàn thành XML");
                                 Log($"✅ {companyName}: Hoàn thành xử lý XML");
+                                //Thực hiện import vô vb6
+                                ImportVb6(connectionString2);
                             }
                             catch (Exception ex)
                             {
@@ -5322,6 +5333,7 @@ string mst, string shDon, DateTime nLap, int Types)
                 }
 
                 Log($"✅ ===== HOÀN THÀNH TẤT CẢ {totalLoops} VÒNG LẶP =====");
+                this.Close();
             }
             catch (Exception ex)
             {
@@ -5330,6 +5342,131 @@ string mst, string shDon, DateTime nLap, int Types)
             finally
             {
                 btnRun.Enabled = true;
+            }
+        }
+        public class TTinChung
+        {
+            public List<VatTu> lstvt = new List<VatTu>();
+           public DataTable PLHH = new DataTable();
+            public HashSet<(string Mst, string SoHD, string KyHieu, DateTime NLap, int Type)> lookupHoaDonCT { get; set; }
+          = new HashSet<(string Mst, string SoHD, string KyHieu, DateTime NLap, int Type)>();
+
+            public HashSet<(string MST, string SHDon, DateTime NLap, int Type)> lookupTbImport
+                = new HashSet<(string MST, string SHDon, DateTime NLap, int Type)>();
+        }
+        public void ImportVb6(string connectionString)
+        { 
+
+            //Tìm file exe mới nhất
+            string query = @"SELECT * FROM tbRegister";
+            var getResgistry = ExecuteQuery2(query, connectionString);
+
+            //Nếu đng chạy thì ko chạy nữa
+            if (getResgistry.Rows[0]["IsRunning"].ToString() == "1")
+            {
+                return;
+            }
+
+            string qr = $"UPDATE tbRegister SET IsRunning = ?";
+            var parameters = new OleDbParameter[]
+            {
+            new OleDbParameter("?", "1"),
+            };
+
+            int rowsAffected = ExecuteQueryResult2(qr, connectionString, parameters);
+            //Xử lý lọc hoa don
+            //Lấy ra các hoa don trong tháng hiện tại
+            string gettbimport= @"SELECT * FROM tbImport";
+            DataTable lsttbImport= ExecuteQuery2(gettbimport, connectionString);
+            if (lsttbImport != null)
+            {
+                lsttbImport = lsttbImport.AsEnumerable().Where(m => m.Field<DateTime>("Nlap").Month == DateTime.Now.Month).CopyToDataTable();  
+            }
+            //Lọc theo điều kiện mật định nếu có
+            int vbCoche = int.Parse(getResgistry.Rows[0]["VbCoche"].ToString());
+            int vbCoche2 = int.Parse(getResgistry.Rows[0]["VbCoche2"].ToString());
+            foreach(DataRow dr in lsttbImport.Rows)
+            {
+                //Đầu vào
+                if (dr["Type"].ToString() == "1")
+                {
+                    if (vbCoche == 0)
+                    {
+                        dr["IsImport"] = 0;
+                        continue;
+                    }
+                    if (vbCoche == 1)
+                    {
+                        dr["IsImport"] = 1;
+                    }
+                    //Kiem tra xem nó có mật đinh ko mới cho vô
+                    else
+                    {
+                        if (dr["IsMD"].ToString() == "1")
+                        {
+                            dr["IsImport"] = 1;
+                        }
+                        else
+                        {
+                            dr["IsImport"] = 0;
+                        }
+                    }
+                }
+                //Đầu ra
+                if (dr["Type"].ToString() == "2")
+                {
+                    if (vbCoche2 == 0)
+                    {
+                        dr["IsImport"] = 0;
+                    }
+                    if (vbCoche2 == 1)
+                    {
+                        dr["IsImport"] = 1;
+                    }
+                    //Kiem tra xem nó có mật đinh ko mới cho vô
+                    else
+                    {
+                        if (dr["IsMD"].ToString() == "1")
+                        {
+                            dr["IsImport"] = 1;
+                        }
+                        else
+                        {
+                            dr["IsImport"] = 0;
+                        }
+                    }
+                }
+
+                string qrupdate = $"UPDATE tbimport SET IsImport = ? WHERE ID = ?";
+                var paramss = new OleDbParameter[]
+                {
+                    new OleDbParameter("?", dr["IsImport"]),
+                    new OleDbParameter("?", dr["ID"])
+                };
+
+                int rrf = ExecuteQueryResult2(qrupdate, connectionString, paramss);
+
+            }
+            string hoadonpath = getResgistry.Rows[0]["Hoadonpath"].ToString();
+
+            // ✅ Lùi về 1 thư mục cha
+            string backPath = Directory.GetParent(hoadonpath)?.FullName ?? hoadonpath;
+
+            // ✅ Tìm file .exe mới nhất
+            string latestExe = Directory.GetFiles(backPath, "*.exe", SearchOption.TopDirectoryOnly)
+             .OrderByDescending(f => File.GetLastWriteTime(f))
+             .FirstOrDefault();
+
+            if (!string.IsNullOrEmpty(latestExe))
+            {
+                Log($"📁 File EXE mới nhất: {latestExe}");
+                Log($"📅 Thời gian sửa đổi: {File.GetLastWriteTime(latestExe)}");
+                Process.Start(latestExe);
+
+            }
+            else
+            {
+                Log($"⚠️ Không tìm thấy file .exe nào trong: {backPath}");
             }
         }
         // ✅ Hàm cập nhật số lần chạy trên UI

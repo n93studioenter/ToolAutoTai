@@ -128,5 +128,5 @@ D:\DA3\ToolTaiHD\ToolTaiHD\bin\Debug\ToolTaiHD.exe.manifest
 D:\DA3\ToolTaiHD\ToolTaiHD\bin\Debug\ToolTaiHD.application
 D:\DA3\ToolTaiHD\ToolTaiHD\obj\Debug\ToolTaiHD.exe.manifest
 D:\DA3\ToolTaiHD\ToolTaiHD\obj\Debug\ToolTaiHD.application
-D:\DA3\ToolTaiHD\ToolTaiHD\obj\Debug\ToolTaiHD.exe.config
 D:\DA3\ToolTaiHD\ToolTaiHD\bin\Debug\FuzzySharp.dll
+D:\DA3\ToolTaiHD\ToolTaiHD\obj\Debug\ToolTaiHD.exe.config
