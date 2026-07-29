@@ -29,11 +29,11 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            DevExpress.XtraEditors.Controls.EditorButtonImageOptions editorButtonImageOptions1 = new DevExpress.XtraEditors.Controls.EditorButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject1 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject2 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject3 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject4 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraEditors.Controls.EditorButtonImageOptions editorButtonImageOptions2 = new DevExpress.XtraEditors.Controls.EditorButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject5 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject6 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject7 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject8 = new DevExpress.Utils.SerializableAppearanceObject();
             this.gridControl1 = new DevExpress.XtraGrid.GridControl();
             this.companyBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.gridView1 = new DevExpress.XtraGrid.Views.Grid.GridView();
@@ -48,6 +48,7 @@
             this.colDaura = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn1 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn2 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.gridColumn3 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.repositoryItemButtonEdit1 = new DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit();
             this.congtyBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.btnRun = new DevExpress.XtraEditors.SimpleButton();
@@ -102,7 +103,7 @@
             this.gridControl1.Name = "gridControl1";
             this.gridControl1.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.repositoryItemButtonEdit1});
-            this.gridControl1.Size = new System.Drawing.Size(1096, 294);
+            this.gridControl1.Size = new System.Drawing.Size(1182, 294);
             this.gridControl1.TabIndex = 0;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -125,7 +126,8 @@
             this.colDauvao,
             this.colDaura,
             this.gridColumn1,
-            this.gridColumn2});
+            this.gridColumn2,
+            this.gridColumn3});
             this.gridView1.GridControl = this.gridControl1;
             this.gridView1.Name = "gridView1";
             this.gridView1.CellValueChanged += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView1_CellValueChanged);
@@ -137,7 +139,7 @@
             this.colName.Name = "colName";
             this.colName.Visible = true;
             this.colName.VisibleIndex = 1;
-            this.colName.Width = 262;
+            this.colName.Width = 223;
             // 
             // colDbpath
             // 
@@ -154,7 +156,7 @@
             this.colFolderPath.Name = "colFolderPath";
             this.colFolderPath.Visible = true;
             this.colFolderPath.VisibleIndex = 2;
-            this.colFolderPath.Width = 242;
+            this.colFolderPath.Width = 206;
             // 
             // colMST
             // 
@@ -170,7 +172,7 @@
             this.colSTT.Name = "colSTT";
             this.colSTT.Visible = true;
             this.colSTT.VisibleIndex = 0;
-            this.colSTT.Width = 60;
+            this.colSTT.Width = 50;
             // 
             // colStatus
             // 
@@ -180,7 +182,7 @@
             this.colStatus.Name = "colStatus";
             this.colStatus.Visible = true;
             this.colStatus.VisibleIndex = 3;
-            this.colStatus.Width = 436;
+            this.colStatus.Width = 245;
             // 
             // colIsRun
             // 
@@ -189,7 +191,7 @@
             this.colIsRun.Name = "colIsRun";
             this.colIsRun.Visible = true;
             this.colIsRun.VisibleIndex = 4;
-            this.colIsRun.Width = 74;
+            this.colIsRun.Width = 86;
             // 
             // colDauvao
             // 
@@ -213,7 +215,7 @@
             this.gridColumn1.Name = "gridColumn1";
             this.gridColumn1.Visible = true;
             this.gridColumn1.VisibleIndex = 5;
-            this.gridColumn1.Width = 94;
+            this.gridColumn1.Width = 112;
             // 
             // gridColumn2
             // 
@@ -223,14 +225,24 @@
             this.gridColumn2.Name = "gridColumn2";
             this.gridColumn2.Visible = true;
             this.gridColumn2.VisibleIndex = 6;
-            this.gridColumn2.Width = 94;
+            this.gridColumn2.Width = 84;
+            // 
+            // gridColumn3
+            // 
+            this.gridColumn3.Caption = "Ngày tài khoản hết hạn";
+            this.gridColumn3.FieldName = "DateAccount";
+            this.gridColumn3.MinWidth = 25;
+            this.gridColumn3.Name = "gridColumn3";
+            this.gridColumn3.Visible = true;
+            this.gridColumn3.VisibleIndex = 7;
+            this.gridColumn3.Width = 154;
             // 
             // repositoryItemButtonEdit1
             // 
             this.repositoryItemButtonEdit1.AutoHeight = false;
-            editorButtonImageOptions1.Image = global::ToolTaiHD.Properties.Resources.cancel_32x32;
+            editorButtonImageOptions2.Image = global::ToolTaiHD.Properties.Resources.cancel_32x32;
             this.repositoryItemButtonEdit1.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "", -1, true, true, false, editorButtonImageOptions1, new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject1, serializableAppearanceObject2, serializableAppearanceObject3, serializableAppearanceObject4, "", null, null, DevExpress.Utils.ToolTipAnchor.Default)});
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "", -1, true, true, false, editorButtonImageOptions2, new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject5, serializableAppearanceObject6, serializableAppearanceObject7, serializableAppearanceObject8, "", null, null, DevExpress.Utils.ToolTipAnchor.Default)});
             this.repositoryItemButtonEdit1.Name = "repositoryItemButtonEdit1";
             // 
             // congtyBindingSource
@@ -240,7 +252,7 @@
             // btnRun
             // 
             this.btnRun.ImageOptions.Image = global::ToolTaiHD.Properties.Resources.play_32x32;
-            this.btnRun.Location = new System.Drawing.Point(1060, 464);
+            this.btnRun.Location = new System.Drawing.Point(1146, 464);
             this.btnRun.Name = "btnRun";
             this.btnRun.Size = new System.Drawing.Size(44, 29);
             this.btnRun.TabIndex = 13;
@@ -263,7 +275,7 @@
             this.groupControl1.Controls.Add(this.checkEdit1);
             this.groupControl1.Location = new System.Drawing.Point(12, 12);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(1092, 109);
+            this.groupControl1.Size = new System.Drawing.Size(1178, 109);
             this.groupControl1.TabIndex = 14;
             this.groupControl1.Text = "Thiết lập";
             // 
@@ -279,8 +291,8 @@
             // 
             // txttimeout
             // 
-            this.txttimeout.EditValue = "10";
-            this.txttimeout.Location = new System.Drawing.Point(731, 31);
+            this.txttimeout.EditValue = "6";
+            this.txttimeout.Location = new System.Drawing.Point(769, 31);
             this.txttimeout.Name = "txttimeout";
             this.txttimeout.Size = new System.Drawing.Size(67, 24);
             this.txttimeout.TabIndex = 14;
@@ -321,7 +333,7 @@
             // 
             // txtSoluongtai
             // 
-            this.txtSoluongtai.EditValue = "1";
+            this.txtSoluongtai.EditValue = "2";
             this.txtSoluongtai.Location = new System.Drawing.Point(435, 31);
             this.txtSoluongtai.Name = "txtSoluongtai";
             this.txtSoluongtai.Size = new System.Drawing.Size(53, 24);
@@ -415,7 +427,7 @@
             this.richTextBox1.ForeColor = System.Drawing.SystemColors.HighlightText;
             this.richTextBox1.Location = new System.Drawing.Point(2, 27);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(1092, 98);
+            this.richTextBox1.Size = new System.Drawing.Size(1173, 98);
             this.richTextBox1.TabIndex = 15;
             this.richTextBox1.Text = "...";
             // 
@@ -424,7 +436,7 @@
             this.groupControl2.Controls.Add(this.richTextBox1);
             this.groupControl2.Location = new System.Drawing.Point(8, 510);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1096, 127);
+            this.groupControl2.Size = new System.Drawing.Size(1177, 127);
             this.groupControl2.TabIndex = 16;
             this.groupControl2.Text = "Ghi chú Log";
             // 
@@ -441,7 +453,7 @@
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
             this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
-            this.label1.Location = new System.Drawing.Point(691, 127);
+            this.label1.Location = new System.Drawing.Point(869, 131);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(175, 16);
             this.label1.TabIndex = 18;
@@ -449,16 +461,16 @@
             // 
             // txtsolanlap
             // 
-            this.txtsolanlap.EditValue = "5";
-            this.txtsolanlap.Location = new System.Drawing.Point(872, 123);
+            this.txtsolanlap.EditValue = "2";
+            this.txtsolanlap.Location = new System.Drawing.Point(1058, 127);
             this.txtsolanlap.Name = "txtsolanlap";
             this.txtsolanlap.Size = new System.Drawing.Size(125, 24);
             this.txtsolanlap.TabIndex = 19;
             // 
             // txtSovongtai
             // 
-            this.txtSovongtai.EditValue = "5";
-            this.txtSovongtai.Location = new System.Drawing.Point(557, 123);
+            this.txtSovongtai.EditValue = "2";
+            this.txtSovongtai.Location = new System.Drawing.Point(719, 127);
             this.txtSovongtai.Name = "txtSovongtai";
             this.txtSovongtai.Size = new System.Drawing.Size(125, 24);
             this.txtSovongtai.TabIndex = 21;
@@ -468,17 +480,17 @@
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
             this.label2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
-            this.label2.Location = new System.Drawing.Point(463, 127);
+            this.label2.Location = new System.Drawing.Point(590, 131);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(80, 16);
+            this.label2.Size = new System.Drawing.Size(123, 16);
             this.label2.TabIndex = 20;
-            this.label2.Text = "Số vòng tải";
+            this.label2.Text = "Số vòng tải tất cả";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1111, 649);
+            this.ClientSize = new System.Drawing.Size(1197, 649);
             this.Controls.Add(this.txtSovongtai);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.txtsolanlap);
@@ -560,6 +572,7 @@
         private DevExpress.XtraEditors.LabelControl labelControl4;
         private DevExpress.XtraEditors.TextEdit txtSovongtai;
         private System.Windows.Forms.Label label2;
+        private DevExpress.XtraGrid.Columns.GridColumn gridColumn3;
     }
 }
 
