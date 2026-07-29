@@ -1010,7 +1010,7 @@ namespace ToolTaiHD
 
             public async Task<bool> DownloadFileAsync(string url, string filePath,int timeoutSeconds)
             {
-                int maxRetry = 1; 
+                int maxRetry = 3; 
 
                 for (int retry = 1; retry <= maxRetry; retry++)
                 {
@@ -2109,7 +2109,13 @@ namespace ToolTaiHD
             });
         }
         #endregion
-
+        public class DownloadStats
+{
+    public int Downloaded { get; set; }
+    public int Failed { get; set; }
+    public int TimeoutCount { get; set; }
+    public object LockObj { get; } = new object();
+}
         #region Download Invoices
         private async Task TaiHangLoatHoaDon(CompanyHttpClient client, List<InvoiceInfo> invoices, string typeName, string companyName, DataRow companyRow = null)
         {
@@ -2131,13 +2137,15 @@ namespace ToolTaiHD
 
                 var stopwatch = Stopwatch.StartNew();
 
-                int maxParallel = 1;
+                int maxParallel =3;
                 int timeoutSeconds = int.Parse(txttimeout.Text); // Mỗi hóa đơn tối đa 15 giây
                 SemaphoreSlim semaphore = new SemaphoreSlim(maxParallel);
                 List<Task> tasks = new List<Task>();
+                var stats = new DownloadStats();
 
                 foreach (var invoice in invoices)
                 {
+
                     await semaphore.WaitAsync();
 
                     tasks.Add(Task.Run(async () =>
@@ -2145,7 +2153,7 @@ namespace ToolTaiHD
                         try
                         {
                             // ✅ Tạo task download với timeout
-                            var downloadTask = DownloadSingleInvoiceAsync(client, invoice, companyName);
+                            var downloadTask = DownloadSingleInvoiceAsync(client, invoice, companyName, stats);
                             var timeoutTask = Task.Delay(TimeSpan.FromSeconds(timeoutSeconds));
 
                             // ✅ Chờ task nào hoàn thành trước
@@ -2178,12 +2186,12 @@ namespace ToolTaiHD
                             lock (lockObj)
                             {
                                 // ✅ Log mỗi khi có 1 hóa đơn hoàn thành (bỏ qua điều kiện % 10)
-                                Log($"⏳ {companyName}: Đã xử lý {downloaded + failed}/{total} hóa đơn {typeName} (✅ {downloaded} thành công, ❌ {failed} thất bại, ⏰ {timeoutCount} timeout)");
+                                Log($"⏳ {companyName}: Đã xử lý {downloaded + failed}/{total} hóa đơn {typeName} (✅ {stats.Downloaded} thành công, ⏰ {timeoutCount} timeout)");
 
                                 // ✅ Cập nhật status vào Grid mỗi khi có 1 hóa đơn
                                 if (companyRow != null)
                                 {
-                                    string status = $"📥 {typeName}: {downloaded + failed}/{total} (✅{downloaded} ❌{failed})";
+                                    string status = $"📥 {typeName}: {downloaded + failed}/{total} (✅{stats.Downloaded})";
                                     UpdateStatusOnUI(companyRow, status);
                                 }
                             }
@@ -2242,11 +2250,11 @@ namespace ToolTaiHD
                 Log($"❌ {companyName}: Lỗi TaiHangLoatHoaDon {typeName}: {ex.Message}");
             }
         }
-        private async Task<bool> DownloadSingleInvoiceAsync(CompanyHttpClient client, InvoiceInfo invoice, string companyName)
+        private async Task<bool> DownloadSingleInvoiceAsync(CompanyHttpClient client, InvoiceInfo invoice, string companyName, DownloadStats start)
         {
             if (invoice == null) return false;
 
-            int maxRetry = 1;
+            int maxRetry = 3;
             int retryCount = 0;
 
             while (retryCount < maxRetry)
@@ -2268,6 +2276,7 @@ namespace ToolTaiHD
 
                     if (isDownloaded)
                     {
+                        start.Downloaded += 1;
                         ExtractZipXML(path);
                         Log($"✅ {companyName}: Tải HĐ {invoice.Sohd} thành công");
                         return true;
@@ -2291,7 +2300,7 @@ namespace ToolTaiHD
                     else
                     {
                         Log($"❌ {companyName}: HĐ {invoice.Sohd} thất bại sau {maxRetry} lần: {ex.Message}");
-
+                        start.Failed += 1;
                     }
                 }
             }
@@ -5383,38 +5392,38 @@ string mst, string shDon, DateTime nLap, int Types)
 
                         tasks.Add(Task.Run(async () =>
                         {
-                            //for (int runCount = 1; runCount <= totalRuns; runCount++)
-                            //{
-                            //    await semaphore.WaitAsync();
+                            for (int runCount = 1; runCount <= totalRuns; runCount++)
+                            {
+                                await semaphore.WaitAsync();
 
-                            //    try
-                            //    {
-                            //        // ✅ Cập nhật số lần đang chạy
-                                   
-                            //        UpdateRunCountOnUI(rowCopy, runCount, totalRuns);
-                            //        UpdateStatusOnUI(rowCopy, $"🔄 {companyName} - Vòng {loopCount}/{totalLoops} - Lần {runCount}/{totalRuns} - Đang xử lý...");
-                            //        Log($"🔄 {companyName}: Vòng {loopCount} - Lần {runCount}/{totalRuns}");
+                                try
+                                {
+                                    // ✅ Cập nhật số lần đang chạy
 
-                            //        await TaihoadonCongty(vbdbpath, rowCopy);
+                                    UpdateRunCountOnUI(rowCopy, runCount, totalRuns);
+                                    UpdateStatusOnUI(rowCopy, $"🔄 {companyName} - Vòng {loopCount}/{totalLoops} - Lần {runCount}/{totalRuns} - Đang xử lý...");
+                                    Log($"🔄 {companyName}: Vòng {loopCount} - Lần {runCount}/{totalRuns}");
 
-                            //        UpdateStatusOnUI(rowCopy, $"✅ {companyName} - Vòng {loopCount} - Lần {runCount}/{totalRuns} - Hoàn thành");
-                            //        Log($"✅ {companyName}: Hoàn thành vòng {loopCount} - lần {runCount}/{totalRuns}");
-                            //    }
-                            //    catch (Exception ex)
-                            //    {
-                            //        Log($"❌ Lỗi {companyName} (Vòng {loopCount} - Lần {runCount}): {ex.Message}");
-                            //        UpdateStatusOnUI(rowCopy, $"❌ {companyName} - Vòng {loopCount} - Lần {runCount}: {ex.Message}");
-                            //    }
-                            //    finally
-                            //    {
-                            //        semaphore.Release();
+                                    await TaihoadonCongty(vbdbpath, rowCopy);
 
-                            //        if (runCount < totalRuns)
-                            //        {
-                            //            await Task.Delay(1000);
-                            //        }
-                            //    }
-                            //}
+                                    UpdateStatusOnUI(rowCopy, $"✅ {companyName} - Vòng {loopCount} - Lần {runCount}/{totalRuns} - Hoàn thành");
+                                    Log($"✅ {companyName}: Hoàn thành vòng {loopCount} - lần {runCount}/{totalRuns}");
+                                }
+                                catch (Exception ex)
+                                {
+                                    Log($"❌ Lỗi {companyName} (Vòng {loopCount} - Lần {runCount}): {ex.Message}");
+                                    UpdateStatusOnUI(rowCopy, $"❌ {companyName} - Vòng {loopCount} - Lần {runCount}: {ex.Message}");
+                                }
+                                finally
+                                {
+                                    semaphore.Release();
+
+                                    if (runCount < totalRuns)
+                                    {
+                                        await Task.Delay(1000);
+                                    }
+                                }
+                            }
 
                             // ✅ Xử lý XML sau khi hoàn thành
                             Log($"📄 {companyName}: Bắt đầu xử lý XML...");
