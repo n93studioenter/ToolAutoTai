@@ -399,7 +399,7 @@ namespace ToolTaiHD
         }
         private async void Form1_Load(object sender, EventArgs e)
         {
-            KillVietStarProcesses();
+           // KillVietStarProcesses();
            string computerName = Environment.MachineName;
             this.Text = $"{computerName} - Saoviet auto";
             await Task.Run(() => WaitForInternetConnection());
