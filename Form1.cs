@@ -348,7 +348,43 @@ namespace ToolTaiHD
             // ✅ Bắt sự kiện click button
             folderButton.ButtonClick += FolderButton_ButtonClick;
         }
+        private void SetupGridClearColumn()
+        {
+            // ✅ Tạo RepositoryItemButtonEdit cho cột Folder
+            RepositoryItemButtonEdit folderButton = new RepositoryItemButtonEdit();
 
+            // ✅ Thêm icon folder (dùng image từ Resources hoặc từ file)
+            folderButton.Buttons[0].Kind = DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph;
+            folderButton.Buttons[0].ImageOptions.Image = Properties.Resources.cancel_32x32; // Từ Resources
+                                                                                           // Hoặc load từ file:
+                                                                                           // folderButton.Buttons[0].ImageOptions.Image = Image.FromFile("folder.png");
+
+            // ✅ Set tooltip
+            folderButton.Buttons[0].ToolTip = "Clear";
+
+            // ✅ Gán cho cột
+            gridView1.Columns["Clear"].ColumnEdit = folderButton;
+
+            // ✅ Bắt sự kiện click button
+            folderButton.ButtonClick += ClearButton_ButtonClick;
+        }
+        private void ClearButton_ButtonClick(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
+        {
+            // Lấy dòng hiện tại
+            int rowHandle = gridView1.FocusedRowHandle;
+            if (rowHandle < 0) return;
+
+            // Lấy giá trị cột cần thiết (ví dụ: đường dẫn)
+            string folderDbpathPath = gridView1.GetRowCellValue(rowHandle, "Dbpath")?.ToString();
+            string connectionString = "Provider=Microsoft.ACE.OLEDB.12.0;" +
+                                    "Data Source=" + folderDbpathPath + ";" +
+                                    "Jet OLEDB:Database Password=1@35^7*9)1;";
+            string query = "DELETE FROM [tbimport]";
+            int rowsAffected = ExecuteQueryResult2(query, connectionString, null);
+
+            query = "DELETE FROM [tbimportdetail]";
+            rowsAffected = ExecuteQueryResult2(query, connectionString, null);
+        }
         // ✅ Sự kiện click vào button
         private void FolderButton_ButtonClick(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
         {
@@ -416,6 +452,7 @@ namespace ToolTaiHD
             gridControl1.DataSource = tbCompany;
             SetupGridCheckBox();
             SetupGridFolderColumn();
+            SetupGridClearColumn(); 
             // Load dữ liệu cache 
 
 
@@ -1282,18 +1319,18 @@ namespace ToolTaiHD
                     // ============================================================
                     Log($"[{companyName}] 📥 Bắt đầu tải Excel đầu vào...");
 
-                    bool t1 = await XulyexelvaoAsync(companyClient, 1, savedPath, companyName, mstcongtys);
-                    bool t2 = await XulyexelvaoAsync(companyClient, 2, savedPath, companyName, mstcongtys);
-                    bool t3 = await XulyexelvaoAsync(companyClient, 3, savedPath, companyName, mstcongtys);
+                    //bool t1 = await XulyexelvaoAsync(companyClient, 1, savedPath, companyName, mstcongtys);
+                    //bool t2 = await XulyexelvaoAsync(companyClient, 2, savedPath, companyName, mstcongtys);
+                    //bool t3 = await XulyexelvaoAsync(companyClient, 3, savedPath, companyName, mstcongtys);
 
-                    if (t1 && t2 && t3)
-                    {
-                        Log($"✅ {companyName}: Tải Excel đầu vào thành công!");
-                    }
-                    else
-                    {
-                        Log($"⚠️ {companyName}: Có lỗi khi tải Excel đầu vào!");
-                    }
+                    //if (t1 && t2 && t3)
+                    //{
+                    //    Log($"✅ {companyName}: Tải Excel đầu vào thành công!");
+                    //}
+                    //else
+                    //{
+                    //    Log($"⚠️ {companyName}: Có lỗi khi tải Excel đầu vào!");
+                    //}
 
                     // ============================================================
                     // ✅ BƯỚC 2: TẢI HÓA ĐƠN ĐẦU VÀO
@@ -2494,13 +2531,37 @@ namespace ToolTaiHD
             // TToan
             XmlElement tToan = doc.CreateElement("TToan");
             ndHDon.AppendChild(tToan);
+            // TTKhac trong TToan
+            XmlElement ttKhacToan = doc.CreateElement("TTKhac");
+            ttKhacToan.AppendChild(TaoTTin(doc, "ServiceProvided", "String", "Le phi thi"));
+            ttKhacToan.AppendChild(TaoTTin(doc, "Location", "String", "British Council Ho Chi Minh City"));
+            ttKhacToan.AppendChild(TaoTTin(doc, "Datasource", "String", "ORS2"));
+            tToan.AppendChild(ttKhacToan);
 
-            // ✅ Sử dụng GetValueOrDefault() cho các giá trị decimal? và kiểm tra null
-            ThemPhanTu(doc, tToan, "TgTCThue", Invoice.Tgtcthue?.ToString() ?? "0");
-            ThemPhanTu(doc, tToan, "TgTThue", Invoice.Tgtthue?.ToString() ?? "0");
-            ThemPhanTu(doc, tToan, "TTCKTMai", Invoice.Ttcktmai?.ToString() ?? "0");
-            ThemPhanTu(doc, tToan, "TgTTTBSo", Invoice.Tgtttbso?.ToString() ?? "0");
-            ThemPhanTu(doc, tToan, "TgTTTBChu", Invoice.Tgtttbchu ?? "");
+
+            // Tổng hợp thuế suất
+            XmlElement tHTTLTSuat = doc.CreateElement("THTTLTSuat");
+            XmlElement lTSuat = doc.CreateElement("LTSuat");
+            ThemPhanTu(doc, lTSuat, "TSuat", $"{Invoice.Hdhhdvu.FirstOrDefault()?.Tsuat.Value * 100}");
+            ThemPhanTu(doc, lTSuat, "TThue", $"{Invoice.Tgtthue}");
+            ThemPhanTu(doc, lTSuat, "ThTien", $"{Invoice.Tgtcthue}");
+            tHTTLTSuat.AppendChild(lTSuat);
+            tToan.AppendChild(tHTTLTSuat);
+            if (Invoice.Tgtphi.HasValue)
+            {
+                XmlElement TPhi = doc.CreateElement("TPhi");
+                ThemPhanTu(doc, TPhi, "ThTien", $"{Invoice.Tgtphi}");
+                tToan.AppendChild(TPhi);
+            }
+
+            if (Invoice.Tgtphi.HasValue)
+                ThemPhanTu(doc, tToan, "TgTCThue", $"{Invoice.Tgtcthue}");
+            else
+                ThemPhanTu(doc, tToan, "TgTCThue", $"{Invoice.Tgtcthue}");
+            ThemPhanTu(doc, tToan, "TgTThue", $"{Invoice.Tgtthue}");
+            ThemPhanTu(doc, tToan, "TTCKTMai", $"{Invoice.Ttcktmai}");
+            ThemPhanTu(doc, tToan, "TgTTTBSo", $"{Invoice.Tgtttbso}");
+            ThemPhanTu(doc, tToan, "TgTTTBChu", $"{Invoice.Tgtttbchu}");
 
             XmlWriterSettings settings = new XmlWriterSettings
             {
@@ -2602,7 +2663,7 @@ namespace ToolTaiHD
 
                 string qr = @"SELECT * FROM tbCompany where  Saoviet = ?  order by STT";
                 string computerName = Environment.MachineName;
-                tbCompany = ExecuteQuery(query, new OleDbParameter("?", computerName));
+                tbCompany = ExecuteQuery(qr, new OleDbParameter("?", computerName));
                 gridControl1.DataSource = tbCompany;
             }
             catch (Exception ex)
@@ -3524,10 +3585,16 @@ namespace ToolTaiHD
                 XtraMessageBox.Show(ex.Message);    
             }
             string hoadonpath = getResgistry.Rows[0]["Hoadonpath"].ToString();
+            string statusFilePath = Path.Combine(hoadonpath, "status.txt");
+
+            // Kiểm tra thư mục tồn tại, nếu không thì tạo
+            string directory = Path.GetDirectoryName(statusFilePath);
+            File.WriteAllText(statusFilePath, "1");
 
             // ✅ Lùi về 1 thư mục cha
             string backPath = Directory.GetParent(hoadonpath)?.FullName ?? hoadonpath;
             string compind = Path.Combine(backPath, "Tools\\Debug\\SaovietTax.exe");
+
             if (File.Exists(compind))
             {
                 ProcessStartInfo startInfo = new ProcessStartInfo
@@ -5688,6 +5755,194 @@ string mst, string shDon, DateTime nLap, int Types)
                 Log($"⚠️ Lỗi UpdateRunCountOnUI: {ex.Message}");
             }
         }
+
+        public static class GDTClient
+        {
+            private static readonly HttpClient _client;
+
+            static GDTClient()
+            {
+                var handler = new HttpClientHandler()
+                {
+                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+                    UseProxy = false
+                };
+
+                _client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(5) };
+
+                _client.DefaultRequestHeaders.Clear();
+                _client.DefaultRequestHeaders.ConnectionClose = false; // Keep-Alive
+                _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                _client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
+            }
+
+            public static void UpdateToken(string token)
+                => _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            public static async Task<string> GetJsonAsync(string url, int maxRetries = 1)
+            {
+                for (int i = 0; i <= maxRetries; i++)
+                {
+                    try
+                    {
+                        var sw = Stopwatch.StartNew();
+                        var response = await _client.GetAsync(url);
+                        string json = await response.Content.ReadAsStringAsync();
+                        sw.Stop();
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            Console.WriteLine($"GDT OK → {sw.ElapsedMilliseconds}ms");
+                            return json;
+                        }
+
+                        // 401 → token sai → không retry
+                        if (response.StatusCode == HttpStatusCode.Unauthorized)
+                            throw new UnauthorizedAccessException("Token hết hạn hoặc sai!");
+
+                        // Các lỗi khác (500, 503…) → retry
+                        Console.WriteLine($"GDT lỗi {response.StatusCode} → retry {i + 1}/{maxRetries}");
+                    }
+                    catch (TaskCanceledException) when (i < maxRetries)
+                    {
+                        Console.WriteLine($"Timeout → retry {i + 1}/{maxRetries}");
+                    }
+                    catch (Exception ex) when (i < maxRetries)
+                    {
+                        Console.WriteLine($"Lỗi mạng → retry {i + 1}/{maxRetries}: {ex.Message}");
+                    }
+
+                    if (i < maxRetries)
+                        await Task.Delay(500 * (i + 1)); // backoff: 500ms, 1000ms, 1500ms
+                }
+                return null; // Hoặc return string.Empty;
+
+                // throw new Exception("Gọi API GDT thất bại sau nhiều lần thử");
+            }
+            // Thay đổi phương thức thành async 
+            public static async Task DownloadFileAsync(
+     string url,
+     string savePath,
+     string token = null,
+     DateTime dt = default,
+     Action<bool, string, long> completionCallback = null)
+            {
+                if (!string.IsNullOrEmpty(token))
+                    UpdateToken(token);
+
+                const int maxRetries = 1;
+                int retryCount = 0;
+
+                var sw = Stopwatch.StartNew();
+
+                while (retryCount < maxRetries)
+                {
+                    try
+                    {
+                        var request = new HttpRequestMessage(HttpMethod.Get, url);
+                        request.Headers.Accept.Clear();
+                        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/octet-stream"));
+                        // Thêm các header khác nếu cần
+
+                        HttpResponseMessage response = null; // Thay vì = new HttpResponseMessage();
+
+
+                        try
+                        {
+                            response = await _client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false); // QUAN TRỌNG: Không capture UI context 
+                            response.EnsureSuccessStatusCode();
+                            using (var stream = await response.Content.ReadAsStreamAsync())
+                            using (var fs = new FileStream(savePath, FileMode.Create, FileAccess.Write, FileShare.None, 81920, true))
+                            {
+                                await stream.CopyToAsync(fs);
+                            }
+
+                        }
+                        catch (Exception ex)
+                        {
+                            // XtraMessageBox.Show(ex.Message);
+                            await Task.Delay(1000); // 2s, 4s, 6s
+                            throw; // QUAN TRỌNG: Phải có throw để exception được catch bên ngoài
+                        }
+                        finally // DÒNG CẦN THÊM: Luôn dispose response
+                        {
+                            response?.Dispose();
+                        }
+
+
+                        sw.Stop();
+                        Console.WriteLine($"Tải thành công: {Path.GetFileName(savePath)} - Thời gian: {sw.ElapsedMilliseconds} ms");
+                        ExtractZipXMLAsynce(savePath); // Giải nén file ZIP
+                        currentProgress += 1;
+                        completionCallback?.Invoke(true, $"Tải thành công: {Path.GetFileName(savePath)}", currentProgress);
+
+                        return; // Thành công → thoát hẳn
+                    }
+                    catch (Exception ex) when (retryCount < maxRetries - 1) // Chỉ retry nếu còn lượt
+                    {
+                       // taithatbai++;
+
+                        retryCount++;
+                        Console.WriteLine($"Lỗi tải file lần {retryCount}: {ex.Message}. Thử lại sau 2 giây...");
+                        string errorMsgs = $"Lỗi tải file lần {retryCount}: {ex.Message}. Thử lại sau 2 giây...";
+                        completionCallback?.Invoke(false, errorMsgs, currentProgress);
+                        // Optional: delay tăng dần (exponential backoff)
+                        await Task.Delay(1000); // 2s, 4s, 6s
+
+                        // Nếu là lỗi mạng/timeout thì tiếp tục retry, các lỗi khác có thể không muốn retry
+                        // Bạn có thể lọc cụ thể hơn:
+                        // if (ex is HttpRequestException || ex is TaskCanceledException) { ... }
+                    }
+                }
+
+                // Nếu ra khỏi vòng lặp nghĩa là đã thử 3 lần vẫn thất bại
+                sw.Stop();
+                string errorMsg = $"Tải file thất bại sau {maxRetries} lần thử: {Path.GetFileName(savePath)}";
+                Console.WriteLine(errorMsg);
+                completionCallback?.Invoke(false, errorMsg, currentProgress);
+
+                // Có thể throw hoặc không tùy nhu cầu
+                throw new Exception(errorMsg);
+            }
+        }
+        private static void ExtractZipXMLAsynce(string path)
+        {
+
+            try
+            {
+                if (File.Exists(path))
+                {
+                    Application.DoEvents();
+                    string rootPath = Path.GetDirectoryName(path);
+                    string getnamefile = Path.GetFileNameWithoutExtension(path);
+                    string directoryPath = rootPath + @"\Giainen" + "_" + getnamefile;
+
+                    ZipFile.ExtractToDirectory(path, directoryPath);
+
+                    var files = Directory.GetFiles(directoryPath, "invoice.html", SearchOption.AllDirectories);
+                    string targetFilePath = Path.Combine(rootPath, getnamefile + ".html");
+                    File.Move(files.FirstOrDefault(), targetFilePath);
+
+                    //xml
+                    var filesxml = Directory.GetFiles(directoryPath, "invoice.xml", SearchOption.AllDirectories);
+                    string targetFilePathxml = Path.Combine(rootPath, getnamefile + ".xml");
+                    File.Move(filesxml.FirstOrDefault(), targetFilePathxml);
+
+                    File.Delete(path);
+                    Directory.Delete(directoryPath, true);
+                }
+                else
+                {
+                    XtraMessageBox.Show("File không tồn tại: " + path);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi khi giải nén hoặc xử lý file: {ex.Message}");
+            }
+
+        }
+        static int currentProgress = 0;
     }
 
     #region Extension Methods
