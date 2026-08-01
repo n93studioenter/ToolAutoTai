@@ -49,11 +49,14 @@
             this.gridColumn1 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn3 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.gridColumn4 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.repositoryItemButtonEdit1 = new DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit();
             this.congtyBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.btnRun = new DevExpress.XtraEditors.SimpleButton();
             this.groupControl1 = new DevExpress.XtraEditors.GroupControl();
+            this.comboBoxEdit1 = new DevExpress.XtraEditors.ComboBoxEdit();
             this.labelControl4 = new DevExpress.XtraEditors.LabelControl();
+            this.labelControl5 = new DevExpress.XtraEditors.LabelControl();
             this.txttimeout = new DevExpress.XtraEditors.TextEdit();
             this.labelControl2 = new DevExpress.XtraEditors.LabelControl();
             this.txtBlock3 = new DevExpress.XtraEditors.TextEdit();
@@ -73,7 +76,6 @@
             this.txtsolanlap = new DevExpress.XtraEditors.TextEdit();
             this.txtSovongtai = new DevExpress.XtraEditors.TextEdit();
             this.label2 = new System.Windows.Forms.Label();
-            this.gridColumn4 = new DevExpress.XtraGrid.Columns.GridColumn();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.companyBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
@@ -81,6 +83,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.congtyBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).BeginInit();
             this.groupControl1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txttimeout.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtBlock3.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkMoc3.Properties)).BeginInit();
@@ -158,7 +161,7 @@
             this.colFolderPath.Name = "colFolderPath";
             this.colFolderPath.Visible = true;
             this.colFolderPath.VisibleIndex = 2;
-            this.colFolderPath.Width = 200;
+            this.colFolderPath.Width = 284;
             // 
             // colMST
             // 
@@ -184,7 +187,7 @@
             this.colStatus.Name = "colStatus";
             this.colStatus.Visible = true;
             this.colStatus.VisibleIndex = 3;
-            this.colStatus.Width = 238;
+            this.colStatus.Width = 220;
             // 
             // colIsRun
             // 
@@ -193,7 +196,7 @@
             this.colIsRun.Name = "colIsRun";
             this.colIsRun.Visible = true;
             this.colIsRun.VisibleIndex = 4;
-            this.colIsRun.Width = 83;
+            this.colIsRun.Width = 52;
             // 
             // colDauvao
             // 
@@ -211,33 +214,43 @@
             // 
             // gridColumn1
             // 
-            this.gridColumn1.Caption = "Folder";
+            this.gridColumn1.Caption = "Thư mục";
             this.gridColumn1.FieldName = "Folder";
             this.gridColumn1.MinWidth = 25;
             this.gridColumn1.Name = "gridColumn1";
             this.gridColumn1.Visible = true;
-            this.gridColumn1.VisibleIndex = 5;
-            this.gridColumn1.Width = 109;
+            this.gridColumn1.VisibleIndex = 8;
+            this.gridColumn1.Width = 107;
             // 
             // gridColumn2
             // 
-            this.gridColumn2.Caption = "RunCount";
+            this.gridColumn2.Caption = "Số vòng hiện tại";
             this.gridColumn2.FieldName = "RunCount";
             this.gridColumn2.MinWidth = 25;
             this.gridColumn2.Name = "gridColumn2";
             this.gridColumn2.Visible = true;
-            this.gridColumn2.VisibleIndex = 6;
-            this.gridColumn2.Width = 81;
+            this.gridColumn2.VisibleIndex = 5;
+            this.gridColumn2.Width = 108;
             // 
             // gridColumn3
             // 
-            this.gridColumn3.Caption = "Ngày tài khoản hết hạn";
+            this.gridColumn3.Caption = "Ngày  hết hạn";
             this.gridColumn3.FieldName = "DateAccount";
             this.gridColumn3.MinWidth = 25;
             this.gridColumn3.Name = "gridColumn3";
             this.gridColumn3.Visible = true;
-            this.gridColumn3.VisibleIndex = 7;
-            this.gridColumn3.Width = 183;
+            this.gridColumn3.VisibleIndex = 6;
+            this.gridColumn3.Width = 86;
+            // 
+            // gridColumn4
+            // 
+            this.gridColumn4.Caption = "Xoá Trung gian";
+            this.gridColumn4.FieldName = "Clear";
+            this.gridColumn4.MinWidth = 25;
+            this.gridColumn4.Name = "gridColumn4";
+            this.gridColumn4.Visible = true;
+            this.gridColumn4.VisibleIndex = 7;
+            this.gridColumn4.Width = 119;
             // 
             // repositoryItemButtonEdit1
             // 
@@ -262,7 +275,9 @@
             // 
             // groupControl1
             // 
+            this.groupControl1.Controls.Add(this.comboBoxEdit1);
             this.groupControl1.Controls.Add(this.labelControl4);
+            this.groupControl1.Controls.Add(this.labelControl5);
             this.groupControl1.Controls.Add(this.txttimeout);
             this.groupControl1.Controls.Add(this.labelControl2);
             this.groupControl1.Controls.Add(this.txtBlock3);
@@ -281,6 +296,17 @@
             this.groupControl1.TabIndex = 14;
             this.groupControl1.Text = "Thiết lập";
             // 
+            // comboBoxEdit1
+            // 
+            this.comboBoxEdit1.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.comboBoxEdit1.Location = new System.Drawing.Point(1134, 31);
+            this.comboBoxEdit1.Name = "comboBoxEdit1";
+            this.comboBoxEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.comboBoxEdit1.Size = new System.Drawing.Size(83, 24);
+            this.comboBoxEdit1.TabIndex = 17;
+            this.comboBoxEdit1.SelectedIndexChanged += new System.EventHandler(this.comboBoxEdit1_SelectedIndexChanged);
+            // 
             // labelControl4
             // 
             this.labelControl4.Appearance.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
@@ -290,6 +316,19 @@
             this.labelControl4.Size = new System.Drawing.Size(183, 16);
             this.labelControl4.TabIndex = 15;
             this.labelControl4.Text = "Mốc thời gian tải trong ngày";
+            // 
+            // labelControl5
+            // 
+            this.labelControl5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.labelControl5.Appearance.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
+            this.labelControl5.Appearance.ForeColor = System.Drawing.Color.DeepSkyBlue;
+            this.labelControl5.Appearance.Options.UseFont = true;
+            this.labelControl5.Appearance.Options.UseForeColor = true;
+            this.labelControl5.Location = new System.Drawing.Point(1069, 35);
+            this.labelControl5.Name = "labelControl5";
+            this.labelControl5.Size = new System.Drawing.Size(59, 16);
+            this.labelControl5.TabIndex = 16;
+            this.labelControl5.Text = "Tháng CT";
             // 
             // txttimeout
             // 
@@ -358,7 +397,7 @@
             // radioButton1
             // 
             this.radioButton1.AutoSize = true;
-            this.radioButton1.Location = new System.Drawing.Point(932, 0);
+            this.radioButton1.Location = new System.Drawing.Point(1071, 3);
             this.radioButton1.Name = "radioButton1";
             this.radioButton1.Size = new System.Drawing.Size(100, 20);
             this.radioButton1.TabIndex = 7;
@@ -488,16 +527,6 @@
             this.label2.TabIndex = 20;
             this.label2.Text = "Số vòng tải tất cả";
             // 
-            // gridColumn4
-            // 
-            this.gridColumn4.Caption = "Clear";
-            this.gridColumn4.FieldName = "Clear";
-            this.gridColumn4.MinWidth = 25;
-            this.gridColumn4.Name = "gridColumn4";
-            this.gridColumn4.Visible = true;
-            this.gridColumn4.VisibleIndex = 8;
-            this.gridColumn4.Width = 63;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
@@ -512,7 +541,7 @@
             this.Controls.Add(this.groupControl1);
             this.Controls.Add(this.btnRun);
             this.Controls.Add(this.gridControl1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -526,6 +555,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).EndInit();
             this.groupControl1.ResumeLayout(false);
             this.groupControl1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txttimeout.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtBlock3.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkMoc3.Properties)).EndInit();
@@ -586,6 +616,8 @@
         private System.Windows.Forms.Label label2;
         private DevExpress.XtraGrid.Columns.GridColumn gridColumn3;
         private DevExpress.XtraGrid.Columns.GridColumn gridColumn4;
+        private DevExpress.XtraEditors.LabelControl labelControl5;
+        private DevExpress.XtraEditors.ComboBoxEdit comboBoxEdit1;
     }
 }
 

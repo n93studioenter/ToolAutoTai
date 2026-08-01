@@ -318,12 +318,17 @@ namespace ToolTaiHD
         {
             base.OnResize(e);
 
-            // Khi form bị minimize, ẩn đi và chỉ hiển thị icon ở system tray
-            if (this.WindowState == FormWindowState.Minimized)
+            // ✅ CHỈ ẨN KHI CHẠY AUTO VÀ BỊ MINIMIZE
+            if (this.WindowState == FormWindowState.Minimized && isAutoMode)
             {
                 this.Hide();
                 this.ShowInTaskbar = false;
+                if (notifyIcon != null)
+                {
+                    notifyIcon.Visible = true;
+                }
             }
+            // ✅ KHI CHẠY BÌNH THƯỜNG, MINIMIZE VẪN HIỂN THỊ TRÊN TASKBAR BÌNH THƯỜNG
         }
         private bool _isExiting = false; // Thêm biến cờ
 
@@ -435,8 +440,9 @@ namespace ToolTaiHD
         }
         private async void Form1_Load(object sender, EventArgs e)
         {
-           // KillVietStarProcesses();
-           string computerName = Environment.MachineName;
+           
+            // KillVietStarProcesses();
+            string computerName = Environment.MachineName;
             this.Text = $"{computerName} - Saoviet auto";
             await Task.Run(() => WaitForInternetConnection());
 
@@ -479,21 +485,42 @@ namespace ToolTaiHD
                 if (chkMoc2.Checked)
                 {
                     txtBlock2.Enabled = true;
-                    txtBlock2.Text = Block1;
+                    txtBlock2.Text = Block2;
                 }
                 if (chkMoc3.Checked)
                 {
                     txtBlock3.Enabled = true;
-                    txtBlock3.Text = Block1;
+                    txtBlock3.Text = Block3;
                 }
             }
            
+
+          
+            comboBoxEdit1.Properties.Items.Clear();
+            for (int i = 1; i <= 12; i++)
+            {
+                comboBoxEdit1.Properties.Items.Add(i);
+            }
+            string checkQuery = "SELECT COUNT(*) FROM tbRemember WHERE Saoviet = ?";
+            DataTable dt = ExecuteQuery(checkQuery, new OleDbParameter("?", computerName));
+
+            int count = Convert.ToInt32(dt.Rows[0][0]);
+            if(count==0)
+            {
+                comboBoxEdit1.SelectedIndex = DateTime.Now.Month - 1;
+            }
+            else
+            {
+                string qr = "SELECT * FROM tbRemember WHERE Saoviet = ?";
+                DataTable dts = ExecuteQuery(qr, new OleDbParameter("?", computerName));
+                comboBoxEdit1.SelectedIndex = int.Parse(dts.Rows[0]["ThangCT"].ToString())-1;
+            }
 
             if (isAutoMode)
             {
                 btnRun.PerformClick();
                 HideToSystemTray();
-            } 
+            }
         }
         #endregion
 
@@ -1319,18 +1346,18 @@ namespace ToolTaiHD
                     // ============================================================
                     Log($"[{companyName}] 📥 Bắt đầu tải Excel đầu vào...");
 
-                    //bool t1 = await XulyexelvaoAsync(companyClient, 1, savedPath, companyName, mstcongtys);
-                    //bool t2 = await XulyexelvaoAsync(companyClient, 2, savedPath, companyName, mstcongtys);
-                    //bool t3 = await XulyexelvaoAsync(companyClient, 3, savedPath, companyName, mstcongtys);
+                    bool t1 = await XulyexelvaoAsync(companyClient, 1, savedPath, companyName, mstcongtys);
+                    bool t2 = await XulyexelvaoAsync(companyClient, 2, savedPath, companyName, mstcongtys);
+                    bool t3 = await XulyexelvaoAsync(companyClient, 3, savedPath, companyName, mstcongtys);
 
-                    //if (t1 && t2 && t3)
-                    //{
-                    //    Log($"✅ {companyName}: Tải Excel đầu vào thành công!");
-                    //}
-                    //else
-                    //{
-                    //    Log($"⚠️ {companyName}: Có lỗi khi tải Excel đầu vào!");
-                    //}
+                    if (t1 && t2 && t3)
+                    {
+                        Log($"✅ {companyName}: Tải Excel đầu vào thành công!");
+                    }
+                    else
+                    {
+                        Log($"⚠️ {companyName}: Có lỗi khi tải Excel đầu vào!");
+                    }
 
                     // ============================================================
                     // ✅ BƯỚC 2: TẢI HÓA ĐƠN ĐẦU VÀO
@@ -1529,7 +1556,7 @@ namespace ToolTaiHD
                             int supplierId = 103807;
 
                             // Lấy ngày đầu tháng
-                            DateTime firstDayOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                            DateTime firstDayOfMonth = new DateTime(DateTime.Now.Year, int.Parse(comboBoxEdit1.EditValue.ToString()), 1);
                             // Lấy ngày cuối tháng
                             DateTime lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
 
@@ -1838,8 +1865,8 @@ namespace ToolTaiHD
         {
             try
             {
-                DateTime dtFrom = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-                DateTime dtTo = DateTime.Now;
+                DateTime dtFrom = new DateTime(DateTime.Now.Year,int.Parse(comboBoxEdit1.EditValue.ToString()), 1);
+                DateTime dtTo = dtFrom.AddMonths(1).AddDays(-1); // Lấy đến cuối tháng
 
                 string formattedDate1 = dtFrom.ToString("dd/MM/yyyyTHH:mm:ss");
                 string formattedDate2 = dtTo.ToString("dd/MM/yyyyTHH:mm:ss");
@@ -1868,7 +1895,7 @@ namespace ToolTaiHD
                 }
 
                 string currentYear = $"HD{DateTime.Now.Year}";
-                string directoryPath = Path.Combine(savedPath, currentYear, "HDVao", DateTime.Now.Month.ToString());
+                string directoryPath = Path.Combine(savedPath, currentYear, "HDVao", comboBoxEdit1.EditValue.ToString());
                 Directory.CreateDirectory(directoryPath);
 
                 string filePath = Path.Combine(directoryPath, filename);
@@ -1913,7 +1940,7 @@ namespace ToolTaiHD
         {
             try
             {
-                DateTime dtFrom = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                DateTime dtFrom = new DateTime(DateTime.Now.Year, int.Parse(comboBoxEdit1.EditValue.ToString()), 1);
                 DateTime dtTo = dtFrom.AddMonths(1).AddDays(-1); // Lấy đến cuối tháng
 
                 string formattedDate1 = dtFrom.ToString("dd/MM/yyyyTHH:mm:ss");
@@ -1940,7 +1967,7 @@ namespace ToolTaiHD
                 }
 
                 string currentYear = $"HD{DateTime.Now.Year}";
-                string directoryPath = Path.Combine(savedPath, currentYear, "HDRa", DateTime.Now.Month.ToString());
+                string directoryPath = Path.Combine(savedPath, currentYear, "HDRa", comboBoxEdit1.EditValue.ToString());
                 Directory.CreateDirectory(directoryPath);
 
                 string filePath = Path.Combine(directoryPath, filename);
@@ -2034,7 +2061,7 @@ namespace ToolTaiHD
                 {
                     string folderName = type == 1 ? "HDVao" : "HDRa";
                     string currentYear = $"HD{DateTime.Now.Year}";
-                    string directoryPath = Path.Combine(savedPath, currentYear, folderName, DateTime.Now.Month.ToString());
+                    string directoryPath = Path.Combine(savedPath, currentYear, folderName, comboBoxEdit1.EditValue.ToString());
 
                     if (!Directory.Exists(directoryPath))
                     {
@@ -2531,37 +2558,13 @@ namespace ToolTaiHD
             // TToan
             XmlElement tToan = doc.CreateElement("TToan");
             ndHDon.AppendChild(tToan);
-            // TTKhac trong TToan
-            XmlElement ttKhacToan = doc.CreateElement("TTKhac");
-            ttKhacToan.AppendChild(TaoTTin(doc, "ServiceProvided", "String", "Le phi thi"));
-            ttKhacToan.AppendChild(TaoTTin(doc, "Location", "String", "British Council Ho Chi Minh City"));
-            ttKhacToan.AppendChild(TaoTTin(doc, "Datasource", "String", "ORS2"));
-            tToan.AppendChild(ttKhacToan);
 
-
-            // Tổng hợp thuế suất
-            XmlElement tHTTLTSuat = doc.CreateElement("THTTLTSuat");
-            XmlElement lTSuat = doc.CreateElement("LTSuat");
-            ThemPhanTu(doc, lTSuat, "TSuat", $"{Invoice.Hdhhdvu.FirstOrDefault()?.Tsuat.Value * 100}");
-            ThemPhanTu(doc, lTSuat, "TThue", $"{Invoice.Tgtthue}");
-            ThemPhanTu(doc, lTSuat, "ThTien", $"{Invoice.Tgtcthue}");
-            tHTTLTSuat.AppendChild(lTSuat);
-            tToan.AppendChild(tHTTLTSuat);
-            if (Invoice.Tgtphi.HasValue)
-            {
-                XmlElement TPhi = doc.CreateElement("TPhi");
-                ThemPhanTu(doc, TPhi, "ThTien", $"{Invoice.Tgtphi}");
-                tToan.AppendChild(TPhi);
-            }
-
-            if (Invoice.Tgtphi.HasValue)
-                ThemPhanTu(doc, tToan, "TgTCThue", $"{Invoice.Tgtcthue}");
-            else
-                ThemPhanTu(doc, tToan, "TgTCThue", $"{Invoice.Tgtcthue}");
-            ThemPhanTu(doc, tToan, "TgTThue", $"{Invoice.Tgtthue}");
-            ThemPhanTu(doc, tToan, "TTCKTMai", $"{Invoice.Ttcktmai}");
-            ThemPhanTu(doc, tToan, "TgTTTBSo", $"{Invoice.Tgtttbso}");
-            ThemPhanTu(doc, tToan, "TgTTTBChu", $"{Invoice.Tgtttbchu}");
+            // ✅ Sử dụng GetValueOrDefault() cho các giá trị decimal? và kiểm tra null
+            ThemPhanTu(doc, tToan, "TgTCThue", Invoice.Tgtcthue?.ToString() ?? "0");
+            ThemPhanTu(doc, tToan, "TgTThue", Invoice.Tgtthue?.ToString() ?? "0");
+            ThemPhanTu(doc, tToan, "TTCKTMai", Invoice.Ttcktmai?.ToString() ?? "0");
+            ThemPhanTu(doc, tToan, "TgTTTBSo", Invoice.Tgtttbso?.ToString() ?? "0");
+            ThemPhanTu(doc, tToan, "TgTTTBChu", Invoice.Tgtttbchu ?? "");
 
             XmlWriterSettings settings = new XmlWriterSettings
             {
@@ -5588,7 +5591,7 @@ string mst, string shDon, DateTime nLap, int Types)
             DataTable lsttbImport= ExecuteQuery2(gettbimport, connectionString);
             if (lsttbImport != null)
             {
-                lsttbImport = lsttbImport.AsEnumerable().Where(m => m.Field<DateTime>("Nlap").Month == DateTime.Now.Month).CopyToDataTable();  
+                lsttbImport = lsttbImport.AsEnumerable().Where(m => m.Field<DateTime>("Nlap").Month == int.Parse(comboBoxEdit1.EditValue.ToString())).CopyToDataTable();  
             }
             //Lọc theo điều kiện mật định nếu có
             int vbCoche = int.Parse(getResgistry.Rows[0]["VbCoche"].ToString());
@@ -5669,8 +5672,7 @@ string mst, string shDon, DateTime nLap, int Types)
             {
                 Log($"📁 File EXE mới nhất: {latestExe}");
                 Log($"📅 Thời gian sửa đổi: {File.GetLastWriteTime(latestExe)}");
-                Process.Start(latestExe);
-
+                Process.Start(latestExe); 
             }
             else
             {
@@ -5943,6 +5945,66 @@ string mst, string shDon, DateTime nLap, int Types)
 
         }
         static int currentProgress = 0;
+
+        private void comboBoxEdit1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string computerName = Environment.MachineName;
+
+            // Lấy giá trị tháng được chọn
+            int selectedMonth = 0;
+            if (comboBoxEdit1.SelectedItem != null)
+            {
+                selectedMonth = Convert.ToInt32(comboBoxEdit1.SelectedItem);
+            }
+
+            try
+            {
+                // 1. Kiểm tra xem đã có dòng Saoviet này chưa
+                string checkQuery = "SELECT COUNT(*) FROM tbRemember WHERE Saoviet = ?";
+                DataTable dt = ExecuteQuery(checkQuery, new OleDbParameter("?", computerName));
+
+                int count = Convert.ToInt32(dt.Rows[0][0]);
+                int rowsAffected = 0;
+
+                if (count > 0)
+                {
+                    // 2. Có rồi -> UPDATE
+                    string query = "UPDATE tbRemember SET ThangCT = ? WHERE Saoviet = ?";
+                    OleDbParameter[] parameters = new OleDbParameter[]
+                    {
+                new OleDbParameter("?", selectedMonth),
+                new OleDbParameter("?", computerName)
+                    };
+                    rowsAffected = ExecuteQueryResult(query, parameters);
+
+                    if (rowsAffected > 0)
+                    {
+                        Log($"✅ UPDATE ThangCT = {selectedMonth} cho {computerName}");
+                    }
+                }
+                else
+                {
+                    // 3. Chưa có -> INSERT
+                    string query = "INSERT INTO tbRemember (Saoviet, ThangCT) VALUES (?, ?)";
+                    OleDbParameter[] parameters = new OleDbParameter[]
+                    {
+                new OleDbParameter("?", computerName),
+                new OleDbParameter("?", selectedMonth)
+                    };
+                    rowsAffected = ExecuteQueryResult(query, parameters);
+
+                    if (rowsAffected > 0)
+                    {
+                        Log($"✅ INSERT ThangCT = {selectedMonth} cho {computerName}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"❌ Lỗi cập nhật ThangCT: {ex.Message}");
+                MessageBox.Show($"Lỗi: {ex.Message}");
+            }
+        }
     }
 
     #region Extension Methods
