@@ -450,6 +450,7 @@ namespace ToolTaiHD
             radioButton1.Text = "Có kết nối Internet!";
 
             string dbPath = Path.Combine("\\\\192.168.1.90\\Ke toan 2025 New\\1 Copi vao dung 1\\Hoadon", "Tooldb.accdb");
+            //string dbPath = Path.Combine("D:\\", "Tooldb.accdb");
             connectionString = $@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={dbPath};";
 
             string query = @"SELECT * FROM tbCompany WHERE Saoviet = ?  order by STT";
@@ -2470,62 +2471,63 @@ namespace ToolTaiHD
         #endregion
 
         #region XML File Creation
-        public static string TaoFileXmlChiCoDLHDon(string folderPath, string fileName, Invoice Invoice, DateTime NLap)
+        public static string TaoFileXmlChiCoDLHDon(string folderPath, string fileName = "HDon_44020.xml", Invoice Invoice = default, DateTime NLap = default)
         {
+            // Tạo thư mục nếu chưa có
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
-            string currentDate = NLap.ToString("yyyyMMdd");
-
-            fileName = $"{currentDate}_{fileName}_KNM.xml";
+            fileName = $"{fileName}_KNM.xml";
             string fullPath = Path.Combine(folderPath, fileName);
 
             XmlDocument doc = new XmlDocument();
             XmlElement root = doc.CreateElement("HDon");
             doc.AppendChild(root);
 
+            // ==================== <DLHDon> ====================
             XmlElement dlHDon = doc.CreateElement("DLHDon");
             dlHDon.SetAttribute("Id", "DuLieuKy");
             root.AppendChild(dlHDon);
 
-            // TTChung
+            // ---- TTChung ----
             XmlElement ttChung = doc.CreateElement("TTChung");
             dlHDon.AppendChild(ttChung);
 
-            ThemPhanTu(doc, ttChung, "PBan", Invoice.Pban ?? "");
-            ThemPhanTu(doc, ttChung, "THDon", "Hóa đơn GTGT");
-            ThemPhanTu(doc, ttChung, "KHMSHDon", Invoice.Khmshdon ?? "");
-            ThemPhanTu(doc, ttChung, "KHHDon", Invoice.Khhdon ?? "");
-            ThemPhanTu(doc, ttChung, "SHDon", Invoice.Shdon ?? "");
-            ThemPhanTu(doc, ttChung, "NLap", NLap.ToString("dd/MM/yyyy"));
+            ThemPhanTu(doc, ttChung, "PBan", $"{Invoice.Pban}");
+            ThemPhanTu(doc, ttChung, "THDon", $"Hóa đơn GTGT");
+            ThemPhanTu(doc, ttChung, "KHMSHDon", $"{Invoice.Khmshdon}");
+            ThemPhanTu(doc, ttChung, "KHHDon", $"{Invoice.Khhdon}");
+            ThemPhanTu(doc, ttChung, "SHDon", $"{Invoice.Shdon}");
+            ThemPhanTu(doc, ttChung, "NLap", $"{NLap}");
             ThemPhanTu(doc, ttChung, "HDCTTChinh", "0");
-            ThemPhanTu(doc, ttChung, "DVTTe", Invoice.Dvtte ?? "");
-            ThemPhanTu(doc, ttChung, "TGia", Invoice.Tgia ?? "");
-            ThemPhanTu(doc, ttChung, "HTTToan", Invoice.Thtttoan ?? "");
-            ThemPhanTu(doc, ttChung, "MSTTCGP", Invoice.Msttcgp ?? "");
+            ThemPhanTu(doc, ttChung, "DVTTe", $"{Invoice.Dvtte}");
+            ThemPhanTu(doc, ttChung, "TGia", $"{Invoice.Tgia}");
+            ThemPhanTu(doc, ttChung, "HTTToan", $"{Invoice.Thtttoan}");
+            ThemPhanTu(doc, ttChung, "MSTTCGP", $"{Invoice.Msttcgp}");
 
             // TTKhac trong TTChung
             XmlElement ttKhacChung = doc.CreateElement("TTKhac");
-            ttKhacChung.AppendChild(TaoTTin(doc, "Extra", "string", ""));
+            XmlElement tTin1 = TaoTTin(doc, "Extra", "string", "ThuyUyen.Nguyen@britishcouncil.org");
+            ttKhacChung.AppendChild(tTin1);
             ttChung.AppendChild(ttKhacChung);
 
-            // NDHDon
+            // ---- NDHDon ----
             XmlElement ndHDon = doc.CreateElement("NDHDon");
             dlHDon.AppendChild(ndHDon);
 
             // NBan
             XmlElement nBan = doc.CreateElement("NBan");
-            ThemPhanTu(doc, nBan, "Ten", Invoice.Nbten ?? "");
-            ThemPhanTu(doc, nBan, "MST", Invoice.Nbmst ?? "");
-            ThemPhanTu(doc, nBan, "DChi", Invoice.Nbdchi ?? "");
-            ThemPhanTu(doc, nBan, "SDThoai", Invoice.Nbsdthoai ?? "");
+            ThemPhanTu(doc, nBan, "Ten", $"{Invoice.Nbten}");
+            ThemPhanTu(doc, nBan, "MST", $"{Invoice.Nbmst}");
+            ThemPhanTu(doc, nBan, "DChi", $"{Invoice.Nbdchi}");
+            ThemPhanTu(doc, nBan, "SDThoai", $"{Invoice.Nbsdthoai}");
             ndHDon.AppendChild(nBan);
 
             // NMua
             XmlElement nMua = doc.CreateElement("NMua");
-            ThemPhanTu(doc, nMua, "Ten", Invoice.Nmten ?? "");
-            ThemPhanTu(doc, nMua, "MST", Invoice.Nmmst ?? "");
-            ThemPhanTu(doc, nMua, "DChi", Invoice.Nmdchi ?? "");
-            ThemPhanTu(doc, nMua, "MKHang", Invoice.Mkhang ?? "");
+            ThemPhanTu(doc, nMua, "Ten", $"{Invoice.Nmten}");
+            ThemPhanTu(doc, nMua, "MST", $"{Invoice.Nmmst}");
+            ThemPhanTu(doc, nMua, "DChi", $"{Invoice.Nmdchi}");
+            ThemPhanTu(doc, nMua, "MKHang", $"{Invoice.Mkhang}");
             ThemPhanTu(doc, nMua, "HVTNMHang", "");
             ndHDon.AppendChild(nMua);
 
@@ -2533,39 +2535,52 @@ namespace ToolTaiHD
             XmlElement dsHHDVu = doc.CreateElement("DSHHDVu");
             ndHDon.AppendChild(dsHHDVu);
 
+            // Hàng hóa dịch vụ 1
             int stt = 1;
-            if (Invoice.Hdhhdvu != null && Invoice.Hdhhdvu.Any())
+            foreach (var dt in Invoice.Hdhhdvu.ToList())
             {
-                foreach (var dt in Invoice.Hdhhdvu.ToList())
-                {
-                    // ✅ Lấy giá trị với kiểm tra null
-                    string ten = !string.IsNullOrEmpty(dt.Ten) ? dt.Ten : "Hoá đơn không nhận mã";
-                    string dvtinh = dt.Dvtinh ?? "";
-                    string sluong = dt.Sluong?.ToString() ?? "0";
-                    string dgia = dt.Dgia?.ToString() ?? "0";
-                    string tsuat = (dt.Tsuat ?? 0).ToString();
-                    string thtien = dt.Thtien?.ToString() ?? "0";
-
-                    TaoHangHoa(doc, dsHHDVu, "0", $"{stt}", ten, dvtinh, sluong, dgia, tsuat, thtien,
-                        new[] {
-                    ("Amount", "numeric", thtien),
-                    ("VATAmount", "numeric", "0")
-                        });
-                    stt++;
-                }
+                TaoHangHoa(doc, dsHHDVu, "0", $"{stt}", !string.IsNullOrEmpty(dt.Ten) ? $"{dt.Ten}" : "Hoá đơn không nhận mã", $"{dt.Dvtinh}", $"{dt.Sluong}", $"{dt.Dgia}", $"{dt.Tsuat.Value * 100}", $"{dt.Thtien}",
+              new[] { ("Amount", "numeric", $"{dt.Thtien}"), ("VATAmount", "numeric", "0") });
+                stt++;
             }
+
 
             // TToan
             XmlElement tToan = doc.CreateElement("TToan");
             ndHDon.AppendChild(tToan);
 
-            // ✅ Sử dụng GetValueOrDefault() cho các giá trị decimal? và kiểm tra null
-            ThemPhanTu(doc, tToan, "TgTCThue", Invoice.Tgtcthue?.ToString() ?? "0");
-            ThemPhanTu(doc, tToan, "TgTThue", Invoice.Tgtthue?.ToString() ?? "0");
-            ThemPhanTu(doc, tToan, "TTCKTMai", Invoice.Ttcktmai?.ToString() ?? "0");
-            ThemPhanTu(doc, tToan, "TgTTTBSo", Invoice.Tgtttbso?.ToString() ?? "0");
-            ThemPhanTu(doc, tToan, "TgTTTBChu", Invoice.Tgtttbchu ?? "");
+            // TTKhac trong TToan
+            XmlElement ttKhacToan = doc.CreateElement("TTKhac");
+            ttKhacToan.AppendChild(TaoTTin(doc, "ServiceProvided", "String", "Le phi thi"));
+            ttKhacToan.AppendChild(TaoTTin(doc, "Location", "String", "British Council Ho Chi Minh City"));
+            ttKhacToan.AppendChild(TaoTTin(doc, "Datasource", "String", "ORS2"));
+            tToan.AppendChild(ttKhacToan);
 
+            // Tổng hợp thuế suất
+            XmlElement tHTTLTSuat = doc.CreateElement("THTTLTSuat");
+            XmlElement lTSuat = doc.CreateElement("LTSuat");
+            ThemPhanTu(doc, lTSuat, "TSuat", $"{Invoice.Hdhhdvu.FirstOrDefault()?.Tsuat.Value * 100}");
+            ThemPhanTu(doc, lTSuat, "TThue", $"{Invoice.Tgtthue}");
+            ThemPhanTu(doc, lTSuat, "ThTien", $"{Invoice.Tgtcthue}");
+            tHTTLTSuat.AppendChild(lTSuat);
+            tToan.AppendChild(tHTTLTSuat);
+            if (Invoice.Tgtphi.HasValue)
+            {
+                XmlElement TPhi = doc.CreateElement("TPhi");
+                ThemPhanTu(doc, TPhi, "ThTien", $"{Invoice.Tgtphi}");
+                tToan.AppendChild(TPhi);
+            }
+
+            if (Invoice.Tgtphi.HasValue)
+                ThemPhanTu(doc, tToan, "TgTCThue", $"{Invoice.Tgtcthue}");
+            else
+                ThemPhanTu(doc, tToan, "TgTCThue", $"{Invoice.Tgtcthue}");
+            ThemPhanTu(doc, tToan, "TgTThue", $"{Invoice.Tgtthue}");
+            ThemPhanTu(doc, tToan, "TTCKTMai", $"{Invoice.Ttcktmai}");
+            ThemPhanTu(doc, tToan, "TgTTTBSo", $"{Invoice.Tgtttbso}");
+            ThemPhanTu(doc, tToan, "TgTTTBChu", $"{Invoice.Tgtttbchu}");
+
+            // Lưu file đẹp
             XmlWriterSettings settings = new XmlWriterSettings
             {
                 Indent = true,
@@ -2576,11 +2591,12 @@ namespace ToolTaiHD
 
             using (XmlWriter writer = XmlWriter.Create(fullPath, settings))
             {
-                doc.Save(writer); 
+                doc.Save(writer);
             }
 
             return fullPath;
         }
+
         static void ThemPhanTu(XmlDocument doc, XmlElement parent, string ten, string giaTri)
         {
             XmlElement e = doc.CreateElement(ten);
