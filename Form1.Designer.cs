@@ -34,6 +34,7 @@
             DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject2 = new DevExpress.Utils.SerializableAppearanceObject();
             DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject3 = new DevExpress.Utils.SerializableAppearanceObject();
             DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject4 = new DevExpress.Utils.SerializableAppearanceObject();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.gridControl1 = new DevExpress.XtraGrid.GridControl();
             this.companyBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.gridView1 = new DevExpress.XtraGrid.Views.Grid.GridView();
@@ -50,13 +51,15 @@
             this.gridColumn2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn3 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn4 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.gridColumn5 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.repositoryItemButtonEdit1 = new DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit();
             this.congtyBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.btnRun = new DevExpress.XtraEditors.SimpleButton();
             this.groupControl1 = new DevExpress.XtraEditors.GroupControl();
-            this.comboBoxEdit1 = new DevExpress.XtraEditors.ComboBoxEdit();
+            this.svgImageBox5 = new DevExpress.XtraEditors.SvgImageBox();
+            this.svgImageBox4 = new DevExpress.XtraEditors.SvgImageBox();
+            this.svgImageBox3 = new DevExpress.XtraEditors.SvgImageBox();
             this.labelControl4 = new DevExpress.XtraEditors.LabelControl();
-            this.labelControl5 = new DevExpress.XtraEditors.LabelControl();
             this.txttimeout = new DevExpress.XtraEditors.TextEdit();
             this.labelControl2 = new DevExpress.XtraEditors.LabelControl();
             this.txtBlock3 = new DevExpress.XtraEditors.TextEdit();
@@ -69,6 +72,9 @@
             this.txtBlock1 = new DevExpress.XtraEditors.TextEdit();
             this.chkMoc1 = new DevExpress.XtraEditors.CheckEdit();
             this.checkEdit1 = new DevExpress.XtraEditors.CheckEdit();
+            this.dateEdit1 = new DevExpress.XtraEditors.DateEdit();
+            this.comboBoxEdit1 = new DevExpress.XtraEditors.ComboBoxEdit();
+            this.labelControl5 = new DevExpress.XtraEditors.LabelControl();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.groupControl2 = new DevExpress.XtraEditors.GroupControl();
             this.labelControl3 = new DevExpress.XtraEditors.LabelControl();
@@ -76,6 +82,11 @@
             this.txtsolanlap = new DevExpress.XtraEditors.TextEdit();
             this.txtSovongtai = new DevExpress.XtraEditors.TextEdit();
             this.label2 = new System.Windows.Forms.Label();
+            this.dateEdit2 = new DevExpress.XtraEditors.DateEdit();
+            this.labelControl6 = new DevExpress.XtraEditors.LabelControl();
+            this.labelControl7 = new DevExpress.XtraEditors.LabelControl();
+            this.svgImageBox1 = new DevExpress.XtraEditors.SvgImageBox();
+            this.svgImageBox2 = new DevExpress.XtraEditors.SvgImageBox();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.companyBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
@@ -83,7 +94,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.congtyBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).BeginInit();
             this.groupControl1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.svgImageBox5)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.svgImageBox4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.svgImageBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txttimeout.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtBlock3.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkMoc3.Properties)).BeginInit();
@@ -93,21 +106,28 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtBlock1.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkMoc1.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.checkEdit1.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateEdit1.Properties.CalendarTimeProperties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateEdit1.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl2)).BeginInit();
             this.groupControl2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtsolanlap.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtSovongtai.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateEdit2.Properties.CalendarTimeProperties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateEdit2.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.svgImageBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.svgImageBox2)).BeginInit();
             this.SuspendLayout();
             // 
             // gridControl1
             // 
             this.gridControl1.DataSource = this.companyBindingSource;
-            this.gridControl1.Location = new System.Drawing.Point(8, 153);
+            this.gridControl1.Location = new System.Drawing.Point(6, 167);
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
             this.gridControl1.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.repositoryItemButtonEdit1});
-            this.gridControl1.Size = new System.Drawing.Size(1244, 294);
+            this.gridControl1.Size = new System.Drawing.Size(1244, 272);
             this.gridControl1.TabIndex = 0;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -132,9 +152,11 @@
             this.gridColumn1,
             this.gridColumn2,
             this.gridColumn3,
-            this.gridColumn4});
+            this.gridColumn4,
+            this.gridColumn5});
             this.gridView1.GridControl = this.gridControl1;
             this.gridView1.Name = "gridView1";
+            this.gridView1.OptionsView.ShowGroupPanel = false;
             this.gridView1.CellValueChanged += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView1_CellValueChanged);
             // 
             // colName
@@ -144,7 +166,7 @@
             this.colName.Name = "colName";
             this.colName.Visible = true;
             this.colName.VisibleIndex = 1;
-            this.colName.Width = 217;
+            this.colName.Width = 198;
             // 
             // colDbpath
             // 
@@ -161,7 +183,7 @@
             this.colFolderPath.Name = "colFolderPath";
             this.colFolderPath.Visible = true;
             this.colFolderPath.VisibleIndex = 2;
-            this.colFolderPath.Width = 284;
+            this.colFolderPath.Width = 139;
             // 
             // colMST
             // 
@@ -177,7 +199,7 @@
             this.colSTT.Name = "colSTT";
             this.colSTT.Visible = true;
             this.colSTT.VisibleIndex = 0;
-            this.colSTT.Width = 48;
+            this.colSTT.Width = 43;
             // 
             // colStatus
             // 
@@ -187,7 +209,7 @@
             this.colStatus.Name = "colStatus";
             this.colStatus.Visible = true;
             this.colStatus.VisibleIndex = 3;
-            this.colStatus.Width = 220;
+            this.colStatus.Width = 297;
             // 
             // colIsRun
             // 
@@ -196,7 +218,7 @@
             this.colIsRun.Name = "colIsRun";
             this.colIsRun.Visible = true;
             this.colIsRun.VisibleIndex = 4;
-            this.colIsRun.Width = 52;
+            this.colIsRun.Width = 62;
             // 
             // colDauvao
             // 
@@ -220,7 +242,7 @@
             this.gridColumn1.Name = "gridColumn1";
             this.gridColumn1.Visible = true;
             this.gridColumn1.VisibleIndex = 8;
-            this.gridColumn1.Width = 107;
+            this.gridColumn1.Width = 64;
             // 
             // gridColumn2
             // 
@@ -230,7 +252,7 @@
             this.gridColumn2.Name = "gridColumn2";
             this.gridColumn2.Visible = true;
             this.gridColumn2.VisibleIndex = 5;
-            this.gridColumn2.Width = 108;
+            this.gridColumn2.Width = 102;
             // 
             // gridColumn3
             // 
@@ -240,7 +262,7 @@
             this.gridColumn3.Name = "gridColumn3";
             this.gridColumn3.Visible = true;
             this.gridColumn3.VisibleIndex = 6;
-            this.gridColumn3.Width = 86;
+            this.gridColumn3.Width = 103;
             // 
             // gridColumn4
             // 
@@ -250,7 +272,17 @@
             this.gridColumn4.Name = "gridColumn4";
             this.gridColumn4.Visible = true;
             this.gridColumn4.VisibleIndex = 7;
-            this.gridColumn4.Width = 119;
+            this.gridColumn4.Width = 97;
+            // 
+            // gridColumn5
+            // 
+            this.gridColumn5.Caption = "Xoá";
+            this.gridColumn5.FieldName = "Delete";
+            this.gridColumn5.MinWidth = 25;
+            this.gridColumn5.Name = "gridColumn5";
+            this.gridColumn5.Visible = true;
+            this.gridColumn5.VisibleIndex = 9;
+            this.gridColumn5.Width = 55;
             // 
             // repositoryItemButtonEdit1
             // 
@@ -275,9 +307,10 @@
             // 
             // groupControl1
             // 
-            this.groupControl1.Controls.Add(this.comboBoxEdit1);
+            this.groupControl1.Controls.Add(this.svgImageBox5);
+            this.groupControl1.Controls.Add(this.svgImageBox4);
+            this.groupControl1.Controls.Add(this.svgImageBox3);
             this.groupControl1.Controls.Add(this.labelControl4);
-            this.groupControl1.Controls.Add(this.labelControl5);
             this.groupControl1.Controls.Add(this.txttimeout);
             this.groupControl1.Controls.Add(this.labelControl2);
             this.groupControl1.Controls.Add(this.txtBlock3);
@@ -290,22 +323,42 @@
             this.groupControl1.Controls.Add(this.txtBlock1);
             this.groupControl1.Controls.Add(this.chkMoc1);
             this.groupControl1.Controls.Add(this.checkEdit1);
+            this.groupControl1.GroupStyle = DevExpress.Utils.GroupStyle.Card;
             this.groupControl1.Location = new System.Drawing.Point(12, 12);
             this.groupControl1.Name = "groupControl1";
             this.groupControl1.Size = new System.Drawing.Size(1238, 109);
             this.groupControl1.TabIndex = 14;
             this.groupControl1.Text = "Thiết lập";
             // 
-            // comboBoxEdit1
+            // svgImageBox5
             // 
-            this.comboBoxEdit1.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.comboBoxEdit1.Location = new System.Drawing.Point(1134, 31);
-            this.comboBoxEdit1.Name = "comboBoxEdit1";
-            this.comboBoxEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.comboBoxEdit1.Size = new System.Drawing.Size(83, 24);
-            this.comboBoxEdit1.TabIndex = 17;
-            this.comboBoxEdit1.SelectedIndexChanged += new System.EventHandler(this.comboBoxEdit1_SelectedIndexChanged);
+            this.svgImageBox5.Location = new System.Drawing.Point(926, 72);
+            this.svgImageBox5.Name = "svgImageBox5";
+            this.svgImageBox5.Size = new System.Drawing.Size(23, 21);
+            this.svgImageBox5.SizeMode = DevExpress.XtraEditors.SvgImageSizeMode.Stretch;
+            this.svgImageBox5.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("svgImageBox5.SvgImage")));
+            this.svgImageBox5.TabIndex = 28;
+            this.svgImageBox5.Text = "svgImageBox5";
+            // 
+            // svgImageBox4
+            // 
+            this.svgImageBox4.Location = new System.Drawing.Point(670, 71);
+            this.svgImageBox4.Name = "svgImageBox4";
+            this.svgImageBox4.Size = new System.Drawing.Size(23, 21);
+            this.svgImageBox4.SizeMode = DevExpress.XtraEditors.SvgImageSizeMode.Stretch;
+            this.svgImageBox4.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("svgImageBox4.SvgImage")));
+            this.svgImageBox4.TabIndex = 27;
+            this.svgImageBox4.Text = "svgImageBox4";
+            // 
+            // svgImageBox3
+            // 
+            this.svgImageBox3.Location = new System.Drawing.Point(415, 69);
+            this.svgImageBox3.Name = "svgImageBox3";
+            this.svgImageBox3.Size = new System.Drawing.Size(23, 21);
+            this.svgImageBox3.SizeMode = DevExpress.XtraEditors.SvgImageSizeMode.Stretch;
+            this.svgImageBox3.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("svgImageBox3.SvgImage")));
+            this.svgImageBox3.TabIndex = 26;
+            this.svgImageBox3.Text = "svgImageBox3";
             // 
             // labelControl4
             // 
@@ -317,32 +370,19 @@
             this.labelControl4.TabIndex = 15;
             this.labelControl4.Text = "Mốc thời gian tải trong ngày";
             // 
-            // labelControl5
-            // 
-            this.labelControl5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelControl5.Appearance.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
-            this.labelControl5.Appearance.ForeColor = System.Drawing.Color.DeepSkyBlue;
-            this.labelControl5.Appearance.Options.UseFont = true;
-            this.labelControl5.Appearance.Options.UseForeColor = true;
-            this.labelControl5.Location = new System.Drawing.Point(1069, 35);
-            this.labelControl5.Name = "labelControl5";
-            this.labelControl5.Size = new System.Drawing.Size(59, 16);
-            this.labelControl5.TabIndex = 16;
-            this.labelControl5.Text = "Tháng CT";
-            // 
             // txttimeout
             // 
             this.txttimeout.EditValue = "6";
             this.txttimeout.Location = new System.Drawing.Point(769, 31);
             this.txttimeout.Name = "txttimeout";
-            this.txttimeout.Size = new System.Drawing.Size(67, 24);
+            this.txttimeout.Size = new System.Drawing.Size(67, 22);
             this.txttimeout.TabIndex = 14;
             this.txttimeout.EditValueChanged += new System.EventHandler(this.txttimeout_EditValueChanged);
             // 
             // labelControl2
             // 
             this.labelControl2.Appearance.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
-            this.labelControl2.Appearance.ForeColor = System.Drawing.Color.Yellow;
+            this.labelControl2.Appearance.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.labelControl2.Appearance.Options.UseFont = true;
             this.labelControl2.Appearance.Options.UseForeColor = true;
             this.labelControl2.Location = new System.Drawing.Point(533, 35);
@@ -354,16 +394,16 @@
             // txtBlock3
             // 
             this.txtBlock3.Enabled = false;
-            this.txtBlock3.Location = new System.Drawing.Point(769, 69);
+            this.txtBlock3.Location = new System.Drawing.Point(824, 71);
             this.txtBlock3.Name = "txtBlock3";
-            this.txtBlock3.Size = new System.Drawing.Size(125, 24);
+            this.txtBlock3.Size = new System.Drawing.Size(125, 22);
             this.txtBlock3.TabIndex = 12;
             this.txtBlock3.EditValueChanged += new System.EventHandler(this.txtBlock3_EditValueChanged);
             this.txtBlock3.Validated += new System.EventHandler(this.txtBlock3_Validated);
             // 
             // chkMoc3
             // 
-            this.chkMoc3.Location = new System.Drawing.Point(679, 73);
+            this.chkMoc3.Location = new System.Drawing.Point(742, 73);
             this.chkMoc3.Name = "chkMoc3";
             this.chkMoc3.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
             this.chkMoc3.Properties.Appearance.Options.UseFont = true;
@@ -377,14 +417,14 @@
             this.txtSoluongtai.EditValue = "2";
             this.txtSoluongtai.Location = new System.Drawing.Point(435, 31);
             this.txtSoluongtai.Name = "txtSoluongtai";
-            this.txtSoluongtai.Size = new System.Drawing.Size(53, 24);
+            this.txtSoluongtai.Size = new System.Drawing.Size(53, 22);
             this.txtSoluongtai.TabIndex = 10;
             this.txtSoluongtai.EditValueChanged += new System.EventHandler(this.textEdit4_EditValueChanged);
             // 
             // labelControl1
             // 
             this.labelControl1.Appearance.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
-            this.labelControl1.Appearance.ForeColor = System.Drawing.Color.Lime;
+            this.labelControl1.Appearance.ForeColor = System.Drawing.Color.Green;
             this.labelControl1.Appearance.Options.UseFont = true;
             this.labelControl1.Appearance.Options.UseForeColor = true;
             this.labelControl1.Location = new System.Drawing.Point(231, 35);
@@ -397,27 +437,28 @@
             // radioButton1
             // 
             this.radioButton1.AutoSize = true;
-            this.radioButton1.Location = new System.Drawing.Point(1071, 3);
+            this.radioButton1.BackColor = System.Drawing.Color.Lime;
+            this.radioButton1.Location = new System.Drawing.Point(1077, 0);
             this.radioButton1.Name = "radioButton1";
             this.radioButton1.Size = new System.Drawing.Size(100, 20);
             this.radioButton1.TabIndex = 7;
             this.radioButton1.TabStop = true;
             this.radioButton1.Text = "radioButton1";
-            this.radioButton1.UseVisualStyleBackColor = true;
+            this.radioButton1.UseVisualStyleBackColor = false;
             // 
             // txtBlock2
             // 
             this.txtBlock2.Enabled = false;
-            this.txtBlock2.Location = new System.Drawing.Point(548, 71);
+            this.txtBlock2.Location = new System.Drawing.Point(568, 70);
             this.txtBlock2.Name = "txtBlock2";
-            this.txtBlock2.Size = new System.Drawing.Size(125, 24);
+            this.txtBlock2.Size = new System.Drawing.Size(125, 22);
             this.txtBlock2.TabIndex = 4;
             this.txtBlock2.EditValueChanged += new System.EventHandler(this.txtBlock2_EditValueChanged);
             this.txtBlock2.Validated += new System.EventHandler(this.txtBlock2_Validated);
             // 
             // chkMoc2
             // 
-            this.chkMoc2.Location = new System.Drawing.Point(454, 73);
+            this.chkMoc2.Location = new System.Drawing.Point(486, 71);
             this.chkMoc2.Name = "chkMoc2";
             this.chkMoc2.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
             this.chkMoc2.Properties.Appearance.Options.UseFont = true;
@@ -429,21 +470,21 @@
             // txtBlock1
             // 
             this.txtBlock1.Enabled = false;
-            this.txtBlock1.Location = new System.Drawing.Point(306, 69);
+            this.txtBlock1.Location = new System.Drawing.Point(313, 69);
             this.txtBlock1.Name = "txtBlock1";
-            this.txtBlock1.Size = new System.Drawing.Size(125, 24);
+            this.txtBlock1.Size = new System.Drawing.Size(125, 22);
             this.txtBlock1.TabIndex = 2;
             this.txtBlock1.EditValueChanged += new System.EventHandler(this.txtBlock1_EditValueChanged);
             this.txtBlock1.Validated += new System.EventHandler(this.txtBlock1_Validated);
             // 
             // chkMoc1
             // 
-            this.chkMoc1.Location = new System.Drawing.Point(223, 73);
+            this.chkMoc1.Location = new System.Drawing.Point(231, 71);
             this.chkMoc1.Name = "chkMoc1";
             this.chkMoc1.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
             this.chkMoc1.Properties.Appearance.Options.UseFont = true;
             this.chkMoc1.Properties.Caption = "Mốc TG1";
-            this.chkMoc1.Size = new System.Drawing.Size(94, 20);
+            this.chkMoc1.Size = new System.Drawing.Size(81, 20);
             this.chkMoc1.TabIndex = 1;
             this.chkMoc1.CheckedChanged += new System.EventHandler(this.chkMoc1_CheckedChanged);
             // 
@@ -452,7 +493,7 @@
             this.checkEdit1.Location = new System.Drawing.Point(17, 33);
             this.checkEdit1.Name = "checkEdit1";
             this.checkEdit1.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
-            this.checkEdit1.Properties.Appearance.ForeColor = System.Drawing.Color.LightCoral;
+            this.checkEdit1.Properties.Appearance.ForeColor = System.Drawing.Color.Firebrick;
             this.checkEdit1.Properties.Appearance.Options.UseFont = true;
             this.checkEdit1.Properties.Appearance.Options.UseForeColor = true;
             this.checkEdit1.Properties.Caption = "Chạy khi khởi động máy";
@@ -460,15 +501,52 @@
             this.checkEdit1.TabIndex = 0;
             this.checkEdit1.CheckedChanged += new System.EventHandler(this.checkEdit1_CheckedChanged);
             // 
+            // dateEdit1
+            // 
+            this.dateEdit1.EditValue = null;
+            this.dateEdit1.Location = new System.Drawing.Point(274, 135);
+            this.dateEdit1.Name = "dateEdit1";
+            this.dateEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.dateEdit1.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.dateEdit1.Size = new System.Drawing.Size(100, 22);
+            this.dateEdit1.TabIndex = 18;
+            this.dateEdit1.EditValueChanged += new System.EventHandler(this.dateEdit1_EditValueChanged);
+            // 
+            // comboBoxEdit1
+            // 
+            this.comboBoxEdit1.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.comboBoxEdit1.Location = new System.Drawing.Point(78, 134);
+            this.comboBoxEdit1.Name = "comboBoxEdit1";
+            this.comboBoxEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.comboBoxEdit1.Size = new System.Drawing.Size(83, 22);
+            this.comboBoxEdit1.TabIndex = 17;
+            this.comboBoxEdit1.SelectedIndexChanged += new System.EventHandler(this.comboBoxEdit1_SelectedIndexChanged);
+            // 
+            // labelControl5
+            // 
+            this.labelControl5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.labelControl5.Appearance.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
+            this.labelControl5.Appearance.ForeColor = System.Drawing.Color.DodgerBlue;
+            this.labelControl5.Appearance.Options.UseFont = true;
+            this.labelControl5.Appearance.Options.UseForeColor = true;
+            this.labelControl5.Location = new System.Drawing.Point(13, 137);
+            this.labelControl5.Name = "labelControl5";
+            this.labelControl5.Size = new System.Drawing.Size(59, 16);
+            this.labelControl5.TabIndex = 16;
+            this.labelControl5.Text = "Tháng CT";
+            // 
             // richTextBox1
             // 
             this.richTextBox1.BackColor = System.Drawing.Color.SlateGray;
             this.richTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.richTextBox1.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
             this.richTextBox1.ForeColor = System.Drawing.SystemColors.HighlightText;
-            this.richTextBox1.Location = new System.Drawing.Point(2, 27);
+            this.richTextBox1.Location = new System.Drawing.Point(2, 25);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(1240, 98);
+            this.richTextBox1.Size = new System.Drawing.Size(1240, 100);
             this.richTextBox1.TabIndex = 15;
             this.richTextBox1.Text = "...";
             // 
@@ -488,13 +566,14 @@
             this.labelControl3.Size = new System.Drawing.Size(12, 16);
             this.labelControl3.TabIndex = 17;
             this.labelControl3.Text = "...";
+            this.labelControl3.Visible = false;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
-            this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
-            this.label1.Location = new System.Drawing.Point(869, 131);
+            this.label1.ForeColor = System.Drawing.Color.Green;
+            this.label1.Location = new System.Drawing.Point(1014, 134);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(175, 16);
             this.label1.TabIndex = 18;
@@ -503,45 +582,106 @@
             // txtsolanlap
             // 
             this.txtsolanlap.EditValue = "2";
-            this.txtsolanlap.Location = new System.Drawing.Point(1058, 127);
+            this.txtsolanlap.Location = new System.Drawing.Point(1195, 131);
             this.txtsolanlap.Name = "txtsolanlap";
-            this.txtsolanlap.Size = new System.Drawing.Size(125, 24);
+            this.txtsolanlap.Size = new System.Drawing.Size(52, 22);
             this.txtsolanlap.TabIndex = 19;
             // 
             // txtSovongtai
             // 
-            this.txtSovongtai.EditValue = "2";
-            this.txtSovongtai.Location = new System.Drawing.Point(719, 127);
+            this.txtSovongtai.EditValue = "1";
+            this.txtSovongtai.Location = new System.Drawing.Point(467, 468);
             this.txtSovongtai.Name = "txtSovongtai";
-            this.txtSovongtai.Size = new System.Drawing.Size(125, 24);
+            this.txtSovongtai.Size = new System.Drawing.Size(125, 22);
             this.txtSovongtai.TabIndex = 21;
+            this.txtSovongtai.Visible = false;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
             this.label2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
-            this.label2.Location = new System.Drawing.Point(590, 131);
+            this.label2.Location = new System.Drawing.Point(325, 471);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(123, 16);
             this.label2.TabIndex = 20;
             this.label2.Text = "Số vòng tải tất cả";
+            this.label2.Visible = false;
+            // 
+            // dateEdit2
+            // 
+            this.dateEdit2.EditValue = null;
+            this.dateEdit2.Location = new System.Drawing.Point(527, 135);
+            this.dateEdit2.Name = "dateEdit2";
+            this.dateEdit2.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.dateEdit2.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.dateEdit2.Size = new System.Drawing.Size(102, 22);
+            this.dateEdit2.TabIndex = 19;
+            this.dateEdit2.EditValueChanged += new System.EventHandler(this.dateEdit2_EditValueChanged);
+            // 
+            // labelControl6
+            // 
+            this.labelControl6.Location = new System.Drawing.Point(186, 137);
+            this.labelControl6.Name = "labelControl6";
+            this.labelControl6.Size = new System.Drawing.Size(47, 16);
+            this.labelControl6.TabIndex = 22;
+            this.labelControl6.Text = "Từ ngày";
+            // 
+            // labelControl7
+            // 
+            this.labelControl7.Location = new System.Drawing.Point(430, 138);
+            this.labelControl7.Name = "labelControl7";
+            this.labelControl7.Size = new System.Drawing.Size(54, 16);
+            this.labelControl7.TabIndex = 23;
+            this.labelControl7.Text = "Đến ngày";
+            // 
+            // svgImageBox1
+            // 
+            this.svgImageBox1.Location = new System.Drawing.Point(240, 132);
+            this.svgImageBox1.Name = "svgImageBox1";
+            this.svgImageBox1.Size = new System.Drawing.Size(32, 30);
+            this.svgImageBox1.SizeMode = DevExpress.XtraEditors.SvgImageSizeMode.Stretch;
+            this.svgImageBox1.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("svgImageBox1.SvgImage")));
+            this.svgImageBox1.TabIndex = 24;
+            this.svgImageBox1.Text = "svgImageBox1";
+            // 
+            // svgImageBox2
+            // 
+            this.svgImageBox2.Location = new System.Drawing.Point(489, 131);
+            this.svgImageBox2.Name = "svgImageBox2";
+            this.svgImageBox2.Size = new System.Drawing.Size(32, 30);
+            this.svgImageBox2.SizeMode = DevExpress.XtraEditors.SvgImageSizeMode.Stretch;
+            this.svgImageBox2.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("svgImageBox2.SvgImage")));
+            this.svgImageBox2.TabIndex = 25;
+            this.svgImageBox2.Text = "svgImageBox2";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(1264, 649);
+            this.Controls.Add(this.svgImageBox2);
+            this.Controls.Add(this.svgImageBox1);
+            this.Controls.Add(this.labelControl7);
+            this.Controls.Add(this.labelControl6);
+            this.Controls.Add(this.dateEdit2);
             this.Controls.Add(this.txtSovongtai);
+            this.Controls.Add(this.dateEdit1);
             this.Controls.Add(this.label2);
+            this.Controls.Add(this.comboBoxEdit1);
             this.Controls.Add(this.txtsolanlap);
             this.Controls.Add(this.label1);
+            this.Controls.Add(this.labelControl5);
             this.Controls.Add(this.labelControl3);
             this.Controls.Add(this.groupControl2);
             this.Controls.Add(this.groupControl1);
             this.Controls.Add(this.btnRun);
             this.Controls.Add(this.gridControl1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.IconOptions.Icon = ((System.Drawing.Icon)(resources.GetObject("Form1.IconOptions.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -555,7 +695,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).EndInit();
             this.groupControl1.ResumeLayout(false);
             this.groupControl1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.svgImageBox5)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.svgImageBox4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.svgImageBox3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txttimeout.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtBlock3.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkMoc3.Properties)).EndInit();
@@ -565,10 +707,17 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtBlock1.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkMoc1.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.checkEdit1.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateEdit1.Properties.CalendarTimeProperties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateEdit1.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl2)).EndInit();
             this.groupControl2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.txtsolanlap.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtSovongtai.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateEdit2.Properties.CalendarTimeProperties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateEdit2.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.svgImageBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.svgImageBox2)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -618,6 +767,16 @@
         private DevExpress.XtraGrid.Columns.GridColumn gridColumn4;
         private DevExpress.XtraEditors.LabelControl labelControl5;
         private DevExpress.XtraEditors.ComboBoxEdit comboBoxEdit1;
+        private DevExpress.XtraGrid.Columns.GridColumn gridColumn5;
+        private DevExpress.XtraEditors.DateEdit dateEdit1;
+        private DevExpress.XtraEditors.DateEdit dateEdit2;
+        private DevExpress.XtraEditors.LabelControl labelControl6;
+        private DevExpress.XtraEditors.LabelControl labelControl7;
+        private DevExpress.XtraEditors.SvgImageBox svgImageBox1;
+        private DevExpress.XtraEditors.SvgImageBox svgImageBox2;
+        private DevExpress.XtraEditors.SvgImageBox svgImageBox5;
+        private DevExpress.XtraEditors.SvgImageBox svgImageBox4;
+        private DevExpress.XtraEditors.SvgImageBox svgImageBox3;
     }
 }
 

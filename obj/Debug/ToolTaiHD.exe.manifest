@@ -990,14 +990,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ToolTaiHD.exe" size="368544">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ToolTaiHD.exe" size="401312">
       <assemblyIdentity name="ToolTaiHD" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>KAGgtVe+Bujb226PT2UD2ra+b8Yb65GUgNSIK0SbgKg=</dsig:DigestValue>
+        <dsig:DigestValue>z01u88VZuS/5Sx4VZ+GaSjsb4nXOdT6++GMnJyaDJS8=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -1010,13 +1010,13 @@
       <dsig:DigestValue>zfpLGOXW7KQhUEh3EjqbnjMKl1DqBsPOmbLEBaZRcZA=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="ToolTaiHD.exe.config" size="3068">
+  <file name="ToolTaiHD.exe.config" size="3074">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>rJ4dVSeitbHwy/fli7y7oAQ0DjYMIL5la3KKErXBP1A=</dsig:DigestValue>
+      <dsig:DigestValue>Vs5R1ok7KklBgwK/ZOkSv/NoQq0zR9IV71FhH9Py6R4=</dsig:DigestValue>
     </hash>
   </file>
 </asmv1:assembly>

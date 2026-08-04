@@ -129,4 +129,5 @@ D:\DA3\ToolTaiHD\ToolTaiHD\obj\Debug\ToolTaiHD.application
 D:\DA3\ToolTaiHD\ToolTaiHD\obj\Debug\ToolTaiHD.csproj.Up2Date
 D:\DA3\ToolTaiHD\ToolTaiHD\obj\Debug\ToolTaiHD.exe
 D:\DA3\ToolTaiHD\ToolTaiHD\obj\Debug\ToolTaiHD.pdb
+D:\DA3\ToolTaiHD\ToolTaiHD\obj\Debug\ToolTaiHD.LoadingForm.resources
 D:\DA3\ToolTaiHD\ToolTaiHD\obj\Debug\ToolTaiHD.exe.config
