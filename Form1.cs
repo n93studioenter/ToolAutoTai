@@ -1,10 +1,12 @@
-﻿using BrotliSharpLib;
+﻿using AutoUpdaterDotNET;
+using BrotliSharpLib;
 using ClosedXML.Excel;
 using ClosedXML.Parser;
 using DevExpress.ClipboardSource.SpreadsheetML;
 using DevExpress.Data.Utils;
 using DevExpress.Xpo.DB.Helpers;
 using DevExpress.XtraEditors;
+using DevExpress.XtraEditors.Controls;
 using DevExpress.XtraEditors.Repository;
 using DevExpress.XtraGrid;
 using DevExpress.XtraGrid.Columns;
@@ -138,7 +140,8 @@ namespace ToolTaiHD
         public Form1(bool isAutoMode = false)
 
         {
-            InitializeComponent();
+            InitializeComponent(); 
+
             this.isAutoMode = isAutoMode; // ✅ Lưu lại
 
             if (isAutoMode)
@@ -494,13 +497,27 @@ namespace ToolTaiHD
         }
         private async void Form1_Load(object sender, EventArgs e)
         {
+            string updateUrl = @"\\192.168.1.90\Ke toan 2025 New\ToolTaiTuDong\update.xml";
+            try
+            {
+                Version currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+                this.Text = $"ToolTaiHD - v{currentVersion}";
+                AutoUpdater.Start(updateUrl);
+            }
+            catch (Exception ex)
+            {
+                // Bỏ qua lỗi nếu không kết nối được server
+                MessageBox.Show($"Không thể kiểm tra cập nhật: {ex.Message}",
+                              "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
             LoadingForm loadingForm = new LoadingForm();
-            this.Opacity=0;
+            this.Opacity = 0;
             loadingForm.Show();
             Application.DoEvents();
             // KillVietStarProcesses();
             string computerName = Environment.MachineName;
-            this.Text = $"{computerName} - Saoviet auto";
+           // this.Text = $"{computerName} - Saoviet auto";
             await Task.Run(() => WaitForInternetConnection());
 
             radioButton1.Checked = true;

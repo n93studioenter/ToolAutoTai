@@ -68,6 +68,7 @@ namespace ToolTaiHD
 
                 // ✅ Tạo form với tham số isAutoMode
                 Form1 form = new Form1(isAutoStart || isTaskScheduler);
+               // Form2 form = new Form2();
 
                 Application.Run(form);
             }
