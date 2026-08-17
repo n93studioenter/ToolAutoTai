@@ -1291,14 +1291,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ToolTaiHD.exe" size="405920">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ToolTaiHD.exe" size="406944">
       <assemblyIdentity name="ToolTaiHD" version="1.0.0.3" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>KhkcQDiNX/trfjNuKUdFZhzoUbuvMJM5ty/Atgfv76E=</dsig:DigestValue>
+        <dsig:DigestValue>e80DrTViLepi3vxqvBTTSN/qvF0MSd50A8vbO0gVKlY=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

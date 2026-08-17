@@ -1406,6 +1406,40 @@ namespace ToolTaiHD
                 Log($"⚠️ Lỗi UpdateStatusOnUI: {ex.Message}");
             }
         }
+        public System.Data.DataTable ExecuteQuery3(string query, params OleDbParameter[] parameters)
+        {
+            System.Data.DataTable dataTable = new System.Data.DataTable();
+
+            using (OleDbConnection connection = new OleDbConnection(connectionString3))
+            {
+                try
+                {
+                    connection.Open();
+
+                    using (OleDbCommand command = new OleDbCommand(query, connection))
+                    {
+                        // Thêm các tham số vào command
+                        if (parameters != null)
+                        {
+                            command.Parameters.AddRange(parameters);
+                        }
+
+                        using (OleDbDataAdapter dataAdapter = new OleDbDataAdapter(command))
+                        {
+                            dataAdapter.Fill(dataTable);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+
+            }
+
+            return dataTable; // Trả về DataTable chứa dữ liệu
+        }
+        public string connectionString3 = "";
         private async Task TaihoadonCongty(string vbdbpath, DataRow dtrow)
         {
             if (string.IsNullOrEmpty(vbdbpath))
@@ -1433,7 +1467,32 @@ namespace ToolTaiHD
 
                 string companyName = dtrow["Name"].ToString();
                 string username = getResgistry.Rows[0]["Username"].ToString();
-                string password = getResgistry.Rows[0]["Password"].ToString();
+                string password = "";
+                //password=getResgistry.Rows[0]["Password"].ToString();
+                try
+                {
+                    string dbPath = Path.Combine("\\\\192.168.1.90\\Ke toan 2025 New\\1 Copi vao dung 1\\Hoadon", "VietstarAccount.mdb");
+                    // string dbPath = Path.Combine("\\\\192.168.1.90\\Ke toan 2025 New\\1 Copi vao dung 1\\Hoadon", "Tooldb.accdb");
+                    connectionString3 = $@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={dbPath};";
+                    string queryGetdetail = @"SELECT * FROM tbcompany where Username = ?";
+                    var parameters2 = new OleDbParameter[]
+                              {
+                                    new OleDbParameter("?", getResgistry.Rows[0]["Username"].ToString()),
+                              };
+                    DataTable tbImportdetails = ExecuteQuery3(queryGetdetail, parameters2);
+                    if (tbImportdetails.Rows.Count > 0)
+                    {
+                        password = tbImportdetails.Rows[0]["Password"].ToString();
+                    }
+                    else
+                    {
+                        password = getResgistry.Rows[0]["Password"].ToString();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    password = getResgistry.Rows[0]["Password"].ToString();
+                }
                 string savedPath = getResgistry.Rows[0]["Hoadonpath"].ToString();
 
                 Log($"[{companyName}] ▶️ Bắt đầu xử lý...");
@@ -1510,11 +1569,12 @@ namespace ToolTaiHD
                     string directoryPathRa = Path.Combine(savedPath, currentYear, "HDRa");
                     string qriv = @"SELECT * FROM tbInvoiceInfo";
                     var tbInvoiceInfo = ExecuteQuery2(qriv, connectionString2);
+                    string qrrrt = @"SELECT * FROM tbRegister";
+                    var tbRrtry = ExecuteQuery2(qrrrt, connectionString2);
                     var invoicesRa = await GetListHoaDonCanTai(username, savedPath, 2);
                     if (invoicesRa.Count > 0 || tbInvoiceInfo.Rows.Count > 0)
                     {
-
-                        if (tbInvoiceInfo.Rows.Count > 0)
+                        if (tbInvoiceInfo.Rows.Count > 0 && tbRrtry.Rows[0]["IsNCC"].ToString()=="1")
                         {
                             Tainhacungcap(vbdbpath, dtrow);
                         }
