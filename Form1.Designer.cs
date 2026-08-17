@@ -81,6 +81,7 @@
             this.labelControl6 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl7 = new DevExpress.XtraEditors.LabelControl();
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
+            this.labelControl8 = new DevExpress.XtraEditors.LabelControl();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.companyBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
@@ -620,12 +621,21 @@
             this.panelControl1.Size = new System.Drawing.Size(1282, 134);
             this.panelControl1.TabIndex = 24;
             // 
+            // labelControl8
+            // 
+            this.labelControl8.Location = new System.Drawing.Point(12, 634);
+            this.labelControl8.Name = "labelControl8";
+            this.labelControl8.Size = new System.Drawing.Size(75, 16);
+            this.labelControl8.TabIndex = 25;
+            this.labelControl8.Text = "labelControl8";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1319, 641);
+            this.ClientSize = new System.Drawing.Size(1319, 655);
+            this.Controls.Add(this.labelControl8);
             this.Controls.Add(this.panelControl1);
             this.Controls.Add(this.labelControl3);
             this.Controls.Add(this.groupControl2);
@@ -717,6 +727,7 @@
         private DevExpress.XtraEditors.LabelControl labelControl6;
         private DevExpress.XtraEditors.LabelControl labelControl7;
         private DevExpress.XtraEditors.PanelControl panelControl1;
+        private DevExpress.XtraEditors.LabelControl labelControl8;
     }
 }
 

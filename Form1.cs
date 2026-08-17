@@ -497,109 +497,125 @@ namespace ToolTaiHD
         }
         private async void Form1_Load(object sender, EventArgs e)
         {
-            string updateUrl = @"\\192.168.1.90\Ke toan 2025 New\ToolTaiTuDong\update.xml";
             try
             {
-                Version currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
-                this.Text = $"ToolTaiHD - v{currentVersion}";
-                AutoUpdater.Start(updateUrl);
-            }
-            catch (Exception ex)
-            {
-                // Bỏ qua lỗi nếu không kết nối được server
-                MessageBox.Show($"Không thể kiểm tra cập nhật: {ex.Message}",
-                              "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
+                //string updateUrl = @"\\192.168.1.90\Ke toan 2025 New\ToolTaiTuDong\update.xml";
+                //try
+                //{
+                //    Version currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+                //    this.Text = $"ToolTaiHD - v{currentVersion}";
+                //    AutoUpdater.Start(updateUrl);
+                //}
+                //catch (Exception ex)
+                //{
+                //    // Bỏ qua lỗi nếu không kết nối được server
+                //    MessageBox.Show($"Không thể kiểm tra cập nhật: {ex.Message}",
+                //                  "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                //}
 
-            LoadingForm loadingForm = new LoadingForm();
-            this.Opacity = 0;
-            loadingForm.Show();
-            Application.DoEvents();
-            // KillVietStarProcesses();
-            string computerName = Environment.MachineName;
-           // this.Text = $"{computerName} - Saoviet auto";
-            await Task.Run(() => WaitForInternetConnection());
+                //LoadingForm loadingForm = new LoadingForm();
+                //this.Opacity = 0;
+                //loadingForm.Show();
+                //Application.DoEvents();
+                // KillVietStarProcesses();
+                string computerName = Environment.MachineName;
+                labelControl8.Text=computerName;
+                // this.Text = $"{computerName} - Saoviet auto";
+                await Task.Run(() => WaitForInternetConnection());
 
-            radioButton1.Checked = true;
-            radioButton1.Text = "Có kết nối Internet!";
+                radioButton1.Checked = true;
+                radioButton1.Text = "Có kết nối Internet!";
 
-            string dbPath = Path.Combine("\\\\192.168.1.90\\Ke toan 2025 New\\1 Copi vao dung 1\\Hoadon", "Tooldb.accdb");
-            //string dbPath = Path.Combine("D:\\", "Tooldb.accdb");
-            connectionString = $@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={dbPath};";
+                string dbPath = Path.Combine("\\\\192.168.1.90\\Ke toan 2025 New\\1 Copi vao dung 1\\Hoadon", "Tooldb.accdb");
+              //  string dbPath = Path.Combine("D:\\", "Tooldb.accdb");
+                connectionString = $@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={dbPath};";
+               // XtraMessageBox.Show(connectionString);
+                string query = @"SELECT * FROM tbCompany WHERE Saoviet = ?  order by STT";
+                tbCompany = ExecuteQuery(query, new OleDbParameter("?", computerName)); 
 
-            string query = @"SELECT * FROM tbCompany WHERE Saoviet = ?  order by STT";
-            tbCompany = ExecuteQuery(query, new OleDbParameter("?", computerName));
-           
-            gridControl1.DataSource = tbCompany;
-            SetupGridCheckBox();
-            SetupGridFolderColumn();
-            SetupGridClearColumn();
-            SetupGridDeleteColumn();
-            // Load dữ liệu cache 
+                gridControl1.DataSource = tbCompany;
+                SetupGridCheckBox();
+                SetupGridFolderColumn();
+                SetupGridClearColumn();
+                SetupGridDeleteColumn();
+                // Load dữ liệu cache 
 
 
-            string qrst = @"SELECT * FROM tbsetting WHERE Saoviet = ?";
-            DataTable tbSetting = ExecuteQuery(qrst, new OleDbParameter("?", computerName));
-            if (tbSetting.Rows.Count > 0)
-            {
-                int autotai = tbSetting.Rows[0].Field<int?>("AutoTai") ?? 0;
-                string Block1 = tbSetting.Rows[0].Field<string>("Block1");
-                string Block2 = tbSetting.Rows[0].Field<string>("Block2");
-                string Block3 = tbSetting.Rows[0].Field<string>("Block3");
-
-                checkEdit1.Checked = autotai == 1 ? true : false;
-                chkMoc1.Checked = !string.IsNullOrEmpty(Block1) ? true : false;
-                chkMoc2.Checked = !string.IsNullOrEmpty(Block2) ? true : false;
-                chkMoc3.Checked = !string.IsNullOrEmpty(Block3) ? true : false;
-                txtSoluongtai.Text = tbSetting.Rows[0].Field<int>("Soluongtai").ToString();
-                txttimeout.Text = tbSetting.Rows[0].Field<int>("Timeout").ToString();
-                if (chkMoc1.Checked)
+                string qrst = @"SELECT * FROM tbsetting WHERE Saoviet = ?";
+                DataTable tbSetting = ExecuteQuery(qrst, new OleDbParameter("?", computerName));
+                if (tbSetting.Rows.Count > 0)
                 {
-                    txtBlock1.Enabled = true;
-                    txtBlock1.Text = Block1;
-                }
-                if (chkMoc2.Checked)
-                {
-                    txtBlock2.Enabled = true;
-                    txtBlock2.Text = Block2;
-                }
-                if (chkMoc3.Checked)
-                {
-                    txtBlock3.Enabled = true;
-                    txtBlock3.Text = Block3;
-                }
-            }
-           
+                    int autotai = tbSetting.Rows[0].Field<int?>("AutoTai") ?? 0;
+                    string Block1 = tbSetting.Rows[0].Field<string>("Block1");
+                    string Block2 = tbSetting.Rows[0].Field<string>("Block2");
+                    string Block3 = tbSetting.Rows[0].Field<string>("Block3");
 
-          
-            comboBoxEdit1.Properties.Items.Clear();
-            for (int i = 1; i <= 12; i++)
-            {
-                comboBoxEdit1.Properties.Items.Add(i);
-            }
-            string checkQuery = "SELECT COUNT(*) FROM tbRemember WHERE Saoviet = ?";
-            DataTable dt = ExecuteQuery(checkQuery, new OleDbParameter("?", computerName));
+                    checkEdit1.Checked = autotai == 1 ? true : false;
+                    chkMoc1.Checked = !string.IsNullOrEmpty(Block1) ? true : false;
+                    chkMoc2.Checked = !string.IsNullOrEmpty(Block2) ? true : false;
+                    chkMoc3.Checked = !string.IsNullOrEmpty(Block3) ? true : false;
+                    txtSoluongtai.Text = tbSetting.Rows[0].Field<int>("Soluongtai").ToString();
+                    txttimeout.Text = tbSetting.Rows[0].Field<int>("Timeout").ToString();
+                    if (chkMoc1.Checked)
+                    {
+                        txtBlock1.Enabled = true;
+                        txtBlock1.Text = Block1;
+                    }
+                    if (chkMoc2.Checked)
+                    {
+                        txtBlock2.Enabled = true;
+                        txtBlock2.Text = Block2;
+                    }
+                    if (chkMoc3.Checked)
+                    {
+                        txtBlock3.Enabled = true;
+                        txtBlock3.Text = Block3;
+                    }
+                }
 
-            int count = Convert.ToInt32(dt.Rows[0][0]);
-            if(count==0)
-            {
-                comboBoxEdit1.SelectedIndex = DateTime.Now.Month - 1;
+
+
+                comboBoxEdit1.Properties.Items.Clear();
+                for (int i = 1; i <= 12; i++)
+                {
+                    comboBoxEdit1.Properties.Items.Add(i);
+                }
+                try
+                {
+                    string checkQuery = "SELECT COUNT(*) FROM tbRemember WHERE Saoviet = ?";
+                    DataTable dt = ExecuteQuery(checkQuery, new OleDbParameter("?", computerName));
+
+                    int count = Convert.ToInt32(dt.Rows[0][0]);
+                    if (count == 0)
+                    {
+                        comboBoxEdit1.SelectedIndex = DateTime.Now.Month - 1;
+                    }
+                    else
+                    {
+                        //string qr = "SELECT * FROM tbRemember WHERE Saoviet = ?";
+                        //DataTable dts = ExecuteQuery(qr, new OleDbParameter("?", computerName));
+                        //comboBoxEdit1.SelectedIndex = int.Parse(dts.Rows[0]["ThangCT"].ToString())-1;
+                        comboBoxEdit1.SelectedIndex = DateTime.Now.Month - 1;
+                    }
+                    Kichhoatngay();
+                }
+                catch(Exception ex)
+                {
+                     XtraMessageBox.Show(ex.Message);
+                }
+              
+                //loadingForm.Close();
+                //this.Opacity = 1;
+                if (isAutoMode)
+                {
+                    btnRun.PerformClick();
+                    HideToSystemTray();
+                }
             }
-            else
+            catch(Exception ex)
             {
-                //string qr = "SELECT * FROM tbRemember WHERE Saoviet = ?";
-                //DataTable dts = ExecuteQuery(qr, new OleDbParameter("?", computerName));
-                //comboBoxEdit1.SelectedIndex = int.Parse(dts.Rows[0]["ThangCT"].ToString())-1;
-                comboBoxEdit1.SelectedIndex = DateTime.Now.Month - 1;
-            }
-            Kichhoatngay();
-            loadingForm.Close();
-            this.Opacity = 1;
-            if (isAutoMode)
-            {
-                btnRun.PerformClick();
-                HideToSystemTray();
-            }
+
+            } 
         }
         #endregion
         private void Kichhoatngay()
