@@ -38,6 +38,7 @@
             this.companyBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.gridView1 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.colName = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.gridColumn7 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colDbpath = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colFolderPath = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colMST = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -51,6 +52,7 @@
             this.gridColumn3 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn4 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn5 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.gridColumn6 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.repositoryItemButtonEdit1 = new DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit();
             this.congtyBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.btnRun = new DevExpress.XtraEditors.SimpleButton();
@@ -112,12 +114,14 @@
             // gridControl1
             // 
             this.gridControl1.DataSource = this.companyBindingSource;
-            this.gridControl1.Location = new System.Drawing.Point(7, 152);
+            this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.gridControl1.Location = new System.Drawing.Point(7, 153);
             this.gridControl1.MainView = this.gridView1;
+            this.gridControl1.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.gridControl1.Name = "gridControl1";
             this.gridControl1.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.repositoryItemButtonEdit1});
-            this.gridControl1.Size = new System.Drawing.Size(1280, 330);
+            this.gridControl1.Size = new System.Drawing.Size(1465, 330);
             this.gridControl1.TabIndex = 0;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -131,6 +135,7 @@
             // 
             this.gridView1.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
             this.colName,
+            this.gridColumn7,
             this.colDbpath,
             this.colFolderPath,
             this.colMST,
@@ -143,7 +148,8 @@
             this.gridColumn2,
             this.gridColumn3,
             this.gridColumn4,
-            this.gridColumn5});
+            this.gridColumn5,
+            this.gridColumn6});
             this.gridView1.GridControl = this.gridControl1;
             this.gridView1.Name = "gridView1";
             this.gridView1.OptionsView.ShowGroupPanel = false;
@@ -151,17 +157,36 @@
             // 
             // colName
             // 
-            this.colName.FieldName = "Name";
-            this.colName.MinWidth = 25;
+            this.colName.AppearanceCell.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
+            this.colName.AppearanceCell.ForeColor = DevExpress.LookAndFeel.DXSkinColors.ForeColors.Critical;
+            this.colName.AppearanceCell.Options.UseFont = true;
+            this.colName.AppearanceCell.Options.UseForeColor = true;
+            this.colName.AppearanceHeader.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
+            this.colName.AppearanceHeader.ForeColor = DevExpress.LookAndFeel.DXSkinColors.ForeColors.Critical;
+            this.colName.AppearanceHeader.Options.UseFont = true;
+            this.colName.AppearanceHeader.Options.UseForeColor = true;
+            this.colName.Caption = "MST";
+            this.colName.FieldName = "MST";
+            this.colName.MinWidth = 24;
             this.colName.Name = "colName";
             this.colName.Visible = true;
             this.colName.VisibleIndex = 1;
-            this.colName.Width = 212;
+            this.colName.Width = 147;
+            // 
+            // gridColumn7
+            // 
+            this.gridColumn7.Caption = "Tên";
+            this.gridColumn7.FieldName = "Name";
+            this.gridColumn7.MinWidth = 25;
+            this.gridColumn7.Name = "gridColumn7";
+            this.gridColumn7.Visible = true;
+            this.gridColumn7.VisibleIndex = 2;
+            this.gridColumn7.Width = 148;
             // 
             // colDbpath
             // 
             this.colDbpath.FieldName = "Dbpath";
-            this.colDbpath.MinWidth = 25;
+            this.colDbpath.MinWidth = 24;
             this.colDbpath.Name = "colDbpath";
             this.colDbpath.Width = 164;
             // 
@@ -169,58 +194,58 @@
             // 
             this.colFolderPath.Caption = "Đường dẫn thư mục";
             this.colFolderPath.FieldName = "FolderPath";
-            this.colFolderPath.MinWidth = 25;
+            this.colFolderPath.MinWidth = 24;
             this.colFolderPath.Name = "colFolderPath";
             this.colFolderPath.Visible = true;
-            this.colFolderPath.VisibleIndex = 2;
-            this.colFolderPath.Width = 149;
+            this.colFolderPath.VisibleIndex = 3;
+            this.colFolderPath.Width = 148;
             // 
             // colMST
             // 
             this.colMST.FieldName = "MST";
-            this.colMST.MinWidth = 25;
+            this.colMST.MinWidth = 24;
             this.colMST.Name = "colMST";
             this.colMST.Width = 164;
             // 
             // colSTT
             // 
             this.colSTT.FieldName = "STT";
-            this.colSTT.MinWidth = 25;
+            this.colSTT.MinWidth = 24;
             this.colSTT.Name = "colSTT";
             this.colSTT.Visible = true;
             this.colSTT.VisibleIndex = 0;
-            this.colSTT.Width = 46;
+            this.colSTT.Width = 45;
             // 
             // colStatus
             // 
             this.colStatus.Caption = "Trạng thái";
             this.colStatus.FieldName = "Status";
-            this.colStatus.MinWidth = 25;
+            this.colStatus.MinWidth = 24;
             this.colStatus.Name = "colStatus";
             this.colStatus.Visible = true;
-            this.colStatus.VisibleIndex = 3;
-            this.colStatus.Width = 266;
+            this.colStatus.VisibleIndex = 4;
+            this.colStatus.Width = 138;
             // 
             // colIsRun
             // 
             this.colIsRun.FieldName = "IsRun";
-            this.colIsRun.MinWidth = 25;
+            this.colIsRun.MinWidth = 24;
             this.colIsRun.Name = "colIsRun";
             this.colIsRun.Visible = true;
-            this.colIsRun.VisibleIndex = 4;
-            this.colIsRun.Width = 67;
+            this.colIsRun.VisibleIndex = 5;
+            this.colIsRun.Width = 76;
             // 
             // colDauvao
             // 
             this.colDauvao.FieldName = "Dauvao";
-            this.colDauvao.MinWidth = 25;
+            this.colDauvao.MinWidth = 24;
             this.colDauvao.Name = "colDauvao";
             this.colDauvao.Width = 125;
             // 
             // colDaura
             // 
             this.colDaura.FieldName = "Daura";
-            this.colDaura.MinWidth = 25;
+            this.colDaura.MinWidth = 24;
             this.colDaura.Name = "colDaura";
             this.colDaura.Width = 134;
             // 
@@ -228,51 +253,61 @@
             // 
             this.gridColumn1.Caption = "Thư mục";
             this.gridColumn1.FieldName = "Folder";
-            this.gridColumn1.MinWidth = 25;
+            this.gridColumn1.MinWidth = 24;
             this.gridColumn1.Name = "gridColumn1";
             this.gridColumn1.Visible = true;
-            this.gridColumn1.VisibleIndex = 8;
-            this.gridColumn1.Width = 72;
+            this.gridColumn1.VisibleIndex = 9;
+            this.gridColumn1.Width = 82;
             // 
             // gridColumn2
             // 
             this.gridColumn2.Caption = "Số vòng hiện tại";
             this.gridColumn2.FieldName = "RunCount";
-            this.gridColumn2.MinWidth = 25;
+            this.gridColumn2.MinWidth = 24;
             this.gridColumn2.Name = "gridColumn2";
             this.gridColumn2.Visible = true;
-            this.gridColumn2.VisibleIndex = 5;
-            this.gridColumn2.Width = 118;
+            this.gridColumn2.VisibleIndex = 6;
+            this.gridColumn2.Width = 135;
             // 
             // gridColumn3
             // 
             this.gridColumn3.Caption = "Ngày  hết hạn";
-            this.gridColumn3.FieldName = "DateAccount";
-            this.gridColumn3.MinWidth = 25;
+            this.gridColumn3.FieldName = "DateExpert";
+            this.gridColumn3.MinWidth = 24;
             this.gridColumn3.Name = "gridColumn3";
             this.gridColumn3.Visible = true;
-            this.gridColumn3.VisibleIndex = 6;
-            this.gridColumn3.Width = 119;
+            this.gridColumn3.VisibleIndex = 7;
+            this.gridColumn3.Width = 138;
             // 
             // gridColumn4
             // 
             this.gridColumn4.Caption = "Xoá Trung gian";
             this.gridColumn4.FieldName = "Clear";
-            this.gridColumn4.MinWidth = 25;
+            this.gridColumn4.MinWidth = 24;
             this.gridColumn4.Name = "gridColumn4";
             this.gridColumn4.Visible = true;
-            this.gridColumn4.VisibleIndex = 7;
-            this.gridColumn4.Width = 112;
+            this.gridColumn4.VisibleIndex = 8;
+            this.gridColumn4.Width = 130;
             // 
             // gridColumn5
             // 
             this.gridColumn5.Caption = "Xoá";
             this.gridColumn5.FieldName = "Delete";
-            this.gridColumn5.MinWidth = 25;
+            this.gridColumn5.MinWidth = 24;
             this.gridColumn5.Name = "gridColumn5";
             this.gridColumn5.Visible = true;
-            this.gridColumn5.VisibleIndex = 9;
-            this.gridColumn5.Width = 83;
+            this.gridColumn5.VisibleIndex = 10;
+            this.gridColumn5.Width = 58;
+            // 
+            // gridColumn6
+            // 
+            this.gridColumn6.Caption = "Mật khẩu";
+            this.gridColumn6.FieldName = "Password";
+            this.gridColumn6.MinWidth = 24;
+            this.gridColumn6.Name = "gridColumn6";
+            this.gridColumn6.Visible = true;
+            this.gridColumn6.VisibleIndex = 11;
+            this.gridColumn6.Width = 184;
             // 
             // repositoryItemButtonEdit1
             // 
@@ -288,10 +323,11 @@
             // 
             // btnRun
             // 
-            this.btnRun.ImageOptions.SvgImage = global::ToolTaiHD.Properties.Resources.lowimportance;
-            this.btnRun.Location = new System.Drawing.Point(1235, 4);
+            this.btnRun.ImageOptions.SvgImage = global::ToolTaiHD.Properties.Resources.next2;
+            this.btnRun.Location = new System.Drawing.Point(1410, 0);
+            this.btnRun.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.btnRun.Name = "btnRun";
-            this.btnRun.Size = new System.Drawing.Size(40, 26);
+            this.btnRun.Size = new System.Drawing.Size(47, 34);
             this.btnRun.TabIndex = 13;
             this.btnRun.Click += new System.EventHandler(this.btnRun_Click);
             // 
@@ -301,7 +337,8 @@
             this.labelControl4.Appearance.ForeColor = System.Drawing.Color.IndianRed;
             this.labelControl4.Appearance.Options.UseFont = true;
             this.labelControl4.Appearance.Options.UseForeColor = true;
-            this.labelControl4.Location = new System.Drawing.Point(312, 25);
+            this.labelControl4.Location = new System.Drawing.Point(399, 30);
+            this.labelControl4.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.labelControl4.Name = "labelControl4";
             this.labelControl4.Size = new System.Drawing.Size(177, 16);
             this.labelControl4.TabIndex = 15;
@@ -310,7 +347,8 @@
             // txttimeout
             // 
             this.txttimeout.EditValue = "6";
-            this.txttimeout.Location = new System.Drawing.Point(984, 79);
+            this.txttimeout.Location = new System.Drawing.Point(1110, 79);
+            this.txttimeout.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.txttimeout.Name = "txttimeout";
             this.txttimeout.Size = new System.Drawing.Size(52, 34);
             this.txttimeout.TabIndex = 14;
@@ -322,7 +360,8 @@
             this.labelControl2.Appearance.ForeColor = System.Drawing.Color.ForestGreen;
             this.labelControl2.Appearance.Options.UseFont = true;
             this.labelControl2.Appearance.Options.UseForeColor = true;
-            this.labelControl2.Location = new System.Drawing.Point(776, 88);
+            this.labelControl2.Location = new System.Drawing.Point(902, 89);
+            this.labelControl2.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.labelControl2.Name = "labelControl2";
             this.labelControl2.Size = new System.Drawing.Size(192, 16);
             this.labelControl2.TabIndex = 13;
@@ -331,7 +370,8 @@
             // txtBlock3
             // 
             this.txtBlock3.Enabled = false;
-            this.txtBlock3.Location = new System.Drawing.Point(1163, 20);
+            this.txtBlock3.Location = new System.Drawing.Point(1325, 21);
+            this.txtBlock3.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.txtBlock3.Name = "txtBlock3";
             this.txtBlock3.Size = new System.Drawing.Size(113, 34);
             this.txtBlock3.TabIndex = 12;
@@ -340,7 +380,8 @@
             // 
             // chkMoc3
             // 
-            this.chkMoc3.Location = new System.Drawing.Point(1067, 22);
+            this.chkMoc3.Location = new System.Drawing.Point(1230, 23);
+            this.chkMoc3.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.chkMoc3.Name = "chkMoc3";
             this.chkMoc3.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
             this.chkMoc3.Properties.Appearance.ForeColor = System.Drawing.Color.IndianRed;
@@ -354,7 +395,8 @@
             // txtSoluongtai
             // 
             this.txtSoluongtai.EditValue = "2";
-            this.txtSoluongtai.Location = new System.Drawing.Point(709, 79);
+            this.txtSoluongtai.Location = new System.Drawing.Point(783, 81);
+            this.txtSoluongtai.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.txtSoluongtai.Name = "txtSoluongtai";
             this.txtSoluongtai.Size = new System.Drawing.Size(52, 34);
             this.txtSoluongtai.TabIndex = 10;
@@ -366,7 +408,8 @@
             this.labelControl1.Appearance.ForeColor = System.Drawing.Color.ForestGreen;
             this.labelControl1.Appearance.Options.UseFont = true;
             this.labelControl1.Appearance.Options.UseForeColor = true;
-            this.labelControl1.Location = new System.Drawing.Point(506, 88);
+            this.labelControl1.Location = new System.Drawing.Point(580, 91);
+            this.labelControl1.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.labelControl1.Name = "labelControl1";
             this.labelControl1.Size = new System.Drawing.Size(187, 16);
             this.labelControl1.TabIndex = 9;
@@ -378,6 +421,7 @@
             this.radioButton1.AutoSize = true;
             this.radioButton1.BackColor = System.Drawing.Color.Lime;
             this.radioButton1.Location = new System.Drawing.Point(1148, 89);
+            this.radioButton1.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.radioButton1.Name = "radioButton1";
             this.radioButton1.Size = new System.Drawing.Size(100, 20);
             this.radioButton1.TabIndex = 7;
@@ -389,7 +433,8 @@
             // txtBlock2
             // 
             this.txtBlock2.Enabled = false;
-            this.txtBlock2.Location = new System.Drawing.Point(923, 21);
+            this.txtBlock2.Location = new System.Drawing.Point(1049, 21);
+            this.txtBlock2.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.txtBlock2.Name = "txtBlock2";
             this.txtBlock2.Size = new System.Drawing.Size(113, 34);
             this.txtBlock2.TabIndex = 4;
@@ -398,7 +443,8 @@
             // 
             // chkMoc2
             // 
-            this.chkMoc2.Location = new System.Drawing.Point(823, 22);
+            this.chkMoc2.Location = new System.Drawing.Point(948, 22);
+            this.chkMoc2.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.chkMoc2.Name = "chkMoc2";
             this.chkMoc2.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
             this.chkMoc2.Properties.Appearance.ForeColor = System.Drawing.Color.IndianRed;
@@ -412,7 +458,8 @@
             // txtBlock1
             // 
             this.txtBlock1.Enabled = false;
-            this.txtBlock1.Location = new System.Drawing.Point(648, 18);
+            this.txtBlock1.Location = new System.Drawing.Point(721, 21);
+            this.txtBlock1.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.txtBlock1.Name = "txtBlock1";
             this.txtBlock1.Size = new System.Drawing.Size(113, 34);
             this.txtBlock1.TabIndex = 2;
@@ -421,7 +468,8 @@
             // 
             // chkMoc1
             // 
-            this.chkMoc1.Location = new System.Drawing.Point(560, 20);
+            this.chkMoc1.Location = new System.Drawing.Point(634, 22);
+            this.chkMoc1.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.chkMoc1.Name = "chkMoc1";
             this.chkMoc1.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
             this.chkMoc1.Properties.Appearance.ForeColor = System.Drawing.Color.IndianRed;
@@ -435,6 +483,7 @@
             // checkEdit1
             // 
             this.checkEdit1.Location = new System.Drawing.Point(21, 20);
+            this.checkEdit1.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.checkEdit1.Name = "checkEdit1";
             this.checkEdit1.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
             this.checkEdit1.Properties.Appearance.ForeColor = System.Drawing.Color.Red;
@@ -449,19 +498,20 @@
             // 
             this.dateEdit1.EditValue = null;
             this.dateEdit1.Location = new System.Drawing.Point(204, 80);
+            this.dateEdit1.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.dateEdit1.Name = "dateEdit1";
             this.dateEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.dateEdit1.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.dateEdit1.Size = new System.Drawing.Size(109, 34);
+            this.dateEdit1.Size = new System.Drawing.Size(108, 34);
             this.dateEdit1.TabIndex = 18;
             this.dateEdit1.EditValueChanged += new System.EventHandler(this.dateEdit1_EditValueChanged);
             // 
             // comboBoxEdit1
             // 
-            this.comboBoxEdit1.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.comboBoxEdit1.Location = new System.Drawing.Point(74, 79);
+            this.comboBoxEdit1.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.comboBoxEdit1.Name = "comboBoxEdit1";
             this.comboBoxEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
@@ -471,12 +521,12 @@
             // 
             // labelControl5
             // 
-            this.labelControl5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.labelControl5.Appearance.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
             this.labelControl5.Appearance.ForeColor = System.Drawing.Color.DodgerBlue;
             this.labelControl5.Appearance.Options.UseFont = true;
             this.labelControl5.Appearance.Options.UseForeColor = true;
-            this.labelControl5.Location = new System.Drawing.Point(10, 88);
+            this.labelControl5.Location = new System.Drawing.Point(10, 89);
+            this.labelControl5.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.labelControl5.Name = "labelControl5";
             this.labelControl5.Size = new System.Drawing.Size(59, 16);
             this.labelControl5.TabIndex = 16;
@@ -485,12 +535,12 @@
             // richTextBox1
             // 
             this.richTextBox1.BackColor = System.Drawing.Color.SlateGray;
-            this.richTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.richTextBox1.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
             this.richTextBox1.ForeColor = System.Drawing.SystemColors.HighlightText;
-            this.richTextBox1.Location = new System.Drawing.Point(2, 36);
+            this.richTextBox1.Location = new System.Drawing.Point(2, 38);
+            this.richTextBox1.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(1276, 102);
+            this.richTextBox1.Size = new System.Drawing.Size(1459, 100);
             this.richTextBox1.TabIndex = 15;
             this.richTextBox1.Text = "...";
             // 
@@ -501,9 +551,10 @@
             this.groupControl2.Controls.Add(this.btnRun);
             this.groupControl2.Controls.Add(this.label2);
             this.groupControl2.Controls.Add(this.txtSovongtai);
-            this.groupControl2.Location = new System.Drawing.Point(9, 488);
+            this.groupControl2.Location = new System.Drawing.Point(9, 487);
+            this.groupControl2.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1280, 140);
+            this.groupControl2.Size = new System.Drawing.Size(1463, 140);
             this.groupControl2.TabIndex = 16;
             this.groupControl2.Text = "Ghi chú Log";
             // 
@@ -512,7 +563,8 @@
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
             this.label2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
-            this.label2.Location = new System.Drawing.Point(291, 56);
+            this.label2.Location = new System.Drawing.Point(290, 57);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(123, 16);
             this.label2.TabIndex = 20;
@@ -523,6 +575,7 @@
             // 
             this.txtSovongtai.EditValue = "1";
             this.txtSovongtai.Location = new System.Drawing.Point(433, 53);
+            this.txtSovongtai.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.txtSovongtai.Name = "txtSovongtai";
             this.txtSovongtai.Size = new System.Drawing.Size(125, 34);
             this.txtSovongtai.TabIndex = 21;
@@ -531,6 +584,7 @@
             // labelControl3
             // 
             this.labelControl3.Location = new System.Drawing.Point(13, 206);
+            this.labelControl3.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.labelControl3.Name = "labelControl3";
             this.labelControl3.Size = new System.Drawing.Size(12, 16);
             this.labelControl3.TabIndex = 17;
@@ -542,7 +596,8 @@
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold);
             this.label1.ForeColor = System.Drawing.Color.ForestGreen;
-            this.label1.Location = new System.Drawing.Point(1042, 88);
+            this.label1.Location = new System.Drawing.Point(1204, 90);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(175, 16);
             this.label1.TabIndex = 18;
@@ -551,7 +606,8 @@
             // txtsolanlap
             // 
             this.txtsolanlap.EditValue = "2";
-            this.txtsolanlap.Location = new System.Drawing.Point(1223, 79);
+            this.txtsolanlap.Location = new System.Drawing.Point(1385, 80);
+            this.txtsolanlap.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.txtsolanlap.Name = "txtsolanlap";
             this.txtsolanlap.Size = new System.Drawing.Size(52, 34);
             this.txtsolanlap.TabIndex = 19;
@@ -560,12 +616,13 @@
             // 
             this.dateEdit2.EditValue = null;
             this.dateEdit2.Location = new System.Drawing.Point(384, 79);
+            this.dateEdit2.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.dateEdit2.Name = "dateEdit2";
             this.dateEdit2.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.dateEdit2.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.dateEdit2.Size = new System.Drawing.Size(109, 34);
+            this.dateEdit2.Size = new System.Drawing.Size(108, 34);
             this.dateEdit2.TabIndex = 19;
             this.dateEdit2.EditValueChanged += new System.EventHandler(this.dateEdit2_EditValueChanged);
             // 
@@ -575,7 +632,8 @@
             this.labelControl6.Appearance.ForeColor = System.Drawing.Color.DodgerBlue;
             this.labelControl6.Appearance.Options.UseFont = true;
             this.labelControl6.Appearance.Options.UseForeColor = true;
-            this.labelControl6.Location = new System.Drawing.Point(150, 88);
+            this.labelControl6.Location = new System.Drawing.Point(150, 89);
+            this.labelControl6.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.labelControl6.Name = "labelControl6";
             this.labelControl6.Size = new System.Drawing.Size(52, 16);
             this.labelControl6.TabIndex = 22;
@@ -587,7 +645,8 @@
             this.labelControl7.Appearance.ForeColor = System.Drawing.Color.DodgerBlue;
             this.labelControl7.Appearance.Options.UseFont = true;
             this.labelControl7.Appearance.Options.UseForeColor = true;
-            this.labelControl7.Location = new System.Drawing.Point(317, 88);
+            this.labelControl7.Location = new System.Drawing.Point(317, 89);
+            this.labelControl7.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.labelControl7.Name = "labelControl7";
             this.labelControl7.Size = new System.Drawing.Size(62, 16);
             this.labelControl7.TabIndex = 23;
@@ -617,13 +676,15 @@
             this.panelControl1.Controls.Add(this.labelControl1);
             this.panelControl1.Controls.Add(this.dateEdit1);
             this.panelControl1.Location = new System.Drawing.Point(7, 12);
+            this.panelControl1.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(1282, 134);
+            this.panelControl1.Size = new System.Drawing.Size(1465, 134);
             this.panelControl1.TabIndex = 24;
             // 
             // labelControl8
             // 
             this.labelControl8.Location = new System.Drawing.Point(12, 634);
+            this.labelControl8.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.labelControl8.Name = "labelControl8";
             this.labelControl8.Size = new System.Drawing.Size(75, 16);
             this.labelControl8.TabIndex = 25;
@@ -634,7 +695,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1319, 655);
+            this.ClientSize = new System.Drawing.Size(1486, 655);
             this.Controls.Add(this.labelControl8);
             this.Controls.Add(this.panelControl1);
             this.Controls.Add(this.labelControl3);
@@ -728,6 +789,8 @@
         private DevExpress.XtraEditors.LabelControl labelControl7;
         private DevExpress.XtraEditors.PanelControl panelControl1;
         private DevExpress.XtraEditors.LabelControl labelControl8;
+        private DevExpress.XtraGrid.Columns.GridColumn gridColumn6;
+        private DevExpress.XtraGrid.Columns.GridColumn gridColumn7;
     }
 }
 

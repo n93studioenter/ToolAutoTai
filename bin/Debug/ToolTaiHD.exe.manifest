@@ -4,7 +4,7 @@
   <description asmv2:iconFile="favicon (2).ico" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <application />
   <entryPoint>
-    <assemblyIdentity name="ToolTaiHD" version="1.0.0.3" language="neutral" processorArchitecture="msil" />
+    <assemblyIdentity name="ToolTaiHD" version="1.0.0.5" language="neutral" processorArchitecture="msil" />
     <commandLine file="ToolTaiHD.exe" parameters="" />
   </entryPoint>
   <trustInfo>
@@ -1291,14 +1291,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ToolTaiHD.exe" size="406944">
-      <assemblyIdentity name="ToolTaiHD" version="1.0.0.3" language="neutral" processorArchitecture="msil" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ToolTaiHD.exe" size="1832352">
+      <assemblyIdentity name="ToolTaiHD" version="1.0.0.5" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>e80DrTViLepi3vxqvBTTSN/qvF0MSd50A8vbO0gVKlY=</dsig:DigestValue>
+        <dsig:DigestValue>fAEhRTGHw2rejGBlr7ER9XR1uyzlv6Oigtambsi7uhI=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -1327,6 +1327,15 @@
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
       <dsig:DigestValue>zfpLGOXW7KQhUEh3EjqbnjMKl1DqBsPOmbLEBaZRcZA=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Resources\image.jpg" size="97469">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>dshKo0LCEUF74ieiVlM+85mp2iAOE4B/mEc0remn96s=</dsig:DigestValue>
     </hash>
   </file>
   <file name="runtimes\win-arm64\native\WebView2Loader.dll" size="151904">

@@ -325,6 +325,10 @@
     <Content Include="favicon %282%29.ico" />
     <Content Include="favicon %283%29.ico" />
     <Content Include="Resources\folder.png" />
+    <Content Include="Resources\image.jpg" />
+    <None Include="Resources\next2.svg" />
+    <None Include="Resources\next_16x16.png" />
+    <None Include="Resources\next1.svg" />
     <None Include="Resources\lowimportance.svg" />
     <None Include="Resources\next.svg" />
     <None Include="Resources\gettingstarted.svg" />

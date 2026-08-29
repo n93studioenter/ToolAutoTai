@@ -23,6 +23,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using FuzzySharp;
 using Microsoft.Win32;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -137,11 +138,21 @@ namespace ToolTaiHD
         public bool isAutoMode { get; set; }
         private NotifyIcon notifyIcon;
         private ContextMenuStrip contextMenu;
+        LoadingForm loadingForm { get; set; }
         public Form1(bool isAutoMode = false)
 
         {
-            InitializeComponent(); 
-
+             loadingForm = new LoadingForm();
+            if (isAutoMode == false)
+            {
+                this.Opacity = 0;
+                loadingForm.Show();
+                Application.DoEvents();
+            }
+            InitializeComponent();
+          
+          
+            //this.Opacity = 0;
             this.isAutoMode = isAutoMode; // ✅ Lưu lại
 
             if (isAutoMode)
@@ -499,26 +510,27 @@ namespace ToolTaiHD
         {
             try
             {
-                //string updateUrl = @"\\192.168.1.90\Ke toan 2025 New\ToolTaiTuDong\update.xml";
-                //try
-                //{
-                //    Version currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
-                //    this.Text = $"ToolTaiHD - v{currentVersion}";
-                //    AutoUpdater.Start(updateUrl);
-                //}
-                //catch (Exception ex)
-                //{
-                //    // Bỏ qua lỗi nếu không kết nối được server
-                //    MessageBox.Show($"Không thể kiểm tra cập nhật: {ex.Message}",
-                //                  "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                //}
+                string updateUrl = @"\\192.168.1.90\Ke toan 2025 New\ToolTaiTuDong\update.xml";
+                try
+                {
+                    Version currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+                    this.Text = $"ToolTaiHD - v{currentVersion}";
+                    AutoUpdater.Start(updateUrl);
+                }
+                catch (Exception ex)
+                {
+                    // Bỏ qua lỗi nếu không kết nối được server
+                    MessageBox.Show($"Không thể kiểm tra cập nhật: {ex.Message}",
+                                  "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
 
                 //LoadingForm loadingForm = new LoadingForm();
-                //this.Opacity = 0;
+              
                 //loadingForm.Show();
-                //Application.DoEvents();
+                Application.DoEvents();
                 // KillVietStarProcesses();
                 string computerName = Environment.MachineName;
+                //computerName = "MAYCHU";
                 labelControl8.Text=computerName;
                 // this.Text = $"{computerName} - Saoviet auto";
                 await Task.Run(() => WaitForInternetConnection());
@@ -532,7 +544,35 @@ namespace ToolTaiHD
                // XtraMessageBox.Show(connectionString);
                 string query = @"SELECT * FROM tbCompany WHERE Saoviet = ?  order by STT";
                 tbCompany = ExecuteQuery(query, new OleDbParameter("?", computerName)); 
+                foreach(DataRow row in tbCompany.Rows)
+                {
+                    string vbdbpath = row["Dbpath"].ToString();
+                    string connectionString2 = "Provider=Microsoft.ACE.OLEDB.12.0;" +
+                                     "Data Source=" + vbdbpath + ";" +
+                                     "Jet OLEDB:Database Password=1@35^7*9)1;";
+                    string qrkh = "SELECT * FROM tbRegister"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
+                    DataTable tbRegister = new DataTable() ;
+                    try
+                    {
+                        tbRegister = ExecuteQuery2(qrkh, connectionString2);
+                    }
+                    catch(Exception ex)
+                    {
+                        continue;
+                    }
+                    row["Password"] = tbRegister.Rows[0]["Password"].ToString();
+                    try
+                    {
+                        if (row["DateExpert"]!=null && string.IsNullOrEmpty(row["DateExpert"].ToString()))
+                        {
+                            row["DateExpert"] = tbRegister.Rows[0]["DateExpert"].ToString();
+                        }
+                    }
+                    catch(Exception ex)
+                    {
 
+                    }
+                }
                 gridControl1.DataSource = tbCompany;
                 SetupGridCheckBox();
                 SetupGridFolderColumn();
@@ -574,7 +614,6 @@ namespace ToolTaiHD
                 }
 
 
-
                 comboBoxEdit1.Properties.Items.Clear();
                 for (int i = 1; i <= 12; i++)
                 {
@@ -614,8 +653,13 @@ namespace ToolTaiHD
             }
             catch(Exception ex)
             {
-
-            } 
+                XtraMessageBox.Show(ex.Message);
+            }
+            if (isAutoMode == false)
+            {
+                this.Opacity = 1;
+                loadingForm.Close();
+            }
         }
         #endregion
         private void Kichhoatngay()
@@ -1034,13 +1078,24 @@ namespace ToolTaiHD
                         string json = JsonConvert.SerializeObject(payload);
                         var content = new StringContent(json, Encoding.UTF8, "application/json");
                         response = client.PostAsync(url, content).Result;
+                        string rsBody = response.Content.ReadAsStringAsync().Result;
 
+                        var jsonBody = JObject.Parse(rsBody);
+
+                        string message = jsonBody["message"]?.ToString();
+                        if(message== "Tên đăng nhập hoặc mật khẩu không đúng")
+                        {
+                            XtraMessageBox.Show("Tên đăng nhập hoặc mật khẩu không đúng");
+                            currentToken = "-1";
+                            lstCongtyKhoa.Add(username);
+                            return ;
+                        }
                         if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                         {
                             Log($"⚠️ Đăng nhập thất bại lần {retryCount}");
                            
                             Thread.Sleep(2000);
-                            continue;
+                            return;
                         }
 
                         response.EnsureSuccessStatusCode();
@@ -1072,7 +1127,19 @@ namespace ToolTaiHD
                                     DateTime expireDate = DateTime.Parse(prof.password_expire);
 
                                     TimeSpan remain = expireDate - DateTime.Now;
+                                    if (remain.TotalDays == 1)
+                                    {
+                                        currentToken = "";
+                                        lstCongtyKhoa.Add(username);
 
+                                        XtraMessageBox.Show(
+                                            $"Mật khẩu đã hết hạn ngày {expireDate:dd/MM/yyyy}.",
+                                            "Hết hạn!",
+                                            MessageBoxButtons.OK,
+                                            MessageBoxIcon.Warning
+                                        );
+                                        return ;
+                                    }
                                     if (remain.TotalDays <= 0)
                                     {
                                         XtraMessageBox.Show(
@@ -1124,7 +1191,7 @@ namespace ToolTaiHD
 
             currentToken = "";
         }
-
+        List<string> lstCongtyKhoa = new List<string>();
         private async Task<string> GetTokenForCompanyAsync(string username, string password, string connectionString,DataRow rowCopy)
         {
             try
@@ -1483,22 +1550,28 @@ namespace ToolTaiHD
                     if (tbImportdetails.Rows.Count > 0)
                     {
                         password = tbImportdetails.Rows[0]["Password"].ToString();
+                       
                     }
                     else
                     {
                         password = getResgistry.Rows[0]["Password"].ToString();
                     }
+                   
                 }
                 catch (Exception ex)
                 {
                     password = getResgistry.Rows[0]["Password"].ToString();
-                }
+                } 
                 string savedPath = getResgistry.Rows[0]["Hoadonpath"].ToString();
 
                 Log($"[{companyName}] ▶️ Bắt đầu xử lý...");
 
                 string token = await GetTokenForCompanyAsync(username, password, connectionString2,dtrow);
-
+                if (token == "-1")
+                {
+                    Log($"❌ {companyName}: Đăng nhập thất bại!");
+                    return;
+                }
                 if (string.IsNullOrEmpty(token))
                 {
                     Log($"❌ {companyName}: Đăng nhập thất bại!");
@@ -1574,7 +1647,7 @@ namespace ToolTaiHD
                     var invoicesRa = await GetListHoaDonCanTai(username, savedPath, 2);
                     if (invoicesRa.Count > 0 || tbInvoiceInfo.Rows.Count > 0)
                     {
-                        if (tbInvoiceInfo.Rows.Count > 0 && tbRrtry.Rows[0]["IsNCC"].ToString()=="1")
+                        if (tbInvoiceInfo.Rows.Count > 0 && tbRrtry.Columns.Contains("IsNCC") && tbRrtry.Rows[0]["IsNCC"].ToString() == "1")
                         {
                             Tainhacungcap(vbdbpath, dtrow);
                         }
@@ -5636,7 +5709,7 @@ string mst, string shDon, DateTime nLap, int Types)
                     {
                         string vbdbpath = item["Dbpath"]?.ToString() ?? "";
                         string companyName = item["Name"]?.ToString() ?? "Unknown";
-
+                        string MST= item["MST"]?.ToString() ?? "";
                         if (string.IsNullOrEmpty(vbdbpath))
                         {
                             Log($"⚠️ {companyName}: Không có Dbpath, bỏ qua!");
@@ -5650,70 +5723,77 @@ string mst, string shDon, DateTime nLap, int Types)
                             for (int runCount = 1; runCount <= totalRuns; runCount++)
                             {
                                 await semaphore.WaitAsync();
+                                //lstCongtyKhoa
+                                if (!lstCongtyKhoa.Contains(MST))
+                                {
+                                    try
+                                    {
+                                        // ✅ Cập nhật số lần đang chạy
+
+                                        UpdateRunCountOnUI(rowCopy, runCount, totalRuns);
+                                        UpdateStatusOnUI(rowCopy, $"🔄 {companyName} - Vòng {loopCount}/{totalLoops} - Lần {runCount}/{totalRuns} - Đang xử lý...");
+                                        Log($"🔄 {companyName}: Vòng {loopCount} - Lần {runCount}/{totalRuns}");
+
+                                        await TaihoadonCongty(vbdbpath, rowCopy);
+
+                                        UpdateStatusOnUI(rowCopy, $"✅ {companyName} - Vòng {loopCount} - Lần {runCount}/{totalRuns} - Hoàn thành");
+                                        Log($"✅ {companyName}: Hoàn thành vòng {loopCount} - lần {runCount}/{totalRuns}");
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Log($"❌ Lỗi {companyName} (Vòng {loopCount} - Lần {runCount}): {ex.Message}");
+                                        UpdateStatusOnUI(rowCopy, $"❌ {companyName} - Vòng {loopCount} - Lần {runCount}: {ex.Message}");
+                                    }
+                                    finally
+                                    {
+                                        semaphore.Release();
+
+                                        if (runCount < totalRuns)
+                                        {
+                                            await Task.Delay(1000);
+                                        }
+                                    }
+                                }
+                                
+                            }
+                            if (!lstCongtyKhoa.Contains(MST))
+                            {
+                                // ✅ Xử lý XML sau khi hoàn thành
+                                Log($"📄 {companyName}: Bắt đầu xử lý XML...");
+                                UpdateStatusOnUI(rowCopy, $"📄 {companyName} - Đang xử lý XML...");
+                                UpdateRunCountOnUI(rowCopy, totalRuns, totalRuns); // Hiển thị hoàn thành
 
                                 try
                                 {
-                                    // ✅ Cập nhật số lần đang chạy
+                                    string connectionString2 = "Provider=Microsoft.ACE.OLEDB.12.0;" +
+                                                "Data Source=" + vbdbpath + ";" +
+                                                "Jet OLEDB:Database Password=1@35^7*9)1;";
 
-                                    UpdateRunCountOnUI(rowCopy, runCount, totalRuns);
-                                    UpdateStatusOnUI(rowCopy, $"🔄 {companyName} - Vòng {loopCount}/{totalLoops} - Lần {runCount}/{totalRuns} - Đang xử lý...");
-                                    Log($"🔄 {companyName}: Vòng {loopCount} - Lần {runCount}/{totalRuns}");
-
-                                    await TaihoadonCongty(vbdbpath, rowCopy);
-
-                                    UpdateStatusOnUI(rowCopy, $"✅ {companyName} - Vòng {loopCount} - Lần {runCount}/{totalRuns} - Hoàn thành");
-                                    Log($"✅ {companyName}: Hoàn thành vòng {loopCount} - lần {runCount}/{totalRuns}");
+                                    //string querydd = @" SELECT *  FROM tbDinhdanhtaikhoan"; // Sử dụng ? thay cho @mst trong OleDb
+                                    //tbDinhDanhtaikhoan = ExecuteQuery2(querydd, connectionString2);
+                                    //TTinChung TTinChung = new TTinChung();
+                                    //var qrkh = "SELECT * FROM KhachHang"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
+                                    //TTinChung.tbKhachhang = ExecuteQuery2(qrkh, connectionString2);
+                                    //TTinChung.lstvt = await LoadDataVattuAsync(connectionString2);
+                                    //string querykh = @" SELECT *  FROM PhanLoaiVattu"; // Sử dụng ? thay cho @mst trong OleDb
+                                    //TTinChung.PLHH = ExecuteQuery2(querykh, connectionString2, new OleDbParameter("?", ""));
+                                    //LoadHoadonCT(connectionString2, TTinChung);
+                                    //Loadtbimport(connectionString2, TTinChung);
+                                    //await Task.Run(() => XulylietkeHoaDon(1, connectionString2, TTinChung));
+                                    //await Task.Run(() => XulylietkeHoaDon(2, connectionString2, TTinChung));
+                                    Xulytooltrunggian(connectionString2);
+                                    UpdateStatusOnUI(rowCopy, $"✅ {companyName} - Hoàn thành XML");
+                                    Log($"✅ {companyName}: Hoàn thành xử lý XML");
+                                    //Thực hiện import vô vb6
+                                    //ImportVb6(connectionString2);
                                 }
                                 catch (Exception ex)
                                 {
-                                    Log($"❌ Lỗi {companyName} (Vòng {loopCount} - Lần {runCount}): {ex.Message}");
-                                    UpdateStatusOnUI(rowCopy, $"❌ {companyName} - Vòng {loopCount} - Lần {runCount}: {ex.Message}");
-                                }
-                                finally
-                                {
-                                    semaphore.Release();
-
-                                    if (runCount < totalRuns)
-                                    {
-                                        await Task.Delay(1000);
-                                    }
+                                    Log($"❌ Lỗi XML {companyName}: {ex.Message}");
+                                    UpdateStatusOnUI(rowCopy, $"❌ {companyName} - Lỗi XML: {ex.Message}");
                                 }
                             }
-
-                            // ✅ Xử lý XML sau khi hoàn thành
-                            Log($"📄 {companyName}: Bắt đầu xử lý XML...");
-                            UpdateStatusOnUI(rowCopy, $"📄 {companyName} - Đang xử lý XML...");
-                            UpdateRunCountOnUI(rowCopy, totalRuns, totalRuns); // Hiển thị hoàn thành
-
-                            try
-                            {
-                                string connectionString2 = "Provider=Microsoft.ACE.OLEDB.12.0;" +
-                                            "Data Source=" + vbdbpath + ";" +
-                                            "Jet OLEDB:Database Password=1@35^7*9)1;";
-
-                                //string querydd = @" SELECT *  FROM tbDinhdanhtaikhoan"; // Sử dụng ? thay cho @mst trong OleDb
-                                //tbDinhDanhtaikhoan = ExecuteQuery2(querydd, connectionString2);
-                                //TTinChung TTinChung = new TTinChung();
-                                //var qrkh = "SELECT * FROM KhachHang"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
-                                //TTinChung.tbKhachhang = ExecuteQuery2(qrkh, connectionString2);
-                                //TTinChung.lstvt = await LoadDataVattuAsync(connectionString2);
-                                //string querykh = @" SELECT *  FROM PhanLoaiVattu"; // Sử dụng ? thay cho @mst trong OleDb
-                                //TTinChung.PLHH = ExecuteQuery2(querykh, connectionString2, new OleDbParameter("?", ""));
-                                //LoadHoadonCT(connectionString2, TTinChung);
-                                //Loadtbimport(connectionString2, TTinChung);
-                                //await Task.Run(() => XulylietkeHoaDon(1, connectionString2, TTinChung));
-                                //await Task.Run(() => XulylietkeHoaDon(2, connectionString2, TTinChung));
-                                 Xulytooltrunggian(connectionString2);
-                                UpdateStatusOnUI(rowCopy, $"✅ {companyName} - Hoàn thành XML");
-                                Log($"✅ {companyName}: Hoàn thành xử lý XML");
-                                //Thực hiện import vô vb6
-                                //ImportVb6(connectionString2);
-                            }
-                            catch (Exception ex)
-                            {
-                                Log($"❌ Lỗi XML {companyName}: {ex.Message}");
-                                UpdateStatusOnUI(rowCopy, $"❌ {companyName} - Lỗi XML: {ex.Message}");
-                            }
+                                
                         }));
                     }
 
@@ -5805,6 +5885,7 @@ string mst, string shDon, DateTime nLap, int Types)
 
                                 string vbdbpath = item["Dbpath"]?.ToString() ?? "";
                                 string companyName = item["Name"]?.ToString() ?? "Unknown";
+                                string MST = item["MST"]?.ToString() ?? "";
                                 int stt = int.Parse(item["STT"].ToString());
 
                                 if (string.IsNullOrEmpty(vbdbpath))
@@ -5815,20 +5896,24 @@ string mst, string shDon, DateTime nLap, int Types)
 
                                 // ✅ Semaphore vẫn hoạt động để giới hạn số lượng
                                 await semaphore.WaitAsync();
-
-                                try
+                               
+                                    try
                                 {
                                     // Process công ty này
                                     for (int runCount = 1; runCount <= totalRuns; runCount++)
                                     {
-                                        UpdateRunCountOnUI(item, runCount, totalRuns);
-                                        UpdateStatusOnUI(item, $"[{stt}] 🔄 {companyName} - Vòng {loopCount} - Lần {runCount}/{totalRuns}");
-                                        Log($"[{stt}] 🔄 {companyName}: Vòng {loopCount} - Lần {runCount}/{totalRuns}");
+                                        if (!lstCongtyKhoa.Contains(MST))
+                                        {
+                                            UpdateRunCountOnUI(item, runCount, totalRuns);
+                                            UpdateStatusOnUI(item, $"[{stt}] 🔄 {companyName} - Vòng {loopCount} - Lần {runCount}/{totalRuns}");
+                                            Log($"[{stt}] 🔄 {companyName}: Vòng {loopCount} - Lần {runCount}/{totalRuns}");
 
-                                        await TaihoadonCongty(vbdbpath, item);
+                                            await TaihoadonCongty(vbdbpath, item);
 
-                                        UpdateStatusOnUI(item, $"[{stt}] ✅ {companyName} - Vòng {loopCount} - Lần {runCount} - Hoàn thành");
-                                        Log($"[{stt}] ✅ {companyName}: Hoàn thành vòng {loopCount} - lần {runCount}");
+                                            UpdateStatusOnUI(item, $"[{stt}] ✅ {companyName} - Vòng {loopCount} - Lần {runCount} - Hoàn thành");
+                                            Log($"[{stt}] ✅ {companyName}: Hoàn thành vòng {loopCount} - lần {runCount}");
+                                        }
+                                       
                                     }
 
                                     // Xử lý XML
@@ -6025,7 +6110,15 @@ string mst, string shDon, DateTime nLap, int Types)
                         try
                         {
                            
-                            row["DateAccount"] = date;
+                            row["DateExpert"] = date;
+                            string query = $"UPDATE tbCompany SET DateExpert = ? WHERE ID = ?";
+                            var parameters = new OleDbParameter[]
+                            {
+            new OleDbParameter("?",date.ToString()),
+            new OleDbParameter("?", row["ID"].ToString())
+                            };
+
+                            int rowsAffected = ExecuteQueryResult(query, parameters);
                             gridControl1.RefreshDataSource();
                         }
                         catch (Exception ex)
@@ -6036,11 +6129,11 @@ string mst, string shDon, DateTime nLap, int Types)
                 }
                 else
                 {
-                    if (!row.Table.Columns.Contains("DateAccount"))
+                    if (!row.Table.Columns.Contains("DateExpert"))
                     {
-                        row.Table.Columns.Add("DateAccount", typeof(string));
+                        row.Table.Columns.Add("DateExpert", typeof(string));
                     }
-                    row["DateAccount"] = date;
+                    row["DateExpert"] = date;
                     gridControl1.RefreshDataSource();
                 }
             }

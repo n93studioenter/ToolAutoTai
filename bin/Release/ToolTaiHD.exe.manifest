@@ -4,7 +4,7 @@
   <description asmv2:iconFile="favicon (2).ico" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <application />
   <entryPoint>
-    <assemblyIdentity name="ToolTaiHD" version="1.0.0.3" language="neutral" processorArchitecture="msil" />
+    <assemblyIdentity name="ToolTaiHD" version="1.0.0.5" language="neutral" processorArchitecture="msil" />
     <commandLine file="ToolTaiHD.exe" parameters="" />
   </entryPoint>
   <trustInfo>
@@ -1291,14 +1291,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ToolTaiHD.exe" size="375712">
-      <assemblyIdentity name="ToolTaiHD" version="1.0.0.3" language="neutral" processorArchitecture="msil" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ToolTaiHD.exe" size="377248">
+      <assemblyIdentity name="ToolTaiHD" version="1.0.0.5" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>qxGAaRyN0R8oHxfo177IqnFpLU/287BaSZHB0969Fuw=</dsig:DigestValue>
+        <dsig:DigestValue>xudUxEYlWd61C/kReb5XyrnwBfleP8KIW2FWc+4ICv0=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
