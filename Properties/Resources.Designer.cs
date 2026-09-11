@@ -61,6 +61,16 @@ namespace ToolTaiHD.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type DevExpress.Utils.Svg.SvgImage.
+        /// </summary>
+        internal static DevExpress.Utils.Svg.SvgImage actions_arrow1down {
+            get {
+                object obj = ResourceManager.GetObject("actions_arrow1down", resourceCulture);
+                return ((DevExpress.Utils.Svg.SvgImage)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap add_32x32 {
@@ -93,9 +103,29 @@ namespace ToolTaiHD.Properties {
         /// <summary>
         ///   Looks up a localized resource of type DevExpress.Utils.Svg.SvgImage.
         /// </summary>
+        internal static DevExpress.Utils.Svg.SvgImage bo_dashboard {
+            get {
+                object obj = ResourceManager.GetObject("bo_dashboard", resourceCulture);
+                return ((DevExpress.Utils.Svg.SvgImage)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type DevExpress.Utils.Svg.SvgImage.
+        /// </summary>
         internal static DevExpress.Utils.Svg.SvgImage bo_lead {
             get {
                 object obj = ResourceManager.GetObject("bo_lead", resourceCulture);
+                return ((DevExpress.Utils.Svg.SvgImage)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type DevExpress.Utils.Svg.SvgImage.
+        /// </summary>
+        internal static DevExpress.Utils.Svg.SvgImage bo_price {
+            get {
+                object obj = ResourceManager.GetObject("bo_price", resourceCulture);
                 return ((DevExpress.Utils.Svg.SvgImage)(obj));
             }
         }
@@ -133,6 +163,26 @@ namespace ToolTaiHD.Properties {
         /// <summary>
         ///   Looks up a localized resource of type DevExpress.Utils.Svg.SvgImage.
         /// </summary>
+        internal static DevExpress.Utils.Svg.SvgImage charttype_pie3d {
+            get {
+                object obj = ResourceManager.GetObject("charttype_pie3d", resourceCulture);
+                return ((DevExpress.Utils.Svg.SvgImage)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type DevExpress.Utils.Svg.SvgImage.
+        /// </summary>
+        internal static DevExpress.Utils.Svg.SvgImage filldown {
+            get {
+                object obj = ResourceManager.GetObject("filldown", resourceCulture);
+                return ((DevExpress.Utils.Svg.SvgImage)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type DevExpress.Utils.Svg.SvgImage.
+        /// </summary>
         internal static DevExpress.Utils.Svg.SvgImage gettingstarted {
             get {
                 object obj = ResourceManager.GetObject("gettingstarted", resourceCulture);
@@ -156,6 +206,16 @@ namespace ToolTaiHD.Properties {
         internal static DevExpress.Utils.Svg.SvgImage lowimportance {
             get {
                 object obj = ResourceManager.GetObject("lowimportance", resourceCulture);
+                return ((DevExpress.Utils.Svg.SvgImage)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type DevExpress.Utils.Svg.SvgImage.
+        /// </summary>
+        internal static DevExpress.Utils.Svg.SvgImage movedown {
+            get {
+                object obj = ResourceManager.GetObject("movedown", resourceCulture);
                 return ((DevExpress.Utils.Svg.SvgImage)(obj));
             }
         }
@@ -196,6 +256,16 @@ namespace ToolTaiHD.Properties {
         internal static DevExpress.Utils.Svg.SvgImage next2 {
             get {
                 object obj = ResourceManager.GetObject("next2", resourceCulture);
+                return ((DevExpress.Utils.Svg.SvgImage)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type DevExpress.Utils.Svg.SvgImage.
+        /// </summary>
+        internal static DevExpress.Utils.Svg.SvgImage next3 {
+            get {
+                object obj = ResourceManager.GetObject("next3", resourceCulture);
                 return ((DevExpress.Utils.Svg.SvgImage)(obj));
             }
         }

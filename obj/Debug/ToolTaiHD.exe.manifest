@@ -1291,14 +1291,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ToolTaiHD.exe" size="1832352">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ToolTaiHD.exe" size="514464">
       <assemblyIdentity name="ToolTaiHD" version="1.0.0.5" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>fAEhRTGHw2rejGBlr7ER9XR1uyzlv6Oigtambsi7uhI=</dsig:DigestValue>
+        <dsig:DigestValue>LSQdbUynXYgEx7Z9c8lR/urAj/NfPlH/0966Ed+bqpA=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -1336,6 +1336,15 @@
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
       <dsig:DigestValue>dshKo0LCEUF74ieiVlM+85mp2iAOE4B/mEc0remn96s=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Resources\saovietfavicon.ico" size="15086">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>ea+W+6lSq6QpXov7UL3x4gT98ThLSNZ9LuOC5U6EebE=</dsig:DigestValue>
     </hash>
   </file>
   <file name="runtimes\win-arm64\native\WebView2Loader.dll" size="151904">

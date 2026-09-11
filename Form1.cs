@@ -10,10 +10,12 @@ using DevExpress.XtraEditors.Controls;
 using DevExpress.XtraEditors.Repository;
 using DevExpress.XtraGrid;
 using DevExpress.XtraGrid.Columns;
+using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.XtraGrid.Views.Grid.ViewInfo;
 using DevExpress.XtraPrinting.Native.Navigation;
 using DevExpress.XtraPrinting.Native.WebClientUIControl;
 using DevExpress.XtraWaitForm;
+using DocumentFormat.OpenXml.ExtendedProperties;
 using DocumentFormat.OpenXml.Office2010.CustomUI;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
@@ -25,12 +27,14 @@ using Microsoft.Win32;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.OleDb;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -53,7 +57,10 @@ using System.Xml;
 using static DevExpress.Data.Helpers.FindSearchRichParser;
 //using static DevExpress.Data.Mask.Internal.MaskSettings<T>;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 using static ToolTaiHD.Form1;
+using Application = System.Windows.Forms.Application;
+using Color = System.Drawing.Color;
 using Process = System.Diagnostics.Process;
 
 namespace ToolTaiHD
@@ -150,8 +157,10 @@ namespace ToolTaiHD
                 Application.DoEvents();
             }
             InitializeComponent();
-          
-          
+            timerClock.Interval = 1000;
+            timerClock.Tick += TimerClock_Tick;
+            timerClock.Start();
+
             //this.Opacity = 0;
             this.isAutoMode = isAutoMode; // ✅ Lưu lại
 
@@ -207,13 +216,17 @@ namespace ToolTaiHD
                 }
             };
         }
+        private void TimerClock_Tick(object sender, EventArgs e)
+        {
+            lblClock.Text = DateTime.Now.ToString("HH:mm:ss");
+        }
         private void InitializeNotifyIcon()
         {
             // Tạo NotifyIcon
             notifyIcon = new NotifyIcon();
 
             // Set icon (bạn cần có file .ico hoặc dùng icon mặc định)
-            notifyIcon.Icon = SystemIcons.Application; // Hoặc load từ file: new Icon("app.ico")
+            //notifyIcon.Icon = Properties.Resources.;
 
             // Set tooltip khi hover
             string appPaths = Assembly.GetExecutingAssembly().Location;
@@ -237,7 +250,7 @@ namespace ToolTaiHD
 
             // Đi lên 2 cấp để đến thư mục Resources trong source
             // Ví dụ: bin\Debug\ → ..\..\Resources\favicon.ico
-            string iconPath = Path.Combine(appPath, @"..\..\Resources\favicon.ico");
+            string iconPath = Path.Combine(appPath, @"..\..\Resources\saovietfavicon.ico");
             // Kiểm tra file tồn tại
             if (File.Exists(iconPath))
             {
@@ -280,7 +293,7 @@ namespace ToolTaiHD
 
                     // Hiển thị thông báo
                     notifyIcon.ShowBalloonTip(3000, "Tool tải hóa đơn",
-                        "Ứng dụng đang chạy ngầm trong System Tray!",
+                        "Ứng dụng đang chạy ngầm trong System Tray! tháng "+ comboBoxEdit1.EditValue.ToString(),
                         ToolTipIcon.Info);
                 }));
             }
@@ -293,7 +306,7 @@ namespace ToolTaiHD
 
                 // Hiển thị thông báo
                 notifyIcon.ShowBalloonTip(3000, "Tool tải hóa đơn",
-                    "Ứng dụng đang chạy ngầm trong System Tray!",
+                    "Ứng dụng đang chạy ngầm trong System Tray! tháng " + comboBoxEdit1.EditValue.ToString(),
                     ToolTipIcon.Info);
             }
         }
@@ -506,15 +519,103 @@ namespace ToolTaiHD
                 Console.WriteLine("Không tìm thấy tiến trình VietStar2025_V9.9.9.exe đang chạy");
             }
         }
+        int thangchon = 0;
+        private async void Xulydata()
+        {
+            //B1 lọc ra thằng hợp lệ, nếu ko tìm dc thì xoá luôn
+            foreach (DataRow row in tbCompany.Rows)
+            {
+                row["Hople"] = 1;
+                string dbpath = row["Dbpath"].ToString();
+                //Kiểm tra xem có bị trùng mst chưa
+                if (!File.Exists(dbpath))
+                {
+                    // row.Delete();
+                    row["Hople"] = -1;
+                    row["IsRun"] = 0;
+                    string query = $"UPDATE tbCompany SET IsRun = ? WHERE ID = ?";
+                    var parameters = new OleDbParameter[]
+                    {
+                            new OleDbParameter("?", "0"), 
+                            new OleDbParameter("?", row["ID"].ToString())
+                    };
+
+                    int rowsAffected = ExecuteQueryResult(query, parameters);
+                    continue;
+                }
+                //Nếu hợp lệ tìm file mới nhất thư mục đang hướng đến
+                string folderpath = row["FolderPath"].ToString();
+                //Doc file txt
+                string filePath = Path.Combine(folderpath, "vbPath.txt");
+                if (!File.Exists(filePath))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    // Đọc toàn bộ nội dung file
+                    string content = File.ReadAllText(filePath);
+                    if (File.Exists(content) && content != dbpath)
+                    {
+                        //Đọc data và lọc ra MST
+                        string qr = "SELECT * FROM tbRegister";
+
+                        // Tạo mảng tham số với giá trị cho câu lệnh SQL
+                        string connectionString3 = "Provider=Microsoft.ACE.OLEDB.12.0;" +
+                      "Data Source=" + dbpath + ";" +
+                      "Jet OLEDB:Database Password=1@35^7*9)1;";
+                        var kq = ExecuteQuery2(qr, connectionString3, null);
+                        row["Hople"] = 2;
+                        row["DbPath"] = content;
+                        row["MST"] = kq.Rows[0]["Username"].ToString();
+                        row["Name"]= Path.GetFileNameWithoutExtension(content).ToString();
+
+                        //Cập nhật luôn cho database
+                        string   query = $"UPDATE tbCompany SET DbPath = ?,MST=?,Name=? WHERE ID = ?";
+                        var parameters = new OleDbParameter[]
+                        {
+                            new OleDbParameter("?", content),
+                            new OleDbParameter("?",  kq.Rows[0]["Username"].ToString()),
+                            new OleDbParameter("?",row["Name"].ToString()),
+                            new OleDbParameter("?", row["ID"].ToString())
+                        };
+
+                        int rowsAffected = ExecuteQueryResult(query, parameters);
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    continue;
+                }
+
+                //Nếu tồn tại hơn 1 thì lấy thằng mới nhất nhưng phải hợp lệ
+
+            }
+            tbCompany.AcceptChanges(); // Xóa vĩnh viễn khỏi DataTable
+        }
         private async void Form1_Load(object sender, EventArgs e)
         {
+            // Đặt màu nền
+            //btnRun.Appearance.BackColor = Color.Blue;
+            //btnRun.Appearance.Options.UseBackColor = true;
+
+
+            var button = new DevExpress.XtraEditors.Controls.EditorButton(
+    DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph);
+
+          
             try
             {
                 string updateUrl = @"\\192.168.1.90\Ke toan 2025 New\ToolTaiTuDong\update.xml";
                 try
                 {
                     Version currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
-                    this.Text = $"ToolTaiHD - v{currentVersion}";
+                    this.Text = $"Phần mềm tải tự động hoá đơn";
                     AutoUpdater.Start(updateUrl);
                 }
                 catch (Exception ex)
@@ -543,36 +644,71 @@ namespace ToolTaiHD
                 connectionString = $@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={dbPath};";
                // XtraMessageBox.Show(connectionString);
                 string query = @"SELECT * FROM tbCompany WHERE Saoviet = ?  order by STT";
-                tbCompany = ExecuteQuery(query, new OleDbParameter("?", computerName)); 
-                foreach(DataRow row in tbCompany.Rows)
+                tbCompany = ExecuteQuery(query, new OleDbParameter("?", computerName));
+                tbCompany.Columns.Add("VbCoche", typeof(string));
+                tbCompany.Columns.Add("VbCoche2", typeof(string));
+
+                //Xử lý data sạch trước
+                tbCompany.Columns.Add("Hople",typeof(int));
+                Xulydata(); 
+
+
+                foreach (DataRow row in tbCompany.Rows)
                 {
+                    string mst= row["MST"].ToString(); 
                     string vbdbpath = row["Dbpath"].ToString();
                     string connectionString2 = "Provider=Microsoft.ACE.OLEDB.12.0;" +
                                      "Data Source=" + vbdbpath + ";" +
                                      "Jet OLEDB:Database Password=1@35^7*9)1;";
                     string qrkh = "SELECT * FROM tbRegister"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
+                                                              //Thêm 2 cột vb cơ chế
+                   
+
                     DataTable tbRegister = new DataTable() ;
                     try
                     {
                         tbRegister = ExecuteQuery2(qrkh, connectionString2);
+                        if (tbRegister != null && tbRegister.Rows.Count > 0)
+                        {
+                            if (!string.IsNullOrEmpty(tbRegister.Rows[0]["VbCoche"].ToString()))
+                            {
+                                if (tbRegister.Rows[0]["VbCoche"].ToString() == "1")
+                                    row["VbCoche"] = "Tự động toàn bộ";
+                                if (tbRegister.Rows[0]["VbCoche"].ToString() == "2")
+                                    row["VbCoche"] = "Theo mật định";
+                            }
+                            if (!string.IsNullOrEmpty(tbRegister.Rows[0]["VbCoche2"].ToString()))
+                            {
+                                if (tbRegister.Rows[0]["VbCoche2"].ToString() == "1")
+                                    row["VbCoche2"] = "Tự động toàn bộ";
+                                if (tbRegister.Rows[0]["VbCoche2"].ToString() == "2")
+                                    row["VbCoche2"] = "Theo mật định";
+                            }
+                            row["Password"] = tbRegister.Rows[0]["Password"].ToString();
+                            try
+                            {
+                                if (row["DateExpert"] != null && string.IsNullOrEmpty(row["DateExpert"].ToString()))
+                                {
+                                    row["DateExpert"] = tbRegister.Rows[0]["DateExpert"].ToString();
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+
+                            }
+                        }
+                        else
+                        {
+                            //row.Delete();
+                        }
                     }
                     catch(Exception ex)
                     {
                         continue;
                     }
-                    row["Password"] = tbRegister.Rows[0]["Password"].ToString();
-                    try
-                    {
-                        if (row["DateExpert"]!=null && string.IsNullOrEmpty(row["DateExpert"].ToString()))
-                        {
-                            row["DateExpert"] = tbRegister.Rows[0]["DateExpert"].ToString();
-                        }
-                    }
-                    catch(Exception ex)
-                    {
-
-                    }
-                }
+                    
+                } 
+               
                 gridControl1.DataSource = tbCompany;
                 SetupGridCheckBox();
                 SetupGridFolderColumn();
@@ -596,10 +732,11 @@ namespace ToolTaiHD
                     chkMoc3.Checked = !string.IsNullOrEmpty(Block3) ? true : false;
                     txtSoluongtai.Text = tbSetting.Rows[0].Field<int>("Soluongtai").ToString();
                     txttimeout.Text = tbSetting.Rows[0].Field<int>("Timeout").ToString();
+
                     if (chkMoc1.Checked)
                     {
                         txtBlock1.Enabled = true;
-                        txtBlock1.Text = Block1;
+                        txtBlock1.Text = Block1; 
                     }
                     if (chkMoc2.Checked)
                     {
@@ -628,15 +765,29 @@ namespace ToolTaiHD
                     if (count == 0)
                     {
                         comboBoxEdit1.SelectedIndex = DateTime.Now.Month - 1;
+                        Kichhoatngay();
                     }
                     else
                     {
-                        //string qr = "SELECT * FROM tbRemember WHERE Saoviet = ?";
-                        //DataTable dts = ExecuteQuery(qr, new OleDbParameter("?", computerName));
-                        //comboBoxEdit1.SelectedIndex = int.Parse(dts.Rows[0]["ThangCT"].ToString())-1;
-                        comboBoxEdit1.SelectedIndex = DateTime.Now.Month - 1;
+                        if (status == 2)
+                        {
+                            string qr = "SELECT * FROM tbRemember WHERE Saoviet = ?";
+                            DataTable dts = ExecuteQuery(qr, new OleDbParameter("?", computerName));
+                            thangchon = int.Parse(dts.Rows[0]["ThangCT"].ToString());
+                            comboBoxEdit1.SelectedIndex = int.Parse(dts.Rows[0]["ThangCT"].ToString()) - 1;
+                            dateEdit1.DateTime= DateTime.Parse(dts.Rows[0]["TuNgay"].ToString());
+                            dateEdit2.DateTime = DateTime.Parse(dts.Rows[0]["DenNgay"].ToString());
+                            // comboBoxEdit1.SelectedIndex = DateTime.Now.Month - 1;
+                        }
+                        else
+                        {
+                            thangchon = DateTime.Now.Month;
+                            comboBoxEdit1.SelectedIndex = DateTime.Now.Month - 1;
+                            Kichhoatngay();
+                        }
+
                     }
-                    Kichhoatngay();
+                    
                 }
                 catch(Exception ex)
                 {
@@ -664,15 +815,31 @@ namespace ToolTaiHD
         #endregion
         private void Kichhoatngay()
         {
-            DateTime firstDayOfMonth = new DateTime(DateTime.Now.Year, int.Parse(comboBoxEdit1.EditValue!=""?comboBoxEdit1.EditValue.ToString():DateTime.Now.Month.ToString()), 1);
-            // Lấy ngày cuối tháng
-            DateTime lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
-            if(lastDayOfMonth.Month==DateTime.Now.Month)
+            if (thangchon == DateTime.Now.Month)
             {
-                lastDayOfMonth = DateTime.Now.Date;
+                DateTime firstDayOfMonth = new DateTime(DateTime.Now.Year, int.Parse(comboBoxEdit1.EditValue != "" ? comboBoxEdit1.EditValue.ToString() : DateTime.Now.Month.ToString()), 1);
+                // Lấy ngày cuối tháng
+                DateTime lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+                if (lastDayOfMonth.Month == DateTime.Now.Month)
+                {
+                    lastDayOfMonth = DateTime.Now.Date;
+                }
+                dateEdit1.DateTime = firstDayOfMonth;
+                dateEdit2.DateTime = lastDayOfMonth;
             }
-            dateEdit1.DateTime = firstDayOfMonth;
-            dateEdit2.DateTime = lastDayOfMonth;
+            else
+            {
+                DateTime firstDayOfMonth = new DateTime(DateTime.Now.Year, int.Parse(comboBoxEdit1.EditValue != "" ? comboBoxEdit1.EditValue.ToString() : DateTime.Now.Month.ToString()), 1);
+                // Lấy ngày cuối tháng
+                DateTime lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+                if (lastDayOfMonth.Month == DateTime.Now.Month)
+                {
+                    lastDayOfMonth = DateTime.Now.Date;
+                }
+                dateEdit1.DateTime = firstDayOfMonth;
+                dateEdit2.DateTime = lastDayOfMonth;
+            }
+          
         }
 
         #region Internet Connection Check
@@ -3211,6 +3378,7 @@ namespace ToolTaiHD
             {
                 txtBlock1.Text = "";
             }
+           
         }
 
         private void chkMoc2_CheckedChanged(object sender, EventArgs e)
@@ -3218,7 +3386,7 @@ namespace ToolTaiHD
             txtBlock2.Enabled = chkMoc2.Checked;
             if (chkMoc2.Checked == false)
             {
-                txtBlock2.Text = "";
+                txtBlock2.EditValue = "";
             }
         }
 
@@ -3227,7 +3395,7 @@ namespace ToolTaiHD
             txtBlock3.Enabled = chkMoc3.Checked;
             if (chkMoc3.Checked == false)
             {
-                txtBlock3.Text = "";
+                txtBlock3.EditValue = "";
             }
         }
 
@@ -3382,7 +3550,7 @@ namespace ToolTaiHD
                     $"/f";
 
                 // Debug xem lệnh tạo ra
-                XtraMessageBox.Show(args);
+               // XtraMessageBox.Show(args);
 
                 RunSchTasks(args, true);
 
@@ -5821,6 +5989,9 @@ string mst, string shDon, DateTime nLap, int Types)
         }
         private async void btnRun_Click(object sender, EventArgs e)
         {
+
+            Xulydata();
+
             btnRun.Enabled = false;
 
             try
@@ -5861,8 +6032,8 @@ string mst, string shDon, DateTime nLap, int Types)
                     // ✅ Tạo Queue theo thứ tự STT
                     var companyQueue = new Queue<DataRow>();
                     foreach (DataRow item in tbCompany.Rows)
-                    {
-                        companyQueue.Enqueue(item);
+                    { 
+                            companyQueue.Enqueue(item);
                     }
 
                     var tasks = new List<Task>();
@@ -6381,12 +6552,21 @@ string mst, string shDon, DateTime nLap, int Types)
             {
                 if (comboBoxEdit1.SelectedItem != "")
                 {
-                    selectedMonth = Convert.ToInt32(comboBoxEdit1.SelectedItem);
+                    if (int.Parse(comboBoxEdit1.EditValue.ToString()) < DateTime.Now.Month)
+                    {
+                        selectedMonth = int.Parse(comboBoxEdit1.EditValue.ToString());
+                      
+                    }
+                    else
+                    {
+                        selectedMonth = Convert.ToInt32(comboBoxEdit1.SelectedItem);
+                    } 
                 }
                 else
                 {
                     selectedMonth = DateTime.Now.Month;
                 }
+                thangchon = selectedMonth;
             }
 
             try
@@ -6400,19 +6580,25 @@ string mst, string shDon, DateTime nLap, int Types)
 
                 if (count > 0)
                 {
-                    // 2. Có rồi -> UPDATE
-                    string query = "UPDATE tbRemember SET ThangCT = ? WHERE Saoviet = ?";
-                    OleDbParameter[] parameters = new OleDbParameter[]
+                    if (dateEdit1.DateTime != DateTime.MinValue)
                     {
+                        string query = "UPDATE tbRemember SET ThangCT = ?, TuNgay =?, DenNgay= ? WHERE Saoviet = ?";
+                        OleDbParameter[] parameters = new OleDbParameter[]
+                        {
                 new OleDbParameter("?", selectedMonth),
+                 new OleDbParameter("?", dateEdit1.DateTime),
+                  new OleDbParameter("?", dateEdit2.DateTime),
                 new OleDbParameter("?", computerName)
-                    };
-                    rowsAffected = ExecuteQueryResult(query, parameters);
+                        };
+                        rowsAffected = ExecuteQueryResult(query, parameters);
 
-                    if (rowsAffected > 0)
-                    {
-                        Log($"✅ UPDATE ThangCT = {selectedMonth} cho {computerName}");
+                        if (rowsAffected > 0)
+                        {
+                            Log($"✅ UPDATE ThangCT = {selectedMonth} cho {computerName}");
+                        }
                     }
+                    // 2. Có rồi -> UPDATE
+                   
                 }
                 else
                 {
@@ -6477,6 +6663,281 @@ string mst, string shDon, DateTime nLap, int Types)
         private void dateEdit2_EditValueChanged(object sender, EventArgs e)
         {
             capnhatngay();
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+        }
+
+        private void timeEdit1_EditValueChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(timeEdit1.Text))
+            {
+                string computerName = Environment.MachineName;
+
+                string query = "UPDATE tbsetting SET Block1 = ? where Saoviet=?";
+                // Khai báo mảng tham số với đủ 10 tham số
+                OleDbParameter[] parameters = new OleDbParameter[]
+                {
+        new OleDbParameter("?", timeEdit1.Text),
+          new OleDbParameter("?",computerName)
+                };
+
+                // Thực thi truy vấn và lấy kết quả
+                int a = ExecuteQueryResult(query, parameters);
+                ScheduleHelper ScheduleHelper = new ScheduleHelper();
+                DeleteSchedule($"Block_L1");
+            }
+        }
+
+        private void timeEdit1_Validated(object sender, EventArgs e)
+        {
+            try
+            {
+                // Kiểm tra tồn tại
+                string computerName = Environment.MachineName;
+                string checkQuery = @"SELECT COUNT(*) FROM tbsetting WHERE Saoviet = ?";
+                DataTable dt = ExecuteQuery(checkQuery, new OleDbParameter("?", computerName));
+
+                int count = Convert.ToInt32(dt.Rows[0][0]);
+                int rowsAffected = 0;
+
+                if (count > 0)
+                {
+                    // UPDATE
+                    string query = @"UPDATE tbsetting SET Block1 = ? WHERE Saoviet = ?";
+                    var parameters = new OleDbParameter[]
+                    {
+                new OleDbParameter("?", timeEdit1.Text),
+                new OleDbParameter("?", computerName)
+                    };
+                    rowsAffected = ExecuteQueryResult(query, parameters);
+                }
+                else
+                {
+                    // INSERT 
+                    string query = @"INSERT INTO tbsetting (Saoviet, Block1,Soluongtai,Timeout) VALUES (?, ?,?,?)";
+                    var parameters = new OleDbParameter[]
+                    {
+                                new OleDbParameter("?", computerName),
+                                  new OleDbParameter("?", timeEdit1.Text),
+                                new OleDbParameter("?", txtSoluongtai.Text),
+                                 new OleDbParameter("?", txttimeout.Text)
+                    };
+                    rowsAffected = ExecuteQueryResult(query, parameters);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"❌ Lỗi SetAutoTaiForComputer: {ex.Message}");
+            }
+            ScheduleHelper ScheduleHelper = new ScheduleHelper();
+            DateTime time = DateTime.Parse(timeEdit1.Text);
+
+            int hour = time.Hour;   // 10
+            int minute = time.Minute; // 30
+            try
+            {
+                CreateSchedule($"Block_L1", hour, minute);
+            }
+            catch (Exception ex)
+            {
+                XtraMessageBox.Show(ex.Message);
+            }
+        }
+
+        private void timeEdit2_EditValueChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(timeEdit2.Text))
+            {
+                string computerName = Environment.MachineName;
+                string query = "UPDATE tbsetting SET Block2 = ? where Saoviet=?";
+                // Khai báo mảng tham số với đủ 10 tham số
+                OleDbParameter[] parameters = new OleDbParameter[]
+                {
+                  new OleDbParameter("?", timeEdit2.Text),
+                  new OleDbParameter("?",computerName)
+                };
+
+                // Thực thi truy vấn và lấy kết quả
+                int a = ExecuteQueryResult(query, parameters);
+                ScheduleHelper ScheduleHelper = new ScheduleHelper();
+                DeleteSchedule($"Block_L2");
+            }
+        }
+
+        private void timeEdit2_Validated(object sender, EventArgs e)
+        {
+            try
+            {
+                // Kiểm tra tồn tại
+                string computerName = Environment.MachineName;
+                string checkQuery = @"SELECT COUNT(*) FROM tbsetting WHERE Saoviet = ?";
+                DataTable dt = ExecuteQuery(checkQuery, new OleDbParameter("?", computerName));
+
+                int count = Convert.ToInt32(dt.Rows[0][0]);
+                int rowsAffected = 0;
+
+                if (count > 0)
+                {
+                    // UPDATE
+                    string query = @"UPDATE tbsetting SET Block2 = ? WHERE Saoviet = ?";
+                    var parameters = new OleDbParameter[]
+                    {
+                new OleDbParameter("?", timeEdit2.Text),
+                new OleDbParameter("?", computerName)
+                    };
+                    rowsAffected = ExecuteQueryResult(query, parameters);
+                }
+                else
+                {
+                    // INSERT 
+                    string query = @"INSERT INTO tbsetting (Saoviet, Block1,Soluongtai,Timeout) VALUES (?, ?,?,?)";
+                    var parameters = new OleDbParameter[]
+                    {
+                                new OleDbParameter("?", computerName),
+                                  new OleDbParameter("?", timeEdit2.Text),
+                                new OleDbParameter("?", txtSoluongtai.Text),
+                                 new OleDbParameter("?", txttimeout.Text)
+                    };
+                    rowsAffected = ExecuteQueryResult(query, parameters);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"❌ Lỗi SetAutoTaiForComputer: {ex.Message}");
+            }
+            ScheduleHelper ScheduleHelper = new ScheduleHelper();
+            DateTime time = DateTime.Parse(timeEdit2.Text);
+
+            int hour = time.Hour;   // 10
+            int minute = time.Minute; // 30
+            try
+            {
+                CreateSchedule($"Block_L2", hour, minute);
+            }
+            catch (Exception ex)
+            {
+                XtraMessageBox.Show(ex.Message);
+            }
+        }
+
+        private void timeEdit3_EditValueChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(timeEdit3.Text))
+            {
+                string computerName = Environment.MachineName;
+                string query = "UPDATE tbsetting SET Block3 = ? where Saoviet=?";
+                // Khai báo mảng tham số với đủ 10 tham số
+                OleDbParameter[] parameters = new OleDbParameter[]
+                {
+                  new OleDbParameter("?", timeEdit3.Text),
+                  new OleDbParameter("?",computerName)
+                };
+
+                // Thực thi truy vấn và lấy kết quả
+                int a = ExecuteQueryResult(query, parameters);
+                ScheduleHelper ScheduleHelper = new ScheduleHelper();
+                DeleteSchedule($"Block_L3");
+            }
+        }
+
+        private void timeEdit3_Validated(object sender, EventArgs e)
+        {
+            try
+            {
+                // Kiểm tra tồn tại
+                string computerName = Environment.MachineName;
+                string checkQuery = @"SELECT COUNT(*) FROM tbsetting WHERE Saoviet = ?";
+                DataTable dt = ExecuteQuery(checkQuery, new OleDbParameter("?", computerName));
+
+                int count = Convert.ToInt32(dt.Rows[0][0]);
+                int rowsAffected = 0;
+
+                if (count > 0)
+                {
+                    // UPDATE
+                    string query = @"UPDATE tbsetting SET Block3 = ? WHERE Saoviet = ?";
+                    var parameters = new OleDbParameter[]
+                    {
+                new OleDbParameter("?", timeEdit3.Text),
+                new OleDbParameter("?", computerName)
+                    };
+                    rowsAffected = ExecuteQueryResult(query, parameters);
+                }
+                else
+                {
+                    // INSERT 
+                    string query = @"INSERT INTO tbsetting (Saoviet, Block1,Soluongtai,Timeout) VALUES (?, ?,?,?)";
+                    var parameters = new OleDbParameter[]
+                    {
+                                new OleDbParameter("?", computerName),
+                                  new OleDbParameter("?", timeEdit3.Text),
+                                new OleDbParameter("?", txtSoluongtai.Text),
+                                 new OleDbParameter("?", txttimeout.Text)
+                    };
+                    rowsAffected = ExecuteQueryResult(query, parameters);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"❌ Lỗi SetAutoTaiForComputer: {ex.Message}");
+            }
+            ScheduleHelper ScheduleHelper = new ScheduleHelper();
+            DateTime time = DateTime.Parse(timeEdit3.Text);
+
+            int hour = time.Hour;   // 10
+            int minute = time.Minute; // 30
+            try
+            {
+                CreateSchedule($"Block_L3", hour, minute);
+            }
+            catch (Exception ex)
+            {
+                XtraMessageBox.Show(ex.Message);
+            }
+        }
+
+        private void panel1_Paint_1(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void gridView1_RowStyle(object sender, DevExpress.XtraGrid.Views.Grid.RowStyleEventArgs e)
+        {
+        }
+
+        private void gridView1_CustomDrawCell(object sender,
+     DevExpress.XtraGrid.Views.Base.RowCellCustomDrawEventArgs e)
+        {
+            if (e.RowHandle < 0) return;
+
+            // Bước 1: Đọc giá trị cột Hople để kiểm tra điều kiện
+            object hopleVal = gridView1.GetRowCellValue(e.RowHandle, "Hople");
+            if (hopleVal == null || hopleVal == DBNull.Value) return;
+            if (Convert.ToInt32(hopleVal) ==1 ) return;
+
+            // Bước 2: Chỉ tô màu cột dbPath (không tô cột Hople)
+            if (e.Column.FieldName != "Dbpath") return;
+
+           
+            if (Convert.ToInt32(hopleVal) == -1)
+            {
+                e.Appearance.BackColor = Color.LightCoral;
+                e.Appearance.ForeColor = Color.White;
+
+                e.Appearance.Options.UseBackColor = true;
+                e.Appearance.Options.UseForeColor = true;
+            }
+
+            if (Convert.ToInt32(hopleVal) == 2)
+            {
+                e.Appearance.BackColor = Color.Green;
+                e.Appearance.ForeColor = Color.White;
+
+                e.Appearance.Options.UseBackColor = true;
+                e.Appearance.Options.UseForeColor = true;
+            }
         }
     }
 

@@ -245,6 +245,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resource1.resx</DependentUpon>
     </Compile>
+    <Compile Include="Resources\Resource2.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resource2.resx</DependentUpon>
+    </Compile>
     <Compile Include="RootDetail.cs" />
     <Compile Include="ScheduleHelper.cs" />
     <Compile Include="SvgCaptchaSolver.cs" />
@@ -272,6 +277,10 @@
     <EmbeddedResource Include="Resources\Resource1.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resource1.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Resource2.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource2.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="App.config" />
     <None Include="packages.config" />
@@ -324,8 +333,16 @@
   <ItemGroup>
     <Content Include="favicon %282%29.ico" />
     <Content Include="favicon %283%29.ico" />
+    <None Include="Resources\filldown.svg" />
+    <None Include="Resources\actions_arrow1down.svg" />
+    <None Include="Resources\bo_dashboard.svg" />
+    <None Include="Resources\bo_price.svg" />
+    <None Include="Resources\charttype_pie3d.svg" />
     <Content Include="Resources\folder.png" />
     <Content Include="Resources\image.jpg" />
+    <None Include="Resources\movedown.svg" />
+    <None Include="Resources\next3.svg" />
+    <Content Include="Resources\saovietfavicon.ico" />
     <None Include="Resources\next2.svg" />
     <None Include="Resources\next_16x16.png" />
     <None Include="Resources\next1.svg" />

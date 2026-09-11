@@ -64,7 +64,7 @@ namespace ToolTaiHD
                 bool isAutoStart = args.Any(a => a.Equals("-autostart", StringComparison.OrdinalIgnoreCase));
 
                 // ✅ Kiểm tra Task Scheduler
-                bool isTaskScheduler = IsRunningFromTaskScheduler();
+              
 
                 // ✅ Tạo form với tham số isAutoMode
                 //Form1 form = new Form1(isAutoStart || isTaskScheduler); 
@@ -73,10 +73,15 @@ namespace ToolTaiHD
                 // ✅ HIỂN THỊ LOADING FORM TRƯỚC
                 using (var loadingForm = new LoadingForm())
                 {
+                   
+                    if (isAutoStart)
+                    {
+                        loadingForm.Opacity = 0;
+                    }
                     loadingForm.Show();
                     loadingForm.Refresh();
                     Application.DoEvents();
-
+                    bool isTaskScheduler = IsRunningFromTaskScheduler();
                     // ✅ TẠO FORM CHÍNH (CÓ THỂ MẤT THỜI GIAN)
                     Form1 form = new Form1(isAutoStart || isTaskScheduler);
 
