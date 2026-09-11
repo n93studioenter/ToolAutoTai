@@ -6930,14 +6930,7 @@ string mst, string shDon, DateTime nLap, int Types)
                 e.Appearance.Options.UseForeColor = true;
             }
 
-            if (Convert.ToInt32(hopleVal) == 2)
-            {
-                e.Appearance.BackColor = Color.Green;
-                e.Appearance.ForeColor = Color.White;
-
-                e.Appearance.Options.UseBackColor = true;
-                e.Appearance.Options.UseForeColor = true;
-            }
+          
         }
     }
 

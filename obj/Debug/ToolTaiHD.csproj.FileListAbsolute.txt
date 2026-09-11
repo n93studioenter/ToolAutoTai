@@ -165,3 +165,4 @@ D:\DA3\ToolTaiHD\ToolTaiHD\bin\Debug\tr\AutoUpdater.NET.resources.dll
 D:\DA3\ToolTaiHD\ToolTaiHD\bin\Debug\zh\AutoUpdater.NET.resources.dll
 D:\DA3\ToolTaiHD\ToolTaiHD\bin\Debug\zh-TW\AutoUpdater.NET.resources.dll
 D:\DA3\ToolTaiHD\ToolTaiHD\obj\Debug\ToolTaiHD.Resources.Resource2.resources
+D:\DA3\ToolTaiHD\ToolTaiHD\obj\Debug\ToolTaiHD.exe.config
