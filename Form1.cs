@@ -525,6 +525,10 @@ namespace ToolTaiHD
             //B1 lọc ra thằng hợp lệ, nếu ko tìm dc thì xoá luôn
             foreach (DataRow row in tbCompany.Rows)
             {
+                if (!tbCompany.Columns.Contains("Hople"))
+                {
+                    tbCompany.Columns.Add("Hople", typeof(int));
+                }
                 row["Hople"] = 1;
                 string dbpath = row["Dbpath"].ToString();
                 //Kiểm tra xem có bị trùng mst chưa
@@ -541,7 +545,7 @@ namespace ToolTaiHD
                     };
 
                     int rowsAffected = ExecuteQueryResult(query, parameters);
-                    continue;
+                    //continue;
                 }
                 //Nếu hợp lệ tìm file mới nhất thư mục đang hướng đến
                 string folderpath = row["FolderPath"].ToString();
@@ -563,7 +567,7 @@ namespace ToolTaiHD
 
                         // Tạo mảng tham số với giá trị cho câu lệnh SQL
                         string connectionString3 = "Provider=Microsoft.ACE.OLEDB.12.0;" +
-                      "Data Source=" + dbpath + ";" +
+                      "Data Source=" + content + ";" +
                       "Jet OLEDB:Database Password=1@35^7*9)1;";
                         var kq = ExecuteQuery2(qr, connectionString3, null);
                         row["Hople"] = 2;
@@ -611,19 +615,19 @@ namespace ToolTaiHD
           
             try
             {
-                string updateUrl = @"\\192.168.1.90\Ke toan 2025 New\ToolTaiTuDong\update.xml";
-                try
-                {
-                    Version currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
-                    this.Text = $"Phần mềm tải tự động hoá đơn";
-                    AutoUpdater.Start(updateUrl);
-                }
-                catch (Exception ex)
-                {
-                    // Bỏ qua lỗi nếu không kết nối được server
-                    MessageBox.Show($"Không thể kiểm tra cập nhật: {ex.Message}",
-                                  "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
+                //string updateUrl = @"\\192.168.1.90\Ke toan 2025 New\ToolTaiTuDong\update.xml";
+                //try
+                //{
+                //    Version currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+                //    this.Text = $"Phần mềm tải tự động hoá đơn";
+                //    AutoUpdater.Start(updateUrl);
+                //}
+                //catch (Exception ex)
+                //{
+                //    // Bỏ qua lỗi nếu không kết nối được server
+                //    MessageBox.Show($"Không thể kiểm tra cập nhật: {ex.Message}",
+                //                  "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                //}
 
                 //LoadingForm loadingForm = new LoadingForm();
               
@@ -633,7 +637,7 @@ namespace ToolTaiHD
                 string computerName = Environment.MachineName;
                 //computerName = "MAYCHU";
                 labelControl8.Text=computerName;
-                // this.Text = $"{computerName} - Saoviet auto";
+                this.Text = $"{computerName} - Saoviet auto version {1.1}";
                 await Task.Run(() => WaitForInternetConnection());
 
                 radioButton1.Checked = true;
@@ -1180,8 +1184,276 @@ namespace ToolTaiHD
             public string password_expire { get; set; }
             public int expired { get; set; }
         }
+
+        public void Gettokken(string username, string password, ref string currentToken, string connectist, DataRow rowCopy)
+        {
+            int maxRetry = 3;
+            int retryCount = 0;
+
+            while (retryCount < maxRetry)
+            {
+                retryCount++;
+                try
+                {
+                    using (var handler = new HttpClientHandler()
+                    {
+                        AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate ,
+                        AllowAutoRedirect = true
+                    })
+                    using (var client = new HttpClient(handler))
+                    {
+                        client.Timeout = TimeSpan.FromSeconds(30);
+
+                        // Header giống trình duyệt
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent",
+                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36");
+                        client.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "application/json, text/plain, */*");
+                        client.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Language", "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7");
+                        client.DefaultRequestHeaders.TryAddWithoutValidation("Origin", "https://hoadondientu.gdt.gov.vn");
+                        client.DefaultRequestHeaders.TryAddWithoutValidation("Referer", "https://hoadondientu.gdt.gov.vn/");
+                        client.DefaultRequestHeaders.TryAddWithoutValidation("sec-ch-ua", "\"Google Chrome\";v=\"140\", \"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\"");
+                        client.DefaultRequestHeaders.TryAddWithoutValidation("sec-ch-ua-mobile", "?0");
+                        client.DefaultRequestHeaders.TryAddWithoutValidation("sec-ch-ua-platform", "\"Windows\"");
+                        client.DefaultRequestHeaders.TryAddWithoutValidation("Sec-Fetch-Dest", "empty");
+                        client.DefaultRequestHeaders.TryAddWithoutValidation("Sec-Fetch-Mode", "cors");
+                        client.DefaultRequestHeaders.TryAddWithoutValidation("Sec-Fetch-Site", "same-origin");
+
+                        // ================= GET CAPTCHA =================
+                        string captchaUrl = "https://hoadondientu.gdt.gov.vn/api/captcha";
+                        HttpResponseMessage response = null;
+                        string captchaBody = null;
+                        int captchaRetry = 0;
+                        int maxCaptchaRetry = 8;
+
+                        while (captchaRetry < maxCaptchaRetry)
+                        {
+                            try
+                            {
+                                using (var capReq = new HttpRequestMessage(HttpMethod.Get, captchaUrl))
+                                {
+                                    capReq.Headers.TryAddWithoutValidation("Request-Id", Guid.NewGuid().ToString());
+                                    capReq.Headers.TryAddWithoutValidation("End-Point", "/");
+                                    capReq.Headers.TryAddWithoutValidation("Action", "");
+
+                                    response = client.SendAsync(capReq).GetAwaiter().GetResult();
+                                }
+
+                                if (response.IsSuccessStatusCode)
+                                {
+                                    captchaBody = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+
+                                    // Kiểm tra HTML/WAF
+                                    if (captchaBody.TrimStart().StartsWith("<!DOCTYPE", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        throw new Exception("Captcha trả về HTML/WAF");
+                                    }
+
+                                    if (!string.IsNullOrEmpty(captchaBody) && captchaBody.Length > 20)
+                                        break;
+                                }
+                            }
+                            catch (Exception exCap)
+                            {
+                                Log($"Captcha lỗi lần {captchaRetry + 1}: {exCap.Message}");
+                            }
+
+                            captchaRetry++;
+                            Thread.Sleep(1000);
+                        }
+
+                        if (string.IsNullOrEmpty(captchaBody))
+                        {
+                            currentToken = "";
+                            Log("Không lấy được captcha sau nhiều lần thử");
+                            return;
+                        }
+
+                        MyJson myJson = JsonConvert.DeserializeObject<MyJson>(captchaBody);
+                        if (myJson == null || string.IsNullOrEmpty(myJson.Key) || string.IsNullOrEmpty(myJson.Content))
+                        {
+                            currentToken = "";
+                            Log("Captcha response thiếu key/content");
+                            return;
+                        }
+
+                        string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "output.svg");
+                        File.WriteAllText(filePath, myJson.Content);
+                        Thread.Sleep(30);
+
+                        // ================= SOLVE CAPTCHA =================
+                        SvgCaptchaSolver solver = new SvgCaptchaSolver();
+                        string captchaResult = solver.SolveCaptcha(filePath)?.Trim() ?? "";
+
+                        if (string.IsNullOrEmpty(captchaResult) || captchaResult.Length < 4)
+                        {
+                            Log($"Captcha giải sai hoặc quá ngắn: '{captchaResult}'");
+                            Thread.Sleep(1500);
+                            continue; // thử lại toàn bộ
+                        }
+
+                        // ================= LOGIN =================
+                        string loginUrl = "https://hoadondientu.gdt.gov.vn/api/security-taxpayer/authenticate";
+                        var payload = new
+                        {
+                            username = username,
+                            password = password,
+                            cvalue = captchaResult,
+                            ckey = myJson.Key
+                        };
+
+                        string jsonPayload = JsonConvert.SerializeObject(payload);
+                        var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+                        using (var loginReq = new HttpRequestMessage(HttpMethod.Post, loginUrl))
+                        {
+                            loginReq.Headers.TryAddWithoutValidation("Request-Id", Guid.NewGuid().ToString());
+                            loginReq.Headers.TryAddWithoutValidation("End-Point", "/");
+                            loginReq.Headers.TryAddWithoutValidation("Action", "");
+                            loginReq.Content = content;
+
+                            response = client.SendAsync(loginReq).GetAwaiter().GetResult();
+                        }
+
+                        string rsBody = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+
+                        // Kiểm tra HTML/WAF
+                        if (rsBody.TrimStart().StartsWith("<!DOCTYPE", StringComparison.OrdinalIgnoreCase))
+                        {
+                            Log("Login bị WAF trả HTML");
+                            Thread.Sleep(2000);
+                            continue;
+                        }
+
+                        // Xử lý sai mật khẩu
+                        try
+                        {
+                            var jsonBody = JObject.Parse(rsBody);
+                            string message = jsonBody["message"]?.ToString();
+                            if (message == "Tên đăng nhập hoặc mật khẩu không đúng")
+                            {
+                                XtraMessageBox.Show("Tên đăng nhập hoặc mật khẩu không đúng");
+                                currentToken = "-1";
+                                lstCongtyKhoa.Add(username);
+                                return;
+                            }
+                        }
+                        catch { }
+
+                        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                        {
+                            Log($"⚠️ Đăng nhập thất bại (401) lần {retryCount}");
+                            Thread.Sleep(2000);
+                            continue;
+                        }
+
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            Log($"Login lỗi HTTP {(int)response.StatusCode}: {rsBody.Substring(0, Math.Min(300, rsBody.Length))}");
+                            Thread.Sleep(2000);
+                            continue;
+                        }
+
+                        // Lấy token
+                        var tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(rsBody);
+                        if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.token))
+                        {
+                            // Fallback tìm JWT
+                            var match = System.Text.RegularExpressions.Regex.Match(rsBody, @"""(eyJ[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+)""");
+                            if (match.Success)
+                                currentToken = match.Groups[1].Value;
+                            else
+                            {
+                                Log("Không tìm thấy token trong response");
+                                currentToken = "";
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            currentToken = tokenResponse.token;
+                        }
+
+                        this.tokken = currentToken;
+
+                        // ================= CONFIRM PROFILE =================
+                        try
+                        {
+                            using (var req = new HttpRequestMessage(HttpMethod.Get, "https://hoadondientu.gdt.gov.vn/api/security-taxpayer/profile"))
+                            {
+                                req.Headers.TryAddWithoutValidation("Request-Id", Guid.NewGuid().ToString());
+                                req.Headers.TryAddWithoutValidation("End-Point", "/");
+                                req.Headers.TryAddWithoutValidation("Action", "");
+                                req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", this.tokken);
+
+                                var profRes = client.SendAsync(req).GetAwaiter().GetResult();
+                                if (profRes.IsSuccessStatusCode)
+                                {
+                                    string profBody = profRes.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                                    var prof = JsonConvert.DeserializeObject<ProfileResponse>(profBody);
+
+                                    if (prof != null && !string.IsNullOrEmpty(prof.password_expire))
+                                    {
+                                        DateTime expireDate = DateTime.Parse(prof.password_expire);
+                                        TimeSpan remain = expireDate - DateTime.Now;
+
+                                        if (remain.TotalDays <= 0)
+                                        {
+                                            currentToken = "";
+                                            lstCongtyKhoa.Add(username);
+                                            XtraMessageBox.Show(
+                                                $"Mật khẩu đã hết hạn ngày {expireDate:dd/MM/yyyy}.",
+                                                "Hết hạn!",
+                                                MessageBoxButtons.OK,
+                                                MessageBoxIcon.Warning);
+                                            return;
+                                        }
+                                        else if (remain.TotalDays <= 3)
+                                        {
+                                            XtraMessageBox.Show(
+                                                $"⚠ Mật khẩu sẽ hết hạn sau {remain.Days} ngày!\nNgày: {expireDate:dd/MM/yyyy}",
+                                                "Cảnh báo",
+                                                MessageBoxButtons.OK,
+                                                MessageBoxIcon.Warning);
+                                        }
+                                        else if (remain.TotalDays <= 7)
+                                        {
+                                            XtraMessageBox.Show($"Mật khẩu sắp hết hạn {expireDate:dd/MM/yyyy} (còn {remain.Days} ngày)");
+                                        }
+
+                                        UpdateDateExpert(rowCopy, expireDate);
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception exProf)
+                        {
+                            Log("Không kiểm tra được ngày hết hạn: " + exProf.Message);
+                        }
+
+                        Log($"✅ Token trả về: {currentToken.Substring(0, Math.Min(20, currentToken.Length))}...");
+                        return; // Thành công
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log($"⚠️ Lỗi lấy token lần {retryCount}: {ex.Message}");
+
+                    if (retryCount >= maxRetry)
+                    {
+                        currentToken = "";
+                        return;
+                    }
+                    Thread.Sleep(2000);
+                }
+            }
+
+            currentToken = "";
+        }
+
+
         #region Token & Authentication
-        public void Gettokken(string username, string password, ref string currentToken, string connectist,DataRow rowCopy)
+        public void Gettokkenold(string username, string password, ref string currentToken, string connectist,DataRow rowCopy)
         {
             int maxRetry = 3;
             int retryCount = 0;
@@ -1393,19 +1665,56 @@ namespace ToolTaiHD
                 _token = token;
                 _companyName = companyName;
 
-                _httpClient = new HttpClient();
+                var handler = new HttpClientHandler()
+                {
+                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate ,
+                    AllowAutoRedirect = true
+                };
+
+                _httpClient = new HttpClient(handler);
                 _httpClient.Timeout = TimeSpan.FromSeconds(120);
+
+                _httpClient.DefaultRequestHeaders.Clear();
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/octet-stream"));
-                _httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
+
+                // User-Agent đầy đủ
+                _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent",
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36");
+
+                _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Language", "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7");
+                _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Origin", "https://hoadondientu.gdt.gov.vn");
+                _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Referer", "https://hoadondientu.gdt.gov.vn/tra-cuu/tra-cuu-hoa-don");
+                _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("sec-ch-ua", "\"Google Chrome\";v=\"140\", \"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\"");
+                _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("sec-ch-ua-mobile", "?0");
+                _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("sec-ch-ua-platform", "\"Windows\"");
+                _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Sec-Fetch-Dest", "empty");
+                _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Sec-Fetch-Mode", "cors");
+                _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Sec-Fetch-Site", "same-origin");
             }
 
-            public async Task<HttpResponseMessage> GetAsync(string url)
+            /// <summary>
+            /// Thêm header đặc thù GDT
+            /// </summary>
+            private void AddGdtHeaders(HttpRequestMessage request, string endPoint = "/tra-cuu/tra-cuu-hoa-don", string action = "")
+            {
+                request.Headers.TryAddWithoutValidation("Request-Id", Guid.NewGuid().ToString());
+                request.Headers.TryAddWithoutValidation("End-Point", endPoint);
+                request.Headers.TryAddWithoutValidation("Action", string.IsNullOrEmpty(action) ? "" : Uri.EscapeDataString(action));
+            }
+
+            public async Task<HttpResponseMessage> GetAsync(string url, string action = "")
             {
                 await _semaphore.WaitAsync();
                 try
                 {
-                    return await _httpClient.GetAsync(url);
+                    using (var request = new HttpRequestMessage(HttpMethod.Get, url))
+                    {
+                        AddGdtHeaders(request, action: action);
+                        return await _httpClient.SendAsync(request);
+                    }
                 }
                 finally
                 {
@@ -1413,9 +1722,9 @@ namespace ToolTaiHD
                 }
             }
 
-            public async Task<bool> DownloadFileAsync(string url, string filePath,int timeoutSeconds)
+            public async Task<bool> DownloadFileAsync(string url, string filePath, int timeoutSeconds, string action = "")
             {
-                int maxRetry = 3; 
+                int maxRetry = 3;
 
                 for (int retry = 1; retry <= maxRetry; retry++)
                 {
@@ -1423,34 +1732,77 @@ namespace ToolTaiHD
                     {
                         using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds)))
                         {
-                            var response = await GetAsync(url);
-
-                            if ((int)response.StatusCode == 429)
+                            using (var request = new HttpRequestMessage(HttpMethod.Get, url))
                             {
-                                Log($"⚠️ {_companyName}: Rate limit! Chờ 5s...");
-                                await Task.Delay(5000);
-                                continue;
-                            }
+                                AddGdtHeaders(request, action: action);
 
-                            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                            {
-                                Log($"❌ {_companyName}: Token hết hạn!");
-                                return false;
-                            }
+                                var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
 
-                            if (response.IsSuccessStatusCode)
-                            {
-                                using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                                if ((int)response.StatusCode == 429)
                                 {
-                                    // ❌ KHÔNG truyền token vào đây
-                                    await response.Content.CopyToAsync(fs);
+                                    Log($"⚠️ {_companyName}: Rate limit! Chờ 5s...");
+                                    await Task.Delay(5000);
+                                    continue;
                                 }
-                                return true;
-                            }
-                            if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
-                            {
-                                //Tải thử cho xml tự tạo
-                               // GetKNMXMLAsync(mstnb, getSHHD, getSohd, tokken, getdate, folderpath, filename,this);
+
+                                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                                {
+                                    Log($"❌ {_companyName}: Token hết hạn!");
+                                    return false;
+                                }
+
+                                if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                                {
+                                    string errBody = await response.Content.ReadAsStringAsync();
+                                    bool isHtml = errBody.TrimStart().StartsWith("<!DOCTYPE", StringComparison.OrdinalIgnoreCase);
+
+                                    Log($"❌ {_companyName}: Bị 403 {(isHtml ? "(WAF/HTML)" : "")} lần {retry}");
+
+                                    if (retry < maxRetry)
+                                    {
+                                        await Task.Delay(retry * 2500);
+                                        continue;
+                                    }
+                                    return false;
+                                }
+
+                                if (response.IsSuccessStatusCode)
+                                {
+                                    // Tạo thư mục nếu cần
+                                    string dir = Path.GetDirectoryName(filePath);
+                                    if (!string.IsNullOrEmpty(dir))
+                                        Directory.CreateDirectory(dir);
+
+                                    using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, 81920, true))
+                                    {
+                                        await response.Content.CopyToAsync(fs);
+                                    }
+
+                                    // Kiểm tra file quá nhỏ
+                                    var fi = new FileInfo(filePath);
+                                    if (fi.Length < 1024)
+                                    {
+                                        Log($"⚠️ {_companyName}: File tải về quá nhỏ ({fi.Length} bytes)");
+                                        try { File.Delete(filePath); } catch { }
+                                        if (retry < maxRetry)
+                                        {
+                                            await Task.Delay(retry * 2000);
+                                            continue;
+                                        }
+                                        return false;
+                                    }
+
+                                    return true;
+                                }
+
+                                if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+                                {
+                                    Log($"⚠️ {_companyName}: Lỗi 500 từ server lần {retry}");
+                                }
+                                else
+                                {
+                                    Log($"⚠️ {_companyName}: HTTP {(int)response.StatusCode} lần {retry}");
+                                }
                             }
                         }
                     }
@@ -1461,53 +1813,49 @@ namespace ToolTaiHD
                     catch (Exception ex)
                     {
                         Log($"⚠️ {_companyName}: Lỗi lần {retry}: {ex.Message}");
-                        if (retry < maxRetry)
-                            await Task.Delay(retry * 2000);
                     }
+
+                    if (retry < maxRetry)
+                        await Task.Delay(retry * 2000);
                 }
+
                 return false;
             }
+
             public async Task GetKNMXMLAsync(string nbmst, string khhdon, string shdon, string tokken,
-     DateTime GetNLap, string path, string filename, string companyName, Form1 form, TTinChung TTinChung)
+                DateTime GetNLap, string path, string filename, string companyName, Form1 form, TTinChung TTinChung)
             {
                 try
                 {
                     string url = $"https://hoadondientu.gdt.gov.vn/api/query/invoices/detail?nbmst={nbmst}&khhdon={khhdon}&shdon={shdon}&khmshdon=1";
 
-                    using (var client = new HttpClient())
+                    using (var request = new HttpRequestMessage(HttpMethod.Get, url))
                     {
-                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokken);
-                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                        client.Timeout = TimeSpan.FromSeconds(30);
+                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokken);
+                        AddGdtHeaders(request, action: "Chi tiết hóa đơn");
 
-                        try
+                        using (var response = await _httpClient.SendAsync(request))
                         {
-                            HttpResponseMessage response = await client.GetAsync(url);
-
                             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                             {
-                                Log($"❌ {companyName}: Token hết hạn khi lấy KNM XML cho HĐ {shdon}"); 
+                                Log($"❌ {companyName}: Token hết hạn khi lấy KNM XML cho HĐ {shdon}");
                                 return;
                             }
 
                             if (response.IsSuccessStatusCode)
                             {
                                 string responseBody = await response.Content.ReadAsStringAsync();
-
                                 if (string.IsNullOrEmpty(responseBody))
                                 {
-                                    Log($"⚠️ {companyName}: Response rỗng cho HĐ {shdon}"); 
+                                    Log($"⚠️ {companyName}: Response rỗng cho HĐ {shdon}");
                                     return;
                                 }
 
                                 var rootObject = JsonConvert.DeserializeObject<Invoice>(responseBody);
+                                TaoFileXmlChiCoDLHDon(path, filename.Replace(".zip", ""), rootObject, GetNLap);
 
-                                TaoFileXmlChiCoDLHDon(path, filename.Replace(".zip", ""), rootObject, GetNLap); 
-
-                                // ✅ Gọi DocfileXmlOne qua instance của Form1
                                 string ph = Path.Combine(path, filename.Replace(".zip", "_KNM.xml"));
-                                await form.DocfileXmlOne(ph, 1, 1,"", TTinChung); // ✅ SỬA: gọi qua form instance
-                                  
+                                await form.DocfileXmlOne(ph, 1, 1, "", TTinChung);
 
                                 Log($"✅ {companyName}: Tạo KNM XML thành công cho HĐ {shdon}");
                             }
@@ -1516,28 +1864,25 @@ namespace ToolTaiHD
                                 Log($"⚠️ {companyName}: Lỗi API cho HĐ {shdon}: {response.StatusCode}");
                             }
                         }
-                        catch (TaskCanceledException)
-                        {
-                            Log($"⏰ {companyName}: Timeout khi lấy KNM XML cho HĐ {shdon}"); 
-                        }
-                        catch (HttpRequestException ex)
-                        {
-                            Log($"❌ {companyName}: Lỗi HttpRequest khi lấy KNM XML: {ex.Message}"); 
-                        }
-                        catch (Exception ex)
-                        {
-                            Log($"❌ {companyName}: Lỗi GetKNMXMLAsync: {ex.Message}"); 
-                        }
                     }
+                }
+                catch (TaskCanceledException)
+                {
+                    Log($"⏰ {companyName}: Timeout khi lấy KNM XML cho HĐ {shdon}");
+                }
+                catch (HttpRequestException ex)
+                {
+                    Log($"❌ {companyName}: Lỗi HttpRequest khi lấy KNM XML: {ex.Message}");
                 }
                 catch (Exception ex)
                 {
-                    Log($"❌ {companyName}: Lỗi GetKNMXMLAsync: {ex.Message}"); 
+                    Log($"❌ {companyName}: Lỗi GetKNMXMLAsync: {ex.Message}");
                 }
             }
-            public async Task<string> GetStringAsync(string url)
+
+            public async Task<string> GetStringAsync(string url, string action = "")
             {
-                var response = await GetAsync(url);
+                var response = await GetAsync(url, action);
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadAsStringAsync();
             }
@@ -1548,7 +1893,6 @@ namespace ToolTaiHD
                 _semaphore?.Dispose();
             }
         }
-        #endregion
 
         #region Main Processing
         //private async void btnRun_Click(object sender, EventArgs e)
@@ -1595,7 +1939,7 @@ namespace ToolTaiHD
         //        btnRun.Enabled = true;
         //    }
         //}
-       
+
 
         // ✅ Hàm cập nhật status an toàn trên UI thread
         private void UpdateStatusOnUI(DataRow row, string statusText)
@@ -2267,8 +2611,174 @@ namespace ToolTaiHD
         }
         #endregion
 
+
         #region Excel Download - Đầu Vào
-        public async Task<bool> XulyexelvaoAsync(CompanyHttpClient client, int _type, string savedPath, string companyName,string mstcongty)
+        public async Task<bool> XulyexelvaoAsync(CompanyHttpClient client, int _type, string savedPath, string companyName, string mstcongty)
+        {
+            try
+            {
+                int month = int.Parse(comboBoxEdit1.EditValue.ToString());
+                DateTime dtFrom = new DateTime(DateTime.Now.Year, month, 1);
+                DateTime dtTo = dtFrom.AddMonths(1).AddDays(-1);
+
+                string formattedDate1 = dtFrom.ToString("dd/MM/yyyy") + "T00:00:00";
+                string formattedDate2 = dtTo.ToString("dd/MM/yyyy") + "T23:59:59";
+
+                string url, filename, fileType, action;
+
+                switch (_type)
+                {
+                    case 1: // Có mã CQT
+                        url = $"https://hoadondientu.gdt.gov.vn/api/query/invoices/export-excel-sold?sort=tdlap:desc,khmshdon:asc,shdon:desc&search=tdlap=ge={formattedDate1};tdlap=le={formattedDate2};ttxly==5&type=purchase";
+                        filename = $"{mstcongty}_HDDienTuDaCapMa.xlsx";
+                        fileType = "hóa đơn điện tử có mã";
+                        action = "Xuất excel (hóa đơn mua vào)";
+                        break;
+
+                    case 2: // Không mã CQT
+                        url = $"https://hoadondientu.gdt.gov.vn/api/query/invoices/export-excel-sold?sort=tdlap:desc,khmshdon:asc,shdon:desc&search=tdlap=ge={formattedDate1};tdlap=le={formattedDate2};ttxly==6&type=purchase";
+                        filename = $"{mstcongty}_HDDienTuKhongMa.xlsx";
+                        fileType = "hóa đơn điện tử không mã";
+                        action = "Xuất excel (hóa đơn mua vào)";
+                        break;
+
+                    case 3: // Máy tính tiền
+                        url = $"https://hoadondientu.gdt.gov.vn/api/sco-query/invoices/export-excel-sold?sort=tdlap:desc,khmshdon:asc,shdon:desc&search=tdlap=ge={formattedDate1};tdlap=le={formattedDate2};ttxly==8&type=purchase";
+                        filename = $"{mstcongty}_HDDienTuMayTinhTien.xlsx";
+                        fileType = "hóa đơn máy tính tiền";
+                        action = "Xuất excel (hóa đơn máy tính tiền mua vào)";
+                        break;
+
+                    default:
+                        return false;
+                }
+
+                string currentYear = $"HD{DateTime.Now.Year}";
+                string directoryPath = Path.Combine(savedPath, currentYear, "HDVao", month.ToString());
+                Directory.CreateDirectory(directoryPath);
+                string filePath = Path.Combine(directoryPath, filename);
+
+                if (File.Exists(filePath))
+                {
+                    TimeSpan ts = DateTime.Now - File.GetLastWriteTime(filePath);
+                    if (ts.TotalMinutes < 300)
+                    {
+                        Log($"✅ {companyName}: Đã có file {fileType} (còn mới)");
+                        return true;
+                    }
+                    File.Delete(filePath);
+                }
+
+                Log($"📥 {companyName}: Đang tải {fileType} đầu vào...");
+
+                // Nếu CompanyHttpClient hỗ trợ truyền action thì thêm vào
+                bool success = await client.DownloadFileAsync(url, filePath, int.Parse(txttimeout.Text));
+
+                if (success)
+                {
+                    // Kiểm tra file có phải Excel thật không
+                    var fi = new FileInfo(filePath);
+                    if (fi.Length < 2048)
+                    {
+                        Log($"❌ {companyName}: File {fileType} quá nhỏ ({fi.Length} bytes)");
+                        try { File.Delete(filePath); } catch { }
+                        return false;
+                    }
+
+                    Log($"✅ {companyName}: Đã tải xong {fileType} đầu vào");
+                    return true;
+                }
+                else
+                {
+                    Log($"❌ {companyName}: Tải {fileType} đầu vào thất bại!");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"❌ {companyName}: Lỗi XulyexelvaoAsync: {ex.Message}");
+                return false;
+            }
+        }
+        public async Task<bool> XulyexelraAsync(CompanyHttpClient client, int _type, string savedPath, string companyName, string mstcongtys)
+        {
+            try
+            {
+                int month = int.Parse(comboBoxEdit1.EditValue.ToString());
+                DateTime dtFrom = new DateTime(DateTime.Now.Year, month, 1);
+                DateTime dtTo = dtFrom.AddMonths(1).AddDays(-1);
+
+                string formattedDate1 = dtFrom.ToString("dd/MM/yyyy") + "T00:00:00";
+                string formattedDate2 = dtTo.ToString("dd/MM/yyyy") + "T23:59:59";
+
+                string url, filename, fileType, action;
+
+                switch (_type)
+                {
+                    case 1: // Hóa đơn điện tử đầu ra
+                        url = $"https://hoadondientu.gdt.gov.vn/api/query/invoices/export-excel?sort=tdlap:desc,khmshdon:asc,shdon:desc&search=tdlap=ge={formattedDate1};tdlap=le={formattedDate2}";
+                        filename = $"{mstcongtys}_Hoadondientu.xlsx";
+                        fileType = "hóa đơn điện tử (đầu ra)";
+                        action = "Xuất excel (hóa đơn bán ra)";
+                        break;
+
+                    case 2: // Hóa đơn máy tính tiền đầu ra
+                        url = $"https://hoadondientu.gdt.gov.vn/api/sco-query/invoices/export-excel?sort=tdlap:desc,khmshdon:asc,shdon:desc&search=tdlap=ge={formattedDate1};tdlap=le={formattedDate2}";
+                        filename = $"{mstcongtys}_HDDienTuMayTinhTien.xlsx";
+                        fileType = "hóa đơn máy tính tiền (đầu ra)";
+                        action = "Xuất excel (hóa đơn máy tính tiền bán ra)";
+                        break;
+
+                    default:
+                        return false;
+                }
+
+                string currentYear = $"HD{DateTime.Now.Year}";
+                string directoryPath = Path.Combine(savedPath, currentYear, "HDRa", month.ToString());
+                Directory.CreateDirectory(directoryPath);
+                string filePath = Path.Combine(directoryPath, filename);
+
+                if (File.Exists(filePath))
+                {
+                    TimeSpan ts = DateTime.Now - File.GetLastWriteTime(filePath);
+                    if (ts.TotalMinutes < 300)
+                    {
+                        Log($"✅ {companyName}: Đã có file {fileType} (còn mới)");
+                        return true;
+                    }
+                    File.Delete(filePath);
+                }
+
+                Log($"📤 {companyName}: Đang tải {fileType}...");
+
+                bool success = await client.DownloadFileAsync(url, filePath, int.Parse(txttimeout.Text));
+
+                if (success)
+                {
+                    var fi = new FileInfo(filePath);
+                    if (fi.Length < 2048)
+                    {
+                        Log($"❌ {companyName}: File {fileType} quá nhỏ ({fi.Length} bytes)");
+                        try { File.Delete(filePath); } catch { }
+                        return false;
+                    }
+
+                    Log($"✅ {companyName}: Đã tải xong {fileType}");
+                    return true;
+                }
+                else
+                {
+                    Log($"❌ {companyName}: Tải {fileType} thất bại!");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"❌ {companyName}: Lỗi XulyexelraAsync: {ex.Message}");
+                return false;
+            }
+        }
+        public async Task<bool> XulyexelvaoAsyncold(CompanyHttpClient client, int _type, string savedPath, string companyName,string mstcongty)
         {
             try
             {
@@ -2343,7 +2853,7 @@ namespace ToolTaiHD
 
         #region Excel Download - Đầu Ra
         #region Excel Download - Đầu Ra (HDRa)
-        public async Task<bool> XulyexelraAsync(CompanyHttpClient client, int _type, string savedPath, string companyName,string mstcongtys)
+        public async Task<bool> XulyexelraAsyncold(CompanyHttpClient client, int _type, string savedPath, string companyName,string mstcongtys)
         {
             try
             {
@@ -6933,7 +7443,7 @@ string mst, string shDon, DateTime nLap, int Types)
           
         }
     }
-
+    #endregion
     #region Extension Methods
     public static class HttpClientExtensions
     {

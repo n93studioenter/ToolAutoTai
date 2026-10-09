@@ -9,14 +9,14 @@
     <framework targetVersion="4.7.2" profile="Full" supportedRuntime="4.0.30319" />
   </compatibleFrameworks>
   <dependency>
-    <dependentAssembly dependencyType="install" codebase="ToolTaiHD.exe.manifest" size="80556">
+    <dependentAssembly dependencyType="install" codebase="ToolTaiHD.exe.manifest" size="54054">
       <assemblyIdentity name="ToolTaiHD.exe" version="1.0.0.4" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>060wlyIiG32Hu93b1A0goda6fe9Y7ZSr26S62b5+1hE=</dsig:DigestValue>
+        <dsig:DigestValue>IVhejrXDx/9bLJ4nbSpRJJSYboGQl5/+nWA60Kk/57Q=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
