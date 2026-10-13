@@ -2671,6 +2671,7 @@ namespace ToolTaiHD
             Directory.CreateDirectory(downloadPath);
 
             ChromeOptions options = new ChromeOptions();
+            options.AddArgument("--headless=new");
             options.AddArgument("--disable-gpu");
             options.AddArgument("--no-sandbox");
             options.AddArgument("--disable-dev-shm-usage");
@@ -3028,7 +3029,7 @@ namespace ToolTaiHD
             Directory.CreateDirectory(downloadPath);
 
             ChromeOptions options = new ChromeOptions();
-            // options.AddArgument("--headless=new");
+            options.AddArgument("--headless=new");
             options.AddArgument("--disable-gpu");
             options.AddArgument("--no-sandbox");
             options.AddArgument("--disable-dev-shm-usage");
@@ -3263,6 +3264,7 @@ namespace ToolTaiHD
             Directory.CreateDirectory(downloadPath);
 
             ChromeOptions options = new ChromeOptions();
+            options.AddArgument("--headless=new");
             options.AddArgument("--disable-gpu");
             options.AddArgument("--no-sandbox");
             options.AddArgument("--disable-dev-shm-usage");
@@ -3508,6 +3510,7 @@ namespace ToolTaiHD
             Directory.CreateDirectory(downloadPath);
 
             ChromeOptions options = new ChromeOptions();
+            options.AddArgument("--headless=new");
             options.AddArgument("--disable-gpu");
             options.AddArgument("--no-sandbox");
             options.AddArgument("--disable-dev-shm-usage");
@@ -4071,7 +4074,7 @@ namespace ToolTaiHD
                 // ═══════════════════════════════════════════════════════
                 ChromeOptions options = new ChromeOptions();
 
-                //options.AddArgument("--headless=new");
+                options.AddArgument("--headless=new");
                 options.AddArgument("--disable-gpu");
                 options.AddArgument("--no-sandbox");
                 options.AddArgument("--disable-dev-shm-usage");
@@ -4621,7 +4624,7 @@ namespace ToolTaiHD
                 Directory.CreateDirectory(downloadPath);
 
                 ChromeOptions options = new ChromeOptions();
-                //options.AddArgument("--headless=new");
+                options.AddArgument("--headless=new");
                 options.AddArgument("--disable-gpu");
                 options.AddArgument("--window-size=1920,1080");
                 options.AddArgument("--disable-notifications");
@@ -4884,7 +4887,7 @@ namespace ToolTaiHD
                 Directory.CreateDirectory(downloadPath);
 
                 ChromeOptions options = new ChromeOptions();
-
+                options.AddArgument("--headless=new");
                 options.AddArgument("--disable-blink-features=AutomationControlled");
                 options.AddExcludedArgument("enable-automation");
                 options.AddAdditionalOption("useAutomationExtension", false);
@@ -5361,7 +5364,7 @@ namespace ToolTaiHD
             await Task.Run(async () =>
             {
                 ChromeOptions options = new ChromeOptions();
-                //options.AddArgument("--headless=new");
+                options.AddArgument("--headless=new");
                 options.AddArgument("--disable-gpu");
                 options.AddArgument("--window-size=1920,1080");
                 options.AddArgument("--disable-notifications");
@@ -6200,7 +6203,7 @@ namespace ToolTaiHD
                 // ⚙️ CHROME OPTIONS — CHẶN POPUP
                 // ═══════════════════════════════════════════════════════
                 ChromeOptions options = new ChromeOptions();
-
+                options.AddArgument("--headless=new");
                 options.AddArgument("--disable-features=OptimizationHints,MediaRouter,PrivacySandboxSettings4," +
                                     "PrivacySandboxAdsAPIs,InterestFeedContentSuggestions,Translate," +
                                     "AcceptCHFrame,ChromeLabs,CalculateNativeWinOcclusion," +
@@ -8849,7 +8852,7 @@ namespace ToolTaiHD
             //await TraCuuNCC(true, "3500405761", "AOEAN3B6ZH3B1FS", "13047", "D:\\DA3\\DA3\\Hoadon", 1);
             // await GetHoaDonMisa(true, "MVF0CBREBX2Q", "3502243033", "31768",1, "D:\\DA3\\DA3");  
             //await TaiBKAV(true, "3500898348", "189", "C26TSV", "b486f3cf-8754-407a-a8ed-f5206e94e7a2", @"D:\\DA3\\DA3",1);
-             await TaiSoftdream(true, "3502475274", "14933", "", "f5c5537e-b3b1-43a9-9f55-e6da4dda5ca5", "D:\\DA3\\DA3\\Hoadon", 1);
+            // await TaiSoftdream(true, "3502475274", "14933", "", "f5c5537e-b3b1-43a9-9f55-e6da4dda5ca5", "D:\\DA3\\DA3\\Hoadon", 1);
             //await TaiVisnam(true, "051080000486", "35", "", "2H0KBEXT13Q4", "D:\\DA3\\DA3\\Hoadon", 1);
 
             return;
