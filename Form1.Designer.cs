@@ -52,6 +52,7 @@
             this.gridColumn5 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn6 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn8 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colTaihdgoc = new DevExpress.XtraGrid.Columns.GridColumn();
             this.congtyBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.btnRun = new DevExpress.XtraEditors.SimpleButton();
             this.labelControl4 = new DevExpress.XtraEditors.LabelControl();
@@ -96,7 +97,6 @@
             this.timeEdit1 = new DevExpress.XtraEditors.TimeEdit();
             this.timerClock = new System.Windows.Forms.Timer(this.components);
             this.lblClock = new DevExpress.XtraEditors.LabelControl();
-            this.colTaihdgoc = new DevExpress.XtraGrid.Columns.GridColumn();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.companyBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
@@ -365,6 +365,14 @@
             this.gridColumn8.Caption = "gridColumn8";
             this.gridColumn8.FieldName = "Hople";
             this.gridColumn8.Name = "gridColumn8";
+            // 
+            // colTaihdgoc
+            // 
+            this.colTaihdgoc.Caption = "Tải hd gốc";
+            this.colTaihdgoc.FieldName = "IsDownload";
+            this.colTaihdgoc.Name = "colTaihdgoc";
+            this.colTaihdgoc.Visible = true;
+            this.colTaihdgoc.VisibleIndex = 12;
             // 
             // congtyBindingSource
             // 
@@ -940,14 +948,6 @@
             this.lblClock.Size = new System.Drawing.Size(90, 14);
             this.lblClock.TabIndex = 27;
             this.lblClock.Text = "labelControl10";
-            // 
-            // colTaihdgoc
-            // 
-            this.colTaihdgoc.Caption = "Tải hd gốc";
-            this.colTaihdgoc.FieldName = "IsDownload";
-            this.colTaihdgoc.Name = "colTaihdgoc";
-            this.colTaihdgoc.Visible = true;
-            this.colTaihdgoc.VisibleIndex = 12;
             // 
             // Form1
             // 

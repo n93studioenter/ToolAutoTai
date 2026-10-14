@@ -835,14 +835,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ToolTaiHD.exe" size="58844064">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ToolTaiHD.exe" size="58857376">
       <assemblyIdentity name="ToolTaiHD" version="1.0.0.5" language="neutral" processorArchitecture="amd64" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>RV/rzctzcE3dtqzKlNFz49DDv3vsEp+zQyw2JO5zzp8=</dsig:DigestValue>
+        <dsig:DigestValue>PaNQ73JsGEn7rKLvrh7GpC8g5gAMYLLB269bjKOQFUE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
