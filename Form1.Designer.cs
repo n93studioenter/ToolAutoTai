@@ -96,6 +96,7 @@
             this.timeEdit1 = new DevExpress.XtraEditors.TimeEdit();
             this.timerClock = new System.Windows.Forms.Timer(this.components);
             this.lblClock = new DevExpress.XtraEditors.LabelControl();
+            this.colTaihdgoc = new DevExpress.XtraGrid.Columns.GridColumn();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.companyBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
@@ -176,7 +177,8 @@
             this.gridColumn4,
             this.gridColumn5,
             this.gridColumn6,
-            this.gridColumn8});
+            this.gridColumn8,
+            this.colTaihdgoc});
             this.gridView1.DetailHeight = 280;
             this.gridView1.GridControl = this.gridControl1;
             this.gridView1.Name = "gridView1";
@@ -273,8 +275,6 @@
             this.colStatus.FieldName = "Status";
             this.colStatus.MinWidth = 19;
             this.colStatus.Name = "colStatus";
-            this.colStatus.Visible = true;
-            this.colStatus.VisibleIndex = 9;
             this.colStatus.Width = 70;
             // 
             // colIsRun
@@ -307,7 +307,7 @@
             this.gridColumn1.MinWidth = 19;
             this.gridColumn1.Name = "gridColumn1";
             this.gridColumn1.Visible = true;
-            this.gridColumn1.VisibleIndex = 10;
+            this.gridColumn1.VisibleIndex = 9;
             this.gridColumn1.Width = 58;
             // 
             // gridColumn2
@@ -336,7 +336,7 @@
             this.gridColumn4.MinWidth = 19;
             this.gridColumn4.Name = "gridColumn4";
             this.gridColumn4.Visible = true;
-            this.gridColumn4.VisibleIndex = 11;
+            this.gridColumn4.VisibleIndex = 10;
             this.gridColumn4.Width = 52;
             // 
             // gridColumn5
@@ -346,7 +346,7 @@
             this.gridColumn5.MinWidth = 19;
             this.gridColumn5.Name = "gridColumn5";
             this.gridColumn5.Visible = true;
-            this.gridColumn5.VisibleIndex = 12;
+            this.gridColumn5.VisibleIndex = 11;
             this.gridColumn5.Width = 54;
             // 
             // gridColumn6
@@ -941,6 +941,14 @@
             this.lblClock.TabIndex = 27;
             this.lblClock.Text = "labelControl10";
             // 
+            // colTaihdgoc
+            // 
+            this.colTaihdgoc.Caption = "Tải hd gốc";
+            this.colTaihdgoc.FieldName = "IsDownload";
+            this.colTaihdgoc.Name = "colTaihdgoc";
+            this.colTaihdgoc.Visible = true;
+            this.colTaihdgoc.VisibleIndex = 12;
+            // 
             // Form1
             // 
             this.Appearance.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
@@ -1080,6 +1088,7 @@
         private System.Windows.Forms.Timer timerClock;
         private DevExpress.XtraEditors.LabelControl lblClock;
         private DevExpress.XtraGrid.Columns.GridColumn gridColumn8;
+        private DevExpress.XtraGrid.Columns.GridColumn colTaihdgoc;
     }
 }
 
